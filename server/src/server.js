@@ -2,9 +2,13 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+
 const connectDB = require('./config/db');
 
 const contentRouter = require('./routes/contentRoutes');
+
 const Service = require('./models/Service');
 const Product = require('./models/Product');
 const Project = require('./models/Project');
@@ -23,6 +27,7 @@ const app = express();
 /* =========================
    CORS
 ========================= */
+
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || '*'
@@ -34,7 +39,7 @@ app.use(express.json());
 /* =========================
    UPLOADS
 ========================= */
-const path = require('path');
+
 const { UP } = require('./middleware/upload');
 
 app.use('/uploads', express.static(UP));
@@ -42,6 +47,7 @@ app.use('/uploads', express.static(UP));
 /* =========================
    HEALTH CHECK
 ========================= */
+
 app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
@@ -52,6 +58,7 @@ app.get('/api/health', (req, res) => {
 /* =========================
    SITEMAP + ROBOTS
 ========================= */
+
 app.use('/', require('./routes/sitemapRoutes'));
 
 /* =========================
@@ -253,8 +260,6 @@ if (process.env.SERVE_CLIENT === 'true') {
     'dist'
   );
 
-  const fs = require('fs');
-
   if (fs.existsSync(dist)) {
     app.use(express.static(dist));
 
@@ -312,23 +317,21 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 4000;
 
-/*
-  Local development:
-  Connect MongoDB and start Express normally.
-
-  Vercel:
-  Export the Express app.
-  Vercel will handle the serverless request.
-*/
-
 if (process.env.VERCEL !== '1') {
-  connectDB().then(() => {
-    app.listen(PORT, () => {
-      console.log(
-        `Rvmaitech API on http://localhost:${PORT}`
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(
+          `Rvmaitech API on http://localhost:${PORT}`
+        );
+      });
+    })
+    .catch((err) => {
+      console.error(
+        'Failed to start server:',
+        err
       );
     });
-  });
 }
 
 /* =========================
