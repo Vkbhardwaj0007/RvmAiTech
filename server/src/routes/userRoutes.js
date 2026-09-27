@@ -1,0 +1,11 @@
+const router = require('express').Router();
+const { list, create, setPassword, remove, setEmail } = require('../controllers/userController');
+const { protect } = require('../middleware/auth');
+const a = require('../utils/asyncHandler');
+router.use(protect);
+router.get('/', a(list));
+router.post('/', a(create));
+router.put('/:id/password', a(setPassword));
+router.put('/:id/email', a(setEmail));
+router.delete('/:id', a(remove));
+module.exports = router;
