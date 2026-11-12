@@ -1,0 +1,15 @@
+{
+  "name": "rvmaitech-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RvmAiTech full-stack website and engineering platform",
+  "scripts": {
+    "build": "npm --prefix web install && npm --prefix web run build && npm --prefix server install",
+    "start": "node server/src/server.js",
+    "server": "npm --prefix server start",
+    "web": "npm --prefix web run dev"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

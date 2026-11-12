@@ -5,7 +5,9 @@
  * and the Vercel handler can use the configured app without starting a
  * listener.
  */
+const path = require('path');
 require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const { config, assertValid } = require('./config/env');
 
