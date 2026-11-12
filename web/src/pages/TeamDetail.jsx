@@ -12,7 +12,7 @@ export default function TeamDetail() {
   if (!m) return <section><div className="wrap"><p className="muted">Loading…</p></div></section>;
   return (
     <>
-      <PageHero kicker="About Us · Leadership" title={m.name} sub={m.role} />
+      <PageHero media={m} kicker="About Us · Leadership" title={m.name} sub={m.role} />
       <section><div className="wrap">
         <div className="pd-crumb"><Link to="/leadership">Our Leadership</Link> <span>/</span> <b>{m.name}</b></div>
         <div className="member">

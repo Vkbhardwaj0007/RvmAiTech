@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import client from '../api/client';
 import { PageHero } from './_hero.jsx';
 import { useSite } from '../api/SiteContext';
 
 export default function Contact() {
+  const [params] = useSearchParams();
   const { content } = useSite();
   const info = content?.contact || {};
   const email = info.email || 'info@rvmaitech.com';
@@ -12,6 +14,20 @@ export default function Contact() {
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const prod = params.get('product');
+    const subj = params.get('subject');
+    if (prod) {
+      setForm((f) => ({
+        ...f,
+        subject: `Enquiry / Quotation for ${prod}`,
+        message: `Hello RvmAiTech team,\n\nWe would like to request a quotation and schedule a product demo for ${prod}. Please share the technical specifications, pricing details, and lead time.\n\nThank you.`,
+      }));
+    } else if (subj) {
+      setForm((f) => ({ ...f, subject: subj }));
+    }
+  }, [params]);
 
   function setF(patch) { setForm((f) => ({ ...f, ...patch })); }
 
@@ -42,8 +58,8 @@ export default function Contact() {
           {sent ? (
             <div className="sent-box">
               <div className="sent-tick">✓</div>
-              <h3>Thanks — message mil gaya!</h3>
-              <p className="muted">Hamari team jaldi contact karegi.</p>
+              <h3>Thank You — Message Received!</h3>
+              <p className="muted">Our technical team will connect with you shortly.</p>
             </div>
           ) : (
             <form onSubmit={submit}>

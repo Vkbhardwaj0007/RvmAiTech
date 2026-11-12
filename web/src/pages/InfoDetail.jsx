@@ -20,7 +20,7 @@ export default function InfoDetail({ kind }) {
 
   return (
     <>
-      <PageHero kicker={kicker} title={d.title} sub={d.summary} />
+      <PageHero media={d} kicker={kicker} title={d.title} sub={d.summary} />
       <section>
         <div className="wrap">
           <div className="pd-crumb"><Link to={back}>{kicker}</Link> <span>/</span> <b>{d.title}</b></div>

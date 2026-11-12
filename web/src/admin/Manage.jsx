@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import client from '../api/client';
 import { COLLECTIONS } from './collections';
+import { cardsFromGroups } from '../components/serviceCards';
+import PointsEditor from './PointsEditor';
 
 export default function Manage() {
   const { type } = useParams();
@@ -21,25 +23,29 @@ export default function Manage() {
 
   function blank() {
     const f = {};
-    cfg.fields.forEach((fl) => { f[fl.key] = fl.type === 'checkbox' ? true : fl.type === 'json' || fl.type === 'lines' ? [] : fl.type === 'number' ? 0 : ''; });
+    cfg.fields.forEach((fl) => { f[fl.key] = fl.default !== undefined ? fl.default : fl.type === 'checkbox' ? true : fl.type === 'json' || fl.type === 'lines' || fl.type === 'cards' ? [] : fl.type === 'number' ? 0 : ''; });
     return f;
   }
   function openCreate() { setModal({ mode: 'create', form: blank() }); }
   function openEdit(it) {
     const f = {};
-    cfg.fields.forEach((fl) => { f[fl.key] = it[fl.key] ?? (fl.type === 'json' || fl.type === 'lines' ? [] : fl.type === 'checkbox' ? true : fl.type === 'number' ? 0 : ''); });
+    cfg.fields.forEach((fl) => { f[fl.key] = it[fl.key] ?? (fl.default !== undefined ? fl.default : fl.type === 'json' || fl.type === 'lines' || fl.type === 'cards' ? [] : fl.type === 'checkbox' ? true : fl.type === 'number' ? 0 : ''); });
+    // no cards saved yet -> start from the old groups so nothing has to be retyped
+    cfg.fields.forEach((fl) => { if (fl.type === 'cards' && !(Array.isArray(f[fl.key]) && f[fl.key].length)) f[fl.key] = cardsFromGroups(it.groups); });
     setModal({ mode: 'edit', id: it._id, form: f });
   }
   function setF(k, v) { setModal((m) => ({ ...m, form: { ...m.form, [k]: v } })); }
 
-  async function uploadFile(key, file) {
-    if (!file) return;
+  async function uploadAny(file) {
     const fd = new FormData();
     fd.append('file', file);
-    try {
-      const r = await client.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setF(key, r.data.url);
-    } catch (e) { alert(e?.response?.data?.message || 'Upload failed'); }
+    const r = await client.post('/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+    return r.data.url;
+  }
+  async function uploadFile(key, file) {
+    if (!file) return;
+    try { setF(key, await uploadAny(file)); }
+    catch (e) { alert(e?.response?.data?.message || 'Upload failed'); }
   }
 
   async function save() {
@@ -52,6 +58,7 @@ export default function Manage() {
       }
       if (fl.type === 'number') body[fl.key] = Number(body[fl.key]) || 0;
       if (fl.type === 'lines' && typeof body[fl.key] === 'string') body[fl.key] = body[fl.key].split('\n').map((x) => x.trim()).filter(Boolean);
+      if (fl.type === 'cards') body[fl.key] = (Array.isArray(body[fl.key]) ? body[fl.key] : []).map((c) => ({ image: c.image || '', heading: (c.heading || '').trim(), body: (c.body || '').trim() })).filter((c) => c.heading || c.body || c.image);
     }
     try {
       if (modal.mode === 'create') await client.post(cfg.endpoint, body);
@@ -97,7 +104,12 @@ export default function Manage() {
           <div className="adm-modal">
             <div className="adm-modal-head"><h3>{modal.mode === 'create' ? 'Add' : 'Edit'} {cfg.label.replace(/s$/, '')}</h3><button onClick={() => setModal(null)}>✕</button></div>
             <div className="adm-modal-body">
-              {cfg.fields.map((fl) => (
+              {cfg.fields.map((fl) => fl.type === 'cards' ? (
+                <div className="adm-field" key={fl.key}>
+                  <span>{fl.label}</span>
+                  <CardsEditor value={Array.isArray(modal.form[fl.key]) ? modal.form[fl.key] : []} onChange={(v) => setF(fl.key, v)} upload={uploadAny} groups={modal.form.groups} />
+                </div>
+              ) : (
                 <label className="adm-field" key={fl.key}>
                   <span>{fl.label}</span>
                   {fl.type === 'textarea' && <textarea rows="3" value={modal.form[fl.key]} onChange={(e) => setF(fl.key, e.target.value)} />}
@@ -130,6 +142,54 @@ export default function Manage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+
+/* Repeater for [{image, heading, body}] cards (service detail pages). */
+function CardsEditor({ value, onChange, upload, groups }) {
+  const [busy, setBusy] = useState(-1);
+  const set = (i, patch) => onChange(value.map((c, k) => (k === i ? { ...c, ...patch } : c)));
+  const move = (i, d) => { const j = i + d; if (j < 0 || j >= value.length) return; const v = [...value]; [v[i], v[j]] = [v[j], v[i]]; onChange(v); };
+  const remove = (i) => onChange(value.filter((_, k) => k !== i));
+  const add = () => onChange([...value, { image: '', heading: '', body: '' }]);
+  async function pick(i, file) {
+    if (!file) return;
+    setBusy(i);
+    try { set(i, { image: await upload(file) }); }
+    catch (e) { alert(e?.response?.data?.message || 'Upload failed'); }
+    finally { setBusy(-1); }
+  }
+  const parsedGroups = typeof groups === 'string' ? (() => { try { return JSON.parse(groups); } catch { return []; } })() : groups;
+  return (
+    <div className="cards-ed">
+      {value.map((c, i) => (
+        <div className="cards-ed-row" key={i}>
+          <div className="cards-ed-img">
+            {c.image ? <img src={c.image} alt="" /> : <div className="cards-ed-ph">No image</div>}
+            <input type="file" accept="image/*" disabled={busy === i} onChange={(e) => { pick(i, e.target.files[0]); e.target.value = ''; }} />
+            {busy === i && <span className="muted" style={{ fontSize: 12 }}>Uploading…</span>}
+            {c.image && <button type="button" className="adm-ic danger" onClick={() => set(i, { image: '' })}>Remove image</button>}
+          </div>
+          <div className="cards-ed-fields">
+            <input placeholder="Heading" value={c.heading || ''} onChange={(e) => set(i, { heading: e.target.value })} />
+            <PointsEditor body={c.body || ''} onChange={(body) => set(i, { body })} />
+            <div className="cards-ed-actions">
+              <button type="button" className="adm-ic" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
+              <button type="button" className="adm-ic" onClick={() => move(i, 1)} disabled={i === value.length - 1}>↓</button>
+              <button type="button" className="adm-ic danger" onClick={() => remove(i)}>Remove card</button>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="cards-ed-actions">
+        <button type="button" className="adm-ic" onClick={add}>+ Add card</button>
+        {value.length === 0 && Array.isArray(parsedGroups) && parsedGroups.length > 0 && (
+          <button type="button" className="adm-ic" onClick={() => onChange(cardsFromGroups(parsedGroups))}>Create cards from the old groups</button>
+        )}
+      </div>
+      <p className="muted" style={{ fontSize: 12, margin: '6px 0 0' }}>Har card = service page par ek full-width section: ek taraf badi image (baari-baari left/right), doosri taraf heading (aakhri word orange) + text; neeche "Points" mein har point ka text likhein aur icon button se icon chunein ("Auto" = text dekh kar apne-aap). Koi card na ho to purane groups se apne-aap ban jaate hain.</p>
     </div>
   );
 }

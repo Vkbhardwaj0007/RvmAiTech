@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Application = require('../models/Application');
 const { sendContactAlert } = require('../utils/mailer');
+const { publicUrlFor } = require('../lib/publicUrl');
 
 const isEmail = (s) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(s || ''));
 
@@ -17,7 +18,10 @@ async function submit(req, res) {
   if (!isEmail(b.email)) return reject(req, res, 'Enter a valid email');
   if (!req.file) return reject(req, res, 'Resume (PDF/DOC/DOCX) is required');
 
-  const resumeUrl = `${req.protocol}://${req.get('host')}/uploads/resumes/${req.file.filename}`;
+  // Built through publicUrl: a bare req.get('host') is attacker-controlled,
+  // and a resume link stored in the CMS pointing at someone else's domain is
+  // exactly the kind of thing an admin would click in good faith.
+  const resumeUrl = publicUrlFor(req, `/uploads/resumes/${req.file.filename}`);
   const doc = await Application.create({
     name: b.name, email: b.email, phone: b.phone,
     position: b.position || 'General application',

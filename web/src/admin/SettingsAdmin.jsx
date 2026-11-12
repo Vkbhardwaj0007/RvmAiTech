@@ -112,6 +112,8 @@ export default function SettingsAdmin() {
         </div>
         <label className="adm-field"><span>Ya external video URLs (optional — direct .mp4/.webm links, comma-separated; upar upload ho toh ye ignore hota hai)</span><input value={hero.video || ''} onChange={(e) => setHero({ ...hero, video: e.target.value })} /></label>
 
+        <p className="muted" style={{ fontSize: 12.5, marginTop: 14 }}>Baaki pages (About, Services, Products…) ka hero background aur intro text/image <b>Pages</b> section se set hota hai.</p>
+
         <h3 className="rep-title" style={{ color: 'var(--navy)', marginTop: 18 }}>Google Analytics</h3>
         <label className="adm-field"><span>Measurement ID (G-XXXXXXX)</span><input value={ga} onChange={(e) => setGa(e.target.value)} placeholder="G-XXXXXXXXXX" /></label>
 

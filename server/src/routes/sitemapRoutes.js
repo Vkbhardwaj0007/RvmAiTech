@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { publicOrigin } = require('../lib/publicUrl');
 const Product = require('../models/Product');
 const Service = require('../models/Service');
 const Technology = require('../models/Technology');
@@ -7,12 +8,12 @@ const Post = require('../models/Post');
 const a = require('../utils/asyncHandler');
 
 function base(req) {
-  return process.env.SITE_URL || `${req.protocol}://${req.get('host')}`;
+  return process.env.SITE_URL || publicOrigin(req) || `http://localhost:${process.env.PORT || 4000}`;
 }
 
 router.get('/sitemap.xml', a(async (req, res) => {
   const b = base(req).replace(/\/$/, '');
-  const staticPaths = ['/', '/about', '/services', '/technologies', '/products', '/projects', '/leadership', '/news', '/careers', '/blog', '/contact'];
+  const staticPaths = ['/', '/about', '/services', '/technologies', '/products', '/projects', '/leadership', '/news', '/careers', '/blog', '/contact', '/clients', '/privacy', '/terms'];
   const [products, services, techs, projects, posts] = await Promise.all([
     Product.find({ published: true }).select('slug updatedAt').lean(),
     Service.find({ published: true }).select('slug updatedAt').lean(),

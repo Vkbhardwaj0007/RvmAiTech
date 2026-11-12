@@ -1,21 +1,54 @@
 import { useSite } from '../api/SiteContext';
+
+/**
+ * Brand mark.
+ *
+ * Order of preference:
+ *   1. a logo uploaded in Admin → Settings (content.logo) — always wins
+ *   2. the bundled RvmAiTech mark in web/public/brand/
+ *
+ * Two bundled files, not one. The supplied artwork is blue and red, which
+ * measures 3.5:1 and 3.2:1 against the navy header — under the 4.5:1 needed to
+ * read comfortably. So the header and footer, which sit on navy, use a
+ * reversed version (near-white wordmark, lifted coral accent: 14:1 and 5.4:1),
+ * and the original is kept for light backgrounds.
+ *
+ * `dark` means "this logo is sitting on a LIGHT background" — the same meaning
+ * the previous version of this component gave the prop.
+ */
+const MARK_ON_LIGHT = '/brand/rvmaitech-logo.png';
+const MARK_ON_DARK = '/brand/rvmaitech-logo-light.png';
+
+// Intrinsic size of both files. Declared so the browser reserves the right box
+// before the image loads and the header does not jump.
+const MARK_W = 563;
+const MARK_H = 150;
+
 export default function Logo({ dark = false }) {
   const { content } = useSite();
-  const logo = content?.logo;
-  if (logo) return <a href="/" className="logo"><img src={logo} alt="RvmAiTech" className="logo-img" /></a>;
-  const base = dark ? { color: '#123a72' } : {};
+  const uploaded = content?.logo;
+
+  if (uploaded) {
+    return (
+      <a href="/" className="logo" aria-label="RvmAiTech — home">
+        <img src={uploaded} alt="RvmAiTech" className="logo-img" />
+      </a>
+    );
+  }
+
   return (
-    <a href="/" className="logo">
-      <svg viewBox="0 0 48 48" width="40" height="40" fill="none" aria-hidden="true">
-        <path d="M6 8h9l10 14-10 14H6l10-14L6 8Z" fill="#f47b20" />
-        <path d="M18 8h11c6 0 10 4 10 9s-4 9-10 9h-4l7 10h-9l-9-13h6c2.4 0 4-1.4 4-3.4S30.4 16 28 16h-4v-8h-6Z" fill={dark ? '#123a72' : '#fff'} />
-        <circle cx="24" cy="24" r="6" stroke="#f47b20" strokeWidth="2.4" />
-        <circle cx="24" cy="24" r="2.2" fill="#f47b20" />
-      </svg>
-      <div>
-        <div className="logo-word"><span className="b" style={base}>Rvm</span><span className="o">Ai</span><span className="b" style={base}>Tech</span></div>
-        <div className="logo-tag">Robotics · Vision · Intelligence</div>
-      </div>
+    <a href="/" className="logo" aria-label="RvmAiTech — home">
+      <img
+        src={dark ? MARK_ON_LIGHT : MARK_ON_DARK}
+        alt="RvmAiTech — Robotics, Vision, Intelligence"
+        className="logo-img"
+        width={MARK_W}
+        height={MARK_H}
+        // The mark is above the fold in the header, so it should not be
+        // deferred behind anything else.
+        fetchPriority="high"
+        decoding="async"
+      />
     </a>
   );
 }

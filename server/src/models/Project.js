@@ -5,6 +5,12 @@ module.exports = mongoose.model('Project', new mongoose.Schema({
   client: { type: String, default: '' },
   summary: { type: String, default: '' },
   description: { type: String, default: '' },
+  problemStatement: { type: String, default: '' },
+  solution: { type: String, default: '' },
+  hardwareUsed: { type: [String], default: [] },
+  softwareUsed: { type: [String], default: [] },
+  photos: { type: [String], default: [] },
+  status: { type: String, default: 'Completed' },
   image: { type: String, default: '' },
   video: { type: String, default: '' },       // uploaded mp4 URL
   videoUrl: { type: String, default: '' },     // external YouTube/link

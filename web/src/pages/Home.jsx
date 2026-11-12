@@ -1,10 +1,31 @@
-import { useEffect, useState } from 'react';
+import { toPoint } from '../components/SplitSection';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
 import Seo from '../components/Seo';
 import { useSite } from '../api/SiteContext';
 import { useLang } from '../api/Lang';
 import HeroVideo, { parseHeroVideos } from '../components/HeroVideo';
+import PageIntro from '../components/PageIntro';
+import ClientCard from '../components/ClientCard';
+import ProductSolutionsSection from '../components/ProductSolutionsSection';
+import WhyChooseSection from '../components/WhyChooseSection';
+import ProjectResultsAndTestimonials from '../components/ProjectResultsAndTestimonials';
+import FaqSection from '../components/FaqSection';
+import DemoRequestModal from '../components/DemoRequestModal';
+import { canRun3D } from '../components/heroScene3DSupport';
+
+/**
+ * three.js is ~132 KB gzipped — far too much for the main bundle when it only
+ * draws a background flourish. Two things keep it from costing anyone:
+ *
+ *   1. It is a lazy import, so it lands in its own chunk and the page (and the
+ *      hero video) renders before any of it is fetched.
+ *   2. `canRun3D()` is consulted BEFORE the component is rendered, and
+ *      `lazy()` only fetches on render — so a phone, a reduced-motion setting
+ *      or a slow connection downloads nothing at all.
+ */
+const HeroScene3D = lazy(() => import('../components/HeroScene3D'));
 
 const FB_STATS = [
   { value: '50+', label: 'Automation projects' },
@@ -33,6 +54,17 @@ export default function Home() {
   const heroImg = content?.hero?.image;
   // admin-uploaded clips (Settings → hero videos) > external URLs > built-in 3 clips
   const heroVideos = parseHeroVideos(content?.hero?.videos?.length ? content.hero.videos : content?.hero?.video);
+  /**
+   * Decided after mount, never during render: the checks touch `navigator`
+   * and `matchMedia`, and starting false means a server-rendered or
+   * hydrating pass never reaches for the chunk.
+   */
+  const [use3D, setUse3D] = useState(false);
+  useEffect(() => { setUse3D(canRun3D()); }, []);
+
+  const [demoOpen, setDemoOpen] = useState(false);
+  const [demoProduct, setDemoProduct] = useState('MDMS (Machine Data Monitoring)');
+
   const [services, setServices] = useState([]);
   const [tech, setTech] = useState([]);
   const [products, setProducts] = useState([]);
@@ -62,22 +94,39 @@ export default function Home() {
     <>
       <Seo title="Intelligent Automation" description="RvmAiTech builds intelligent automation — process, home and industrial — with robotics, computer vision and machine intelligence." />
       {/* HERO */}
-      <section className="hero">
+      <section className="hero" id="hero">
         {heroImg
           ? <div className="hero-video on" aria-hidden="true"><img src={heroImg} alt="" /></div>
           : <HeroVideo sources={heroVideos} />}
+        {/* Sits between the video and the text. Not rendered — and therefore
+            not downloaded — on devices that opt out. */}
+        {use3D && (
+          <Suspense fallback={null}>
+            <HeroScene3D />
+          </Suspense>
+        )}
         <div className="wrap hero-inner">
-          <span className="eyebrow">{t('hero_eyebrow')}</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(13, 38, 73, 0.65)', border: '1px solid rgba(244, 123, 32, 0.7)', padding: '7px 18px', borderRadius: 30, fontSize: 13.5, fontWeight: 600, color: '#ffd5ad', marginBottom: 18, backdropFilter: 'blur(10px)', boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+            <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#f47b20', boxShadow: '0 0 10px #f47b20' }}></span>
+            <span><b>MDMS Intelligence:</b> Real-Time Machine Telemetry · 30%+ Downtime Reduction · Live OEE</span>
+          </div>
           <h1>{t('hero_l1')}<br /><span className="t2">{t('hero_l2')}</span></h1>
-          <p className="lead">{t('hero_lead')}</p>
+          <p className="lead" style={{ maxWidth: '64ch' }}>{t('hero_lead')}</p>
           <div className="hero-cta">
-            <Link to="/contact" className="btn btn-primary">{t('hero_cta1')}</Link>
-            <Link to="/services" className="btn btn-ghost">{t('hero_cta2')}</Link>
+            <button
+              type="button"
+              onClick={() => { setDemoProduct('MDMS (Machine Data Monitoring)'); setDemoOpen(true); }}
+              className="btn btn-primary"
+              style={{ cursor: 'pointer', border: 'none' }}
+            >
+              {t('hero_cta1')}
+            </button>
+            <a href="#solutions" className="btn btn-ghost">{t('hero_cta2')}</a>
           </div>
           <div className="hero-pills">
-            <div className="hero-pill"><b>Higher</b> accuracy</div>
-            <div className="hero-pill"><b>Less</b> downtime</div>
-            <div className="hero-pill"><b>Lower</b> cost per unit</div>
+            <div className="hero-pill"><b>30%+ Less</b> machine downtime (MDMS)</div>
+            <div className="hero-pill"><b>Zero Code Change</b> edge datalogging</div>
+            <div className="hero-pill"><b>100% Live</b> shop-floor OEE</div>
           </div>
         </div>
       </section>
@@ -91,22 +140,25 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ABOUT-THIS-PAGE INTRO (Admin → Pages → Home) */}
+      <PageIntro pageKey="home" slot="top" />
+
       {/* SERVICES */}
       <section>
         <div className="wrap">
-          <div className="sec-head">
+          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 46px' }}>
             <div className="sec-kicker">What we do</div>
             <h2>Three ways we put automation to work</h2>
-            <p>From a single machine to a whole plant to your living room — automation that fits how you operate.</p>
+            <p style={{ maxWidth: 640, margin: '12px auto 0' }}>From a single machine to a whole plant to your living room — automation that fits how you operate.</p>
           </div>
           <div className="grid-3">
             {services.map((s, i) => (
-              <Link className="card link" to={`/services/${s.slug}`} key={s._id || i}>
+              <Link className={`card link card-dynamic ${i % 2 === 0 ? 'hover-orange' : 'hover-blue'}`} to={`/services/${s.slug}`} key={s._id || i}>
                 <span className="card-num">{String(i + 1).padStart(2, '0')}</span>
-                <div className="card-ico">{iconFor(s.icon)}</div>
+                <div className="card-ico card-icon-wrap">{iconFor(s.icon)}</div>
                 <h3>{s.title}</h3><p>{s.summary}</p>
-                {s.features?.length > 0 && <ul className="tick">{s.features.map((f, k) => <li key={k}>{f}</li>)}</ul>}
-                <span className="card-link">Learn more →</span>
+                {s.features?.length > 0 && <ul className="tick">{s.features.map((f, k) => <li key={k}>{toPoint(f).text}</li>)}</ul>}
+                <span className="card-link card-action-link">Learn more →</span>
               </Link>
             ))}
             {services.length === 0 && <p className="muted">Services load nahi hue — backend chalu hai? (port 4000)</p>}
@@ -117,13 +169,14 @@ export default function Home() {
       {/* OUR WORKFLOW */}
       <section className="soft" id="workflow">
         <div className="wrap">
-          <div className="sec-head">
+          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 46px' }}>
             <div className="sec-kicker">How we work</div>
             <h2>Our Workflow</h2>
-            <p>A clear, step-by-step path from your process to a running, optimised automation. Click a step for details.</p>
+            <p style={{ maxWidth: 640, margin: '12px auto 0' }}>A clear, step-by-step path from your process to a running, optimised automation. Click a step for details.</p>
           </div>
           <div className="flow">
             {flowList.map((w, i) => {
+              const stepSlug = w.slug || w.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
               const inner = (
                 <>
                   <div className="flow-node">{i + 1}</div>
@@ -131,9 +184,11 @@ export default function Home() {
                   <p>{w.summary}</p>
                 </>
               );
-              return w.slug
-                ? <Link className="flow-step link" to={`/workflow/${w.slug}`} key={w._id || i}>{inner}</Link>
-                : <div className="flow-step" key={i}>{inner}</div>;
+              return (
+                <Link className="flow-step link" to={`/workflow/${stepSlug}`} key={w._id || i}>
+                  {inner}
+                </Link>
+              );
             })}
           </div>
         </div>
@@ -142,43 +197,48 @@ export default function Home() {
       {/* TECHNOLOGIES */}
       <section className="dark">
         <div className="wrap">
-          <div className="sec-head">
+          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 46px' }}>
             <div className="sec-kicker">Our core</div>
             <h2 style={{ color: '#fff' }}>Robotics, vision and intelligence</h2>
-            <p style={{ color: '#b6c6de' }}>Every solution draws on the same three strengths — so a machine can see, decide and act on its own.</p>
+            <p style={{ color: '#b6c6de', maxWidth: 640, margin: '12px auto 0' }}>Every solution draws on the same three strengths — so a machine can see, decide and act on its own.</p>
           </div>
           <div className="grid-3">
             {tech.map((t, i) => (
-              <Link className="cap link" to={`/technologies/${t.slug}`} key={t._id || i}>
-                <div className="cap-ico">{iconFor(t.icon)}</div>
+              <Link className={`cap link card-dynamic ${i % 2 === 0 ? 'hover-orange' : 'hover-blue'}`} to={`/technologies/${t.slug}`} key={t._id || i}>
+                <div className="cap-ico card-icon-wrap">{iconFor(t.icon)}</div>
                 <h3>{t.title}</h3><p>{t.summary}</p>
-                <span className="card-link" style={{ color: 'var(--orange-soft)' }}>Explore →</span>
+                <span className="card-link card-action-link">Explore →</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PRODUCTS PREVIEW */}
-      {products.length > 0 && (
+      {/* PRODUCT SOLUTIONS SHOWCASE (MDMS, Datalogger, Home Automation separated) */}
+      <ProductSolutionsSection />
+
+      {/* WHY CHOOSE RVMAITECH */}
+      <WhyChooseSection />
+
+      {/* CLIENTS — click a company → /clients/<slug> (its video + details) */}
+      {clients.length > 0 && (
         <section>
           <div className="wrap">
-            <div className="sec-head">
-              <div className="sec-kicker">Our products</div>
-              <h2>Hardware &amp; software, ready to deploy</h2>
+            <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 36px' }}>
+              <div className="sec-kicker">Trusted by</div>
+              <h2>Companies we work with</h2>
+              <p>Click a company to watch the project video and read what we built together.</p>
             </div>
-            <div className="grid-3">
-              {products.map((p) => (
-                <article className="card" key={p._id}>
-                  <div className="prod-cat">{p.category}</div>
-                  <h3>{p.name}</h3><p>{p.summary}</p>
-                  <Link to="/products" className="card-link">View products →</Link>
-                </article>
-              ))}
+            <div className="clients">
+              {clients.map((c) => <ClientCard client={c} key={c._id} />)}
             </div>
+            <div className="clients-more"><Link to="/clients" className="card-link">All companies →</Link></div>
           </div>
         </section>
       )}
+
+      {/* ACTUAL PROJECT RESULTS & CUSTOMER TESTIMONIALS */}
+      <ProjectResultsAndTestimonials />
 
       {/* INDUSTRIES */}
       <section className="soft">
@@ -195,43 +255,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CLIENTS */}
-      {clients.length > 0 && (
-        <section>
-          <div className="wrap">
-            <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 36px' }}>
-              <div className="sec-kicker">Trusted by</div>
-              <h2>Companies we work with</h2>
-            </div>
-            <div className="clients">
-              {clients.map((c) => (
-                c.url
-                  ? <a className="client" href={c.url} target="_blank" rel="noreferrer" key={c._id}>{c.logo ? <img src={c.logo} alt={c.name} /> : <span>{c.name}</span>}</a>
-                  : <div className="client" key={c._id}>{c.logo ? <img src={c.logo} alt={c.name} /> : <span>{c.name}</span>}</div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* TESTIMONIALS */}
-      <section>
-        <div className="wrap">
-          <div className="sec-head">
-            <div className="sec-kicker">Client voices</div>
-            <h2>Results that speak</h2>
-          </div>
-          <div className="grid-3">
-            {testiList.map((t, i) => (
-              <article className="quote" key={t._id || i}>
-                <div className="q-mark">“</div>
-                <p>{t.quote}</p>
-                <div className="q-by">{t.author}{t.role ? ` · ${t.role}` : ''}</div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* FAQ SECTION */}
+      <FaqSection />
 
       {/* CTA */}
       <section>
@@ -242,12 +267,25 @@ export default function Home() {
               <p>Tell us the process you want to improve. We'll propose the right mix of robotics, vision and intelligence — with a clear payback.</p>
             </div>
             <div className="cta-actions">
-              <Link to="/contact" className="btn btn-primary">Get a quote</Link>
-              <Link to="/products" className="btn btn-ghost">See products</Link>
+              <button
+                type="button"
+                onClick={() => { setDemoProduct('MDMS (Machine Data Monitoring)'); setDemoOpen(true); }}
+                className="btn btn-primary"
+                style={{ cursor: 'pointer', border: 'none' }}
+              >
+                Book a Live Demo
+              </button>
+              <Link to="/contact" className="btn btn-ghost">Get a quote</Link>
             </div>
           </div>
         </div>
       </section>
+
+      <DemoRequestModal
+        isOpen={demoOpen}
+        onClose={() => setDemoOpen(false)}
+        initialProduct={demoProduct}
+      />
     </>
   );
 }

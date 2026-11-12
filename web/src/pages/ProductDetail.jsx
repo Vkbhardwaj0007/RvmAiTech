@@ -19,7 +19,7 @@ export default function ProductDetail() {
 
   return (
     <>
-      <PageHero kicker={p.category} title={p.name} sub={p.summary} />
+      <PageHero media={p} kicker={p.category} title={p.name} sub={p.summary} />
       <section>
         <div className="wrap">
           <div className="pd-crumb"><Link to="/products">Products</Link> <span>/</span> <b>{p.name}</b></div>
@@ -53,8 +53,27 @@ export default function ProductDetail() {
             </div>
           )}
 
+          <div className="pd-pricing-box" style={{ background: '#f5f9ff', border: '1px solid #c7dcfb', borderRadius: 12, padding: '24px 28px', marginTop: 32 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+              <div>
+                <h4 style={{ margin: 0, color: '#0d2649', fontSize: 18 }}>Commercial Quotation &amp; Scoping</h4>
+                <p style={{ margin: '6px 0 0', color: '#52637a', fontSize: 14 }}>
+                  Pricing is customized according to machine count, PLC protocols, sensor I/O, and on-premise vs. cloud hosting. Includes engineering setup, hardware commissioning, and warranty support.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <Link to={`/contact?product=${encodeURIComponent(p.name)}`} className="btn btn-primary">
+                  Request Official Quotation
+                </Link>
+                <Link to="/contact" className="btn btn-ghost" style={{ border: '1px solid #1351b4', color: '#1351b4' }}>
+                  Book Demo
+                </Link>
+              </div>
+            </div>
+          </div>
+
           <div className="pd-cta">
-            <Link to="/contact" className="btn btn-primary">Enquire about {p.name}</Link>
+            <Link to={`/contact?product=${encodeURIComponent(p.name)}`} className="btn btn-primary">Enquire about {p.name}</Link>
             <Link to={`/products?category=${encodeURIComponent(p.category)}`} className="btn" style={{ border: '2px solid var(--line)', color: 'var(--navy)' }}>All {p.category} products</Link>
           </div>
         </div>

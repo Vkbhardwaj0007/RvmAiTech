@@ -32,11 +32,22 @@ export default function Footer() {
         </div>
         <div className="foot-col">
           <h4>Company</h4>
-          <Link to="/about">About Us</Link><Link to="/services">Services</Link><Link to="/technologies">Technologies</Link><Link to="/projects">Projects</Link>
+          <Link to="/about">About Us</Link>
+          <Link to="/services">Services</Link>
+          <Link to="/technologies">Technologies</Link>
+          <Link to="/projects">Projects</Link>
+          <Link to="/privacy">Privacy Policy</Link>
+          <Link to="/terms">Terms &amp; Conditions</Link>
         </div>
         <div className="foot-col">
           <h4>Products</h4>
-          <Link to="/products">All Products</Link><Link to="/products?category=MDMS">MDMS</Link><Link to="/products?category=Datalogger">Datalogger</Link><Link to="/products?category=Home%20Automation">Home Automation</Link><Link to="/contact">Request a quote</Link>
+          <Link to="/products">All Products</Link>
+          <Link to="/products?category=MDMS">MDMS (Machine Monitoring)</Link>
+          <Link to="/products?category=Datalogger">Edge Datalogger</Link>
+          <Link to="/products?category=Smart%20Parking">Smart Parking</Link>
+          <Link to="/products?category=Smart%20Home%20Automation">Smart Home Automation</Link>
+          <Link to="/products?category=School%20ERP">School &amp; Hotel ERP</Link>
+          <Link to="/contact">Request a quote</Link>
         </div>
         <div className="foot-col">
           <h4>Get in touch</h4>

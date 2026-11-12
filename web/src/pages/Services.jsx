@@ -1,3 +1,4 @@
+import { toPoint } from '../components/SplitSection';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
@@ -14,7 +15,7 @@ export default function Services() {
           <Link className="card link" to={`/services/${s.slug}`} key={s._id}>
             <div className="card-ico">{iconFor(s.icon)}</div>
             <h3>{s.title}</h3><p>{s.summary}</p>
-            {s.features?.length > 0 && <ul className="tick">{s.features.map((f, k) => <li key={k}>{f}</li>)}</ul>}
+            {s.features?.length > 0 && <ul className="tick">{s.features.map((f, k) => <li key={k}>{toPoint(f).text}</li>)}</ul>}
             <span className="card-link">Learn more →</span>
           </Link>
         ))}

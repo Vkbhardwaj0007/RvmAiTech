@@ -26,7 +26,7 @@ export default function JobDetail() {
 
   return (
     <>
-      <PageHero kicker={j.department || 'Careers'} title={j.title} sub={j.summary || `${j.type} · ${j.location}`} />
+      <PageHero media={j} kicker={j.department || 'Careers'} title={j.title} sub={j.summary || `${j.type} · ${j.location}`} />
       <section><div className="wrap job-detail">
         <div className="pd-crumb"><Link to="/careers">Careers</Link> <span>/</span> <b>{j.title}</b></div>
 

@@ -12,7 +12,7 @@ export default function PostDetail() {
   const back = p.category === 'News' ? '/news' : '/blog';
   return (
     <>
-      <PageHero kicker={p.category} title={p.title} sub={p.excerpt} />
+      <PageHero media={p} kicker={p.category} title={p.title} sub={p.excerpt} />
       <section><div className="wrap post-wrap">
         <div className="pd-crumb"><Link to={back}>{p.category === 'News' ? 'In News' : 'Blog'}</Link> <span>/</span> <b>{p.title}</b></div>
         <div className="post-meta">{p.author && <span>By {p.author}</span>} <span>{new Date(p.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span></div>

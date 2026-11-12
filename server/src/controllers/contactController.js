@@ -2,14 +2,42 @@ const ContactMessage = require('../models/ContactMessage');
 const { sendContactAlert } = require('../utils/mailer');
 
 async function submit(req, res) {
-  const { name, email, phone, subject, message } = req.body;
-  if (!name) return res.status(400).json({ message: 'name required' });
-  const m = await ContactMessage.create({ name, email, phone, subject, message });
-  // fire-and-forget email to site owner
+  const { name, email, phone, company, subject, budget, timeline, message, projectCategory, requirements } = req.body;
+  if (!name) return res.status(400).json({ message: 'Name is required' });
+  const finalSubject = subject || (projectCategory ? `[${projectCategory}] Project Inquiry` : 'Custom Hardware & Software Project Enquiry');
+  const finalMessage = message || requirements || '';
+  const m = await ContactMessage.create({
+    name,
+    email: email || '',
+    phone: phone || '',
+    company: company || '',
+    subject: finalSubject,
+    budget: budget || '',
+    timeline: timeline || '',
+    message: finalMessage,
+  });
+  // Send email to admin
+  const details = [
+    `Name: ${name}`,
+    `Company: ${company || '-'}`,
+    `Email: ${email || '-'}`,
+    `Phone / WhatsApp: ${phone || '-'}`,
+    `Project Category: ${finalSubject}`,
+    budget ? `Expected Budget: ${budget}` : null,
+    timeline ? `Project Timeline: ${timeline}` : null,
+    '',
+    `Project Requirements / Description:`,
+    finalMessage || '-',
+    '',
+    `Received: ${new Date().toLocaleString('en-IN')}`
+  ].filter((line) => line !== null).join('\n');
+
   sendContactAlert(
-    `New enquiry from ${name}`,
-    `Name: ${name}\nEmail: ${email || '-'}\nPhone: ${phone || '-'}\nSubject: ${subject || '-'}\n\nMessage:\n${message || '-'}\n\nReceived: ${new Date().toLocaleString('en-IN')}`
-  ).catch(() => {});
+    `New enquiry from ${name}${company ? ` (${company})` : ''}`,
+    details
+  ).catch((err) => {
+    console.error('Contact email notification error:', err?.message || err);
+  });
   res.status(201).json({ ok: true, id: m._id });
 }
 async function list(req, res) {

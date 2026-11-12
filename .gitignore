@@ -1,3 +1,20 @@
 ﻿node_modules/
-.env
 *.log
+
+# Secrets. The broad .env* pattern matters: a file like
+# .env.backup, .env.local or .env.production.bak holds the same
+# live credentials as .env and is the usual way they get committed
+# by accident.
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+*.bak
+
+# Uploaded media is user data, not source. Note that on an
+# ephemeral host (Render, Railway, Vercel) this directory does not
+# survive a redeploy — see DEPLOY.md.
+server/uploads/*
+!server/uploads/.gitkeep

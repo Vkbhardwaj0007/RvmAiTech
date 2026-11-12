@@ -1,5 +1,5 @@
 // Each collection: how to list, what columns, and the edit form fields.
-// field types: text | textarea | number | checkbox | json (arrays/objects)
+// field types: text | textarea | number | checkbox | json (arrays/objects) | lines | image | video | cards ([{image,heading,body}])
 export const COLLECTIONS = {
   services: {
     label: 'Services', endpoint: '/services', titleField: 'title',
@@ -8,10 +8,12 @@ export const COLLECTIONS = {
       { key: 'title', label: 'Title', type: 'text' },
       { key: 'summary', label: 'Summary', type: 'textarea' },
       { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'intro', label: 'Intro paragraph', type: 'textarea' },
-      { key: 'groups', label: 'Detail groups (JSON [{heading,items:[]}])', type: 'json' },
+      { key: 'intro', label: 'Intro paragraph ("Why <service>?" block)', type: 'textarea' },
+      { key: 'image', label: 'Main image ("Why <service>?" block, left side)', type: 'image' },
+      { key: 'cards', label: 'Detail sections — each one: big image on one side, heading + text on the other', type: 'cards' },
+      { key: 'groups', label: 'Old detail groups (JSON [{heading,items:[]}]) — only used when there are no cards', type: 'json' },
       { key: 'icon', label: 'Icon (process/home/industry/robot/vision/ai)', type: 'text' },
-      { key: 'features', label: 'Features (JSON array)', type: 'json' },
+      { key: 'features', label: 'Highlights — shown as icon points under "Why <service>?" (JSON: ["text", …] ya [{"title","description","icon"}])', type: 'json' },
       { key: 'order', label: 'Order', type: 'number' },
       { key: 'published', label: 'Published', type: 'checkbox' },
     ],
@@ -28,7 +30,7 @@ export const COLLECTIONS = {
       { key: 'positioning', label: 'Positioning (tagline)', type: 'text' },
       { key: 'buildsOn', label: 'Builds on (e.g. MDMS 2.3)', type: 'text' },
       { key: 'image', label: 'Image', type: 'image' },
-      { key: 'features', label: 'Features (JSON array)', type: 'json' },
+      { key: 'features', label: 'Features (JSON: ["text", …] ya [{"title","description","icon"}])', type: 'json' },
       { key: 'specs', label: 'Specs (JSON [{label,value}])', type: 'json' },
       { key: 'order', label: 'Order', type: 'number' },
       { key: 'published', label: 'Published', type: 'checkbox' },
@@ -36,16 +38,101 @@ export const COLLECTIONS = {
   },
   projects: {
     label: 'Projects', endpoint: '/projects', titleField: 'title',
-    columns: ['title', 'client', 'year'],
+    columns: ['title', 'client', 'year', 'status'],
     fields: [
-      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'title', label: 'Project Name', type: 'text' },
+      { key: 'status', label: 'Project Status (e.g. Live in Production / Completed)', type: 'text' },
       { key: 'client', label: 'Client', type: 'text' },
       { key: 'year', label: 'Year', type: 'text' },
       { key: 'summary', label: 'Summary', type: 'textarea' },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'image', label: 'Image', type: 'image' },
-      { key: 'video', label: 'Video upload (mp4, max 60MB)', type: 'video' },
+      { key: 'problemStatement', label: 'Problem Statement', type: 'textarea' },
+      { key: 'solution', label: 'Solution Delivered', type: 'textarea' },
+      { key: 'hardwareUsed', label: 'Hardware Used (comma-separated or JSON array)', type: 'json' },
+      { key: 'softwareUsed', label: 'Software Used (comma-separated or JSON array)', type: 'json' },
+      { key: 'description', label: 'Additional Description', type: 'textarea' },
+      { key: 'image', label: 'Cover / Primary Photo', type: 'image' },
+      { key: 'photos', label: 'Additional Project Photos (JSON array of URLs)', type: 'json' },
+      { key: 'video', label: 'Working Demo Video upload (mp4, max 60MB)', type: 'video' },
       { key: 'videoUrl', label: 'OR YouTube/video link', type: 'text' },
+      { key: 'order', label: 'Order', type: 'number' },
+      { key: 'published', label: 'Published', type: 'checkbox' },
+    ],
+  },
+  software: {
+    label: 'Software Development', endpoint: '/software-development', titleField: 'title',
+    columns: ['title', 'client', 'year'],
+    fields: [
+      { key: 'title', label: 'Project Name', type: 'text' },
+      { key: 'client', label: 'Client', type: 'text' },
+      { key: 'year', label: 'Year', type: 'text' },
+      { key: 'summary', label: 'Summary', type: 'textarea' },
+      { key: 'problemStatement', label: 'Problem Statement', type: 'textarea' },
+      { key: 'solution', label: 'Solution Delivered', type: 'textarea' },
+      { key: 'stack', label: 'Tech Stack (comma-separated or JSON array)', type: 'json' },
+      { key: 'description', label: 'Additional Description', type: 'textarea' },
+      { key: 'image', label: 'Cover / Primary Photo', type: 'image' },
+      { key: 'photos', label: 'Additional Project Photos (JSON array of URLs)', type: 'json' },
+      { key: 'video', label: 'Working Demo Video upload (mp4, max 60MB)', type: 'video' },
+      { key: 'videoUrl', label: 'OR YouTube/video link', type: 'text' },
+      { key: 'order', label: 'Order', type: 'number' },
+      { key: 'published', label: 'Published', type: 'checkbox' },
+    ],
+  },
+  erpcards: {
+    label: 'ERP Cards', endpoint: '/erp-cards', titleField: 'title',
+    columns: ['title', 'badge', 'order'],
+    fields: [
+      { key: 'title', label: 'Card Title', type: 'text' },
+      { key: 'badge', label: 'Badge / Tag (e.g. Education ERP)', type: 'text' },
+      { key: 'summary', label: 'Short Summary', type: 'textarea' },
+      { key: 'problemStatement', label: 'Problem Statement', type: 'textarea' },
+      { key: 'solution', label: 'Solution Delivered', type: 'textarea' },
+      { key: 'features', label: 'Features (JSON: ["text", …])', type: 'json' },
+      { key: 'highlights', label: 'Key Highlights (JSON: ["text", …])', type: 'json' },
+      { key: 'softwareUsed', label: 'Tech Stack (JSON: ["React", …])', type: 'json' },
+      { key: 'icon', label: 'Icon (lucide name e.g. Globe, ShieldCheck, Database)', type: 'text' },
+      { key: 'image', label: 'Cover Image', type: 'image' },
+      { key: 'order', label: 'Order', type: 'number' },
+      { key: 'published', label: 'Published', type: 'checkbox' },
+    ],
+  },
+  capabilities: {
+    label: 'Capabilities', endpoint: '/capabilities', titleField: 'title',
+    columns: ['title', 'order'],
+    fields: [
+      { key: 'title', label: 'Title', type: 'text' },
+      { key: 'summary', label: 'Summary', type: 'textarea' },
+      { key: 'problemStatement', label: 'Problem Statement', type: 'textarea' },
+      { key: 'solution', label: 'Solution Delivered', type: 'textarea' },
+      { key: 'features', label: 'Features (JSON: ["text", …])', type: 'json' },
+      { key: 'hardwareUsed', label: 'Hardware Used (JSON: ["ESP32", …])', type: 'json' },
+      { key: 'softwareUsed', label: 'Software Used (JSON: ["Node.js", …])', type: 'json' },
+      { key: 'icon', label: 'Icon (lucide name e.g. Cpu, Code, BarChart3, Database)', type: 'text' },
+      { key: 'image', label: 'Cover Image', type: 'image' },
+      { key: 'order', label: 'Order', type: 'number' },
+      { key: 'published', label: 'Published', type: 'checkbox' },
+    ],
+  },
+  stack: {
+    label: 'Technology Stack', endpoint: '/stack', titleField: 'title',
+    columns: ['title', 'category', 'color', 'order', 'published'],
+    fields: [
+      { key: 'title', label: 'Technology Name (e.g. React.js, ESP32, Modbus RTU)', type: 'text' },
+      { key: 'category', label: 'Category (IoT / Frontend / Backend / Database / AI / Cloud)', type: 'text' },
+      { key: 'color', label: 'Theme Style (orange / blue / cyan / purple / green)', type: 'text' },
+      { key: 'order', label: 'Display Order / Priority', type: 'number' },
+      { key: 'published', label: 'Published (Show on website)', type: 'checkbox' },
+    ],
+  },
+  process: {
+    label: 'Process Steps', endpoint: '/process', titleField: 'title',
+    columns: ['title', 'order'],
+    fields: [
+      { key: 'title', label: 'Step Title', type: 'text' },
+      { key: 'summary', label: 'Summary', type: 'textarea' },
+      { key: 'description', label: 'Detailed Description', type: 'textarea' },
+      { key: 'deliverables', label: 'Deliverables (JSON: ["doc1", …])', type: 'json' },
+      { key: 'icon', label: 'Icon (lucide name e.g. Layers, Cpu, Code)', type: 'text' },
       { key: 'order', label: 'Order', type: 'number' },
       { key: 'published', label: 'Published', type: 'checkbox' },
     ],
@@ -121,10 +208,11 @@ export const COLLECTIONS = {
   },
   team: {
     label: 'Leadership', endpoint: '/team', titleField: 'name',
-    columns: ['name', 'role'],
+    columns: ['name', 'role', 'founder'],
     fields: [
       { key: 'name', label: 'Name', type: 'text' },
-      { key: 'role', label: 'Role', type: 'text' },
+      { key: 'role', label: 'Role (e.g. Founder & CEO, R&D Head) — shown under the name', type: 'text' },
+      { key: 'founder', label: 'Founder / Co-Founder — show in the big cards on top', type: 'checkbox', default: false },
       { key: 'photo', label: 'Photo', type: 'image' },
       { key: 'bio', label: 'Bio (short, shown on card)', type: 'textarea' },
       { key: 'details', label: 'Full profile (paragraphs, blank line between)', type: 'textarea' },
@@ -157,13 +245,40 @@ export const COLLECTIONS = {
   },
   clients: {
     label: 'Clients', endpoint: '/clients', titleField: 'name',
-    columns: ['name', 'url'],
+    columns: ['name', 'industry', 'order'],
     fields: [
-      { key: 'name', label: 'Client name', type: 'text' },
-      { key: 'logo', label: 'Logo', type: 'image' },
-      { key: 'url', label: 'Website URL (optional)', type: 'text' },
+      { key: 'name', label: 'Company name', type: 'text' },
+      { key: 'logo', label: 'Logo (shown on the card; the name is shown when there is no logo)', type: 'image' },
+      { key: 'tagline', label: 'Tagline — one line under the name on the company page', type: 'text' },
+      { key: 'industry', label: 'Industry (e.g. Packaging, Automotive parts)', type: 'text' },
+      { key: 'location', label: 'Location (e.g. Gurugram, Haryana)', type: 'text' },
+      { key: 'since', label: 'Working together since (e.g. 2021)', type: 'text' },
+      { key: 'url', label: 'Website URL (optional — "Visit website" button)', type: 'text' },
+      { key: 'video', label: 'Video upload (mp4, max 60MB) — plays when the company is clicked', type: 'video' },
+      { key: 'videoUrl', label: 'OR video link (YouTube / Vimeo / direct .mp4) — used when no file is uploaded', type: 'text' },
+      { key: 'image', label: 'Cover image (video poster; shown when there is no video)', type: 'image' },
+      { key: 'summary', label: 'Summary (short, top of the company page)', type: 'textarea' },
+      { key: 'description', label: 'Details (paragraphs, blank line between; lines starting with "- " become points)', type: 'textarea' },
+      { key: 'highlights', label: 'What we did — one point per line (shown with icons)', type: 'lines' },
+      { key: 'sections', label: 'Detail sections — each one: image on one side, heading + text on the other', type: 'cards' },
       { key: 'order', label: 'Order', type: 'number' },
       { key: 'published', label: 'Published', type: 'checkbox' },
     ],
   },
 };
+
+// Every item that has its own page gets its own page hero (top banner of that page).
+// Empty = the hero chosen in Admin → Pages for that section is used.
+const HERO_FIELDS = [
+  { key: 'heroImage', label: '🖼️ Page hero — image (is item ke page ka top banner)', type: 'image' },
+  { key: 'heroVideo', label: '🎬 Page hero — video upload (mp4/webm, max 60MB) — image se upar priority', type: 'video' },
+  { key: 'heroVideoUrl', label: '🔗 Page hero — OR video link (direct .mp4 / YouTube / Vimeo)', type: 'text' },
+];
+['services', 'products', 'projects', 'software', 'technologies', 'workflow', 'posts', 'team', 'openings', 'clients'].forEach((k) => {
+  const c = COLLECTIONS[k];
+  if (!c) return;
+  const have = new Set(c.fields.map((f) => f.key));
+  const add = HERO_FIELDS.filter((f) => !have.has(f.key));
+  const at = c.fields.findIndex((f) => /^(title|name)$/.test(f.key));   // right after the title / name field
+  c.fields.splice(at + 1, 0, ...add);
+});

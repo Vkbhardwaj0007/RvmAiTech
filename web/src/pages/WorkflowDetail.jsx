@@ -17,7 +17,7 @@ export default function WorkflowDetail() {
 
   return (
     <>
-      <PageHero kicker="Our Workflow" title={w.title} sub={w.summary} />
+      <PageHero media={w} kicker="Our Workflow" title={w.title} sub={w.summary} />
       <section>
         <div className="wrap">
           <div className="pd-crumb"><Link to="/#workflow">Our Workflow</Link> <span>/</span> <b>{w.title}</b></div>

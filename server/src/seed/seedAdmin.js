@@ -1,11 +1,23 @@
 require('dotenv').config();
+const crypto = require('crypto');
 const connectDB = require('../config/db');
+const { config, assertValid } = require('../config/env');
+const { passwordProblems } = require('../lib/passwords');
 const User = require('../models/User');
 const Service = require('../models/Service');
 const Technology = require('../models/Technology');
 const slugify = require('../utils/slugify');
 
 (async () => {
+  // Same boot-time configuration check the server does, so seeding against a
+  // misconfigured environment fails here rather than later.
+  try {
+    assertValid();
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+
   await connectDB();
 
   // `npm run seed:fresh` -> wipe content collections first, then reseed
@@ -20,11 +32,52 @@ const slugify = require('../utils/slugify');
 
   const userId = (process.env.SEED_ADMIN_USERID || 'admin').toLowerCase();
   let admin = await User.findOne({ userId });
-  if (admin) console.log(`Admin '${userId}' exists — skip.`);
-  else {
-    admin = new User({ name: process.env.SEED_ADMIN_NAME || 'Admin', userId, password: process.env.SEED_ADMIN_PASSWORD || 'Admin@123' });
+
+  if (admin) {
+    console.log(`Admin '${userId}' exists — skip.`);
+  } else {
+    /**
+     * The previous version defaulted to the literal password `Admin@123` and
+     * printed it, and that pair was also published in README.txt. Any
+     * deployment seeded with it had a publicly known admin password.
+     *
+     * Now: a password must be supplied, or one is generated. There is no weak
+     * default, and a supplied password has to satisfy the same policy as every
+     * other password in the system.
+     */
+    const supplied = process.env.SEED_ADMIN_PASSWORD;
+    let password = supplied;
+    let generated = false;
+
+    if (!password) {
+      // 32 url-safe characters of CSPRNG output.
+      password = crypto.randomBytes(24).toString('base64url');
+      generated = true;
+    } else {
+      const problems = passwordProblems(password, { 'user ID': userId });
+      if (problems.length) {
+        console.error('SEED_ADMIN_PASSWORD is not acceptable:');
+        for (const p of problems) console.error(`  - ${p}`);
+        console.error('\nFix it in server/.env, or unset it to have one generated.');
+        process.exit(1);
+      }
+    }
+
+    admin = new User({ name: process.env.SEED_ADMIN_NAME || 'Admin', userId, password });
     await admin.save();
-    console.log(`Admin created -> ${userId} / ${process.env.SEED_ADMIN_PASSWORD || 'Admin@123'}`);
+
+    if (generated) {
+      // Printed once, to the operator running the seed. Copy it into a
+      // password manager now — it is not stored anywhere in recoverable form.
+      console.log('\n' + '='.repeat(64));
+      console.log(`Admin created.  user id: ${userId}`);
+      console.log(`                password: ${password}`);
+      console.log('This password is shown once and cannot be recovered. Save it now.');
+      console.log('='.repeat(64) + '\n');
+    } else {
+      // A supplied password is never echoed back to the console or the logs.
+      console.log(`Admin created -> ${userId} (password taken from SEED_ADMIN_PASSWORD)`);
+    }
   }
   // seed 3 default services if none
   if (await Service.countDocuments() === 0) {

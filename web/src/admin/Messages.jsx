@@ -33,7 +33,10 @@ export function Messages() {
             {msgs.map((m) => (
               <tr key={m._id} style={{ opacity: m.read ? 0.55 : 1 }}>
                 <td>{new Date(m.createdAt).toLocaleString('en-IN')}</td>
-                <td>{m.name}</td>
+                <td>
+                  <b>{m.name}</b>
+                  {m.company && <div style={{ fontSize: 12, color: '#f47b20', fontWeight: 600 }}>{m.company}</div>}
+                </td>
                 <td>{m.email || '—'}<br />{m.phone || ''}</td>
                 <td>{m.subject || '—'}</td>
                 <td>{(m.message || '').slice(0, 80)}</td>
