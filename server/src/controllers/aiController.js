@@ -1,62 +1,67 @@
 const { config } = require('../config/env');
 
 const RVMAITECH_SYSTEM_PROMPT = `
-You are the official AI Engineering Assistant of RvmAiTech (https://rvmaitech.com).
-RvmAiTech is a premier Industrial Automation, Embedded Systems, Machine Vision, Robotics, Smart Parking, IoT, and Custom Software Development engineering firm based in India.
+You are the official customer & engineering support consultant of RvmAiTech (https://rvmaitech.com).
+Your tone MUST be warm, polite, professional, and natural — exactly like a helpful human consultant communicating with a client (not like a generic encyclopedic AI).
 
-Official Leadership & Founders:
-- Founder & CEO: Mr. Vivek Bhardwaj (Embedded Systems, IoT & Machine Intelligence Engineer, Building Machines That See, Decide & Act)
-- Co-Founder & CTO: Mr. Rahul (Leads system design and floor automation delivery)
-- Managing Director (MD): Vishal (Operations, project commissioning & engineering delivery)
+Key Conversational Rules:
+1. GREETING RULE:
+   If the user says "hi", "hii", "hello", "hellow", "namaste", "hey", or any greeting, reply warmly and respectfully:
+   "Hello Sir / Madam! RvmAiTech me aapka swagat hai. Main aapki kya madad kar sakta hoon?"
+   Do NOT dump essays, lists of projects, or unsolicited bullet points on a simple greeting!
 
-Official Contact & Support:
-- WhatsApp & Phone: +91 70520 50656
-- Official Email: rvmaitech2026@gmail.com
+2. TO-THE-POINT RULE:
+   "Jo puchhega wahi reply dena, usse zyada nahi."
+   Answer ONLY what the user asks. Keep your answer crisp, accurate, polite, and to the point.
+   Address the user respectfully ("Sir / Madam").
+   Language: Match the user's language naturally (Hindi, Hinglish, or English).
 
-Company Offerings:
-1. Smart Parking Automation System (ANPR cameras, boom barriers, ultrasonic bay sensors, thermal POS billing, WhatsApp bills)
-2. Machine Vision & AI Cameras (Automated defect inspection, OCR text extraction, part identification)
-3. Industrial Robotics & Process Automation (Custom robotic actuators, conveyor automation, PLC/SCADA programming)
-4. Custom PCB Design & Hardware Development (KiCad/EasyEDA schematics, multi-layer layouts, prototyping from POC to PVT)
-5. Embedded Systems & Firmware (ESP32, STM32, ARM Cortex-M, FreeRTOS, Embedded C/C++, OTA updates)
-6. Industrial IoT & Communication (Modbus RTU/TCP, isolated RS-485, MQTT, 4G LTE gateways, local SD buffering)
-7. Enterprise ERP & SaaS Software (School & College ERP Suite, Hotel & Resort PMS)
-8. Custom Full-Stack Web & Mobile Apps (React.js, Node.js, Python FastAPI/Django, PostgreSQL, TimescaleDB, MongoDB Atlas)
+3. COMPANY & FOUNDER KNOWLEDGE:
+   - Founder & CEO: Mr. Vivek Bhardwaj (Specialist in Embedded Systems, IoT, Robotics, Computer Vision & Machine Intelligence)
+   - Co-Founder & CTO: Mr. Rahul (System Architecture & Floor Automation)
+   - Managing Director (MD): Vishal (Operations & Project Commissioning)
+   - Official WhatsApp & Phone: +91 70520 50656
+   - Official Email: rvmaitech2026@gmail.com
+   - Core Services:
+     * Smart Parking Automation (ANPR AI Cameras, Automated Boom Barriers, Ultrasonic Bay Sensors, Cloud/Offline POS Billing, WhatsApp/UPI Receipts)
+     * Industrial IoT & Automation (Modbus RTU/TCP over RS-485, PLC Telemetry, 4G Gateways, 30-day offline buffer)
+     * Custom PCB & Hardware Prototyping (KiCad/EasyEDA 2-6 layers, ESP32/STM32, Turnkey Prototypes)
+     * Machine Vision & AI Cameras (Defect Inspection, OCR Text/Expiry reading, Robot Guidance)
+     * Enterprise Software (School & College ERP, Hotel & Resort PMS)
+     * Full-Stack Web & Mobile Applications (React.js, Node.js, Python, PostgreSQL)
 
-Rules:
-- Match user's language naturally (Hindi, Hinglish, or English).
-- Be polite, technically accurate, confident, and structured.
-- Always provide direct, helpful answers to questions about the founder, leadership, services, technology, and projects.
+4. Closing:
+   Keep closing friendly and brief, offering direct WhatsApp consultation (+91 70520 50656) when relevant for quotes or demos.
 `;
 
-// Built-in intelligent knowledge matcher
+// Built-in intelligent human-like knowledge matcher
 function getBuiltinKnowledgeResponse(query, language = 'hinglish') {
   const q = (query || '').toLowerCase().trim();
 
-  // 0. Greetings Check (hi, hii, hello, helo, hlo, namaste, etc.)
+  // 0. Greetings Check (hi, hii, hello, helo, hlo, hey, namaste, pranam, etc.)
   const isGreeting =
-    /^(hi+|hello+|hey+|hlo+|helo+|namaste|namaskar|pranam|hola|greetings)(\b|\s|$)/i.test(q) ||
-    q.includes('kaise ho') ||
-    q.includes('good morning') ||
-    q.includes('good evening') ||
-    q.includes('good afternoon');
+    /^(hi+|hello+|hellow+|hey+|hlo+|helo+|namaste|namaskar|pranam|hola|greetings)(\b|\s|[!?.]|$)/i.test(q) ||
+    q === 'hi' ||
+    q === 'hii' ||
+    q === 'hello' ||
+    q === 'hellow' ||
+    q === 'hlo' ||
+    q === 'helo' ||
+    q === 'hey' ||
+    q === 'namaste' ||
+    q === 'namaskar';
 
-  if (isGreeting && q.length < 40 && !q.includes('parking') && !q.includes('founder') && !q.includes('pcb') && !q.includes('erp') && !q.includes('iot') && !q.includes('cost') && !q.includes('price')) {
-    return `Hello & Welcome to **RvmAiTech Engineering & Intelligence**! 👋
+  if (isGreeting && q.length < 35 && !q.includes('parking') && !q.includes('founder') && !q.includes('pcb') && !q.includes('erp') && !q.includes('iot') && !q.includes('cost') && !q.includes('price')) {
+    return `Hello Sir / Madam! 👋
 
-Main RvmAiTech ka AI Technical Consultant hoon.
+**RvmAiTech me aapka swagat hai.**
 
-Aap mujhse hamari company aur projects ke baare me kuch bhi pooch sakte hain, jaise:
-• 🚗 **Smart Parking Automation** (ANPR Cameras, Boom Barriers & POS Billing)
-• 👔 **Leadership & Founders** (Mr. Vivek Bhardwaj & Team)
-• 👁️ **Machine Vision & AI Cameras** (Defect Inspection & OCR)
-• 🤖 **Industrial Robotics & Process Automation** (PLCs & Custom Actuators)
-• ⚡ **Custom PCB & Hardware Prototyping** (Schematics to Production)
-• 📡 **Industrial IoT & Telemetry** (Modbus RS485 & 4G Gateways)
-• 🎓 **School & Hotel ERP Software**
-• 💼 **Project Feasibility, Cost & Quotation**
+Main aapki kya madad kar sakta hoon?`;
+  }
 
-Bataiye, main aapki kis project ya requirement me madad kar sakta hoon?`;
+  // 0.1 "Kaise ho" / "How are you"
+  if (q.includes('kaise ho') || q.includes('how are you') || q.includes('kya haal')) {
+    return `Main badhiya hoon, Sir / Madam! Aap batayein, aap kaise hain aur aaj main aapki kya madad kar sakta hoon?`;
   }
 
   // 1. Founder & Leadership Team
@@ -75,25 +80,107 @@ Bataiye, main aapki kis project ya requirement me madad kar sakta hoon?`;
     q.includes('rahul') ||
     q.includes('vishal')
   ) {
-    return `👔 **RvmAiTech Leadership & Founders**
+    return `Sir / Madam, RvmAiTech ke Founder & CEO **Mr. Vivek Bhardwaj** hain. Woh Embedded Systems, IoT, Robotics aur Machine Vision ke specialist hain.
 
-RvmAiTech ki shuruat aur leadership high-skilled engineering professionals ke dwara ki gayi hai:
+Hamari core leadership team:
+• **Mr. Vivek Bhardwaj** — Founder & CEO
+• **Mr. Rahul** — Co-Founder & CTO (System Architecture & Floor Automation)
+• **Vishal** — Managing Director (Operations & Commissioning)
 
-1. **Mr. Vivek Bhardwaj — Founder & CEO**
-   - RvmAiTech ke mukhya sansthaapak (Founder & CEO) hain.
-   - Background: Embedded Systems, IoT, Robotics, Computer Vision aur Machine Intelligence ke specialist hain.
-   - Vision: *"Building machines that see, decide, and act on their own."*
-
-2. **Mr. Rahul — Co-Founder & CTO**
-   - Floor automation systems aur hardware delivery design ko lead karte hain.
-
-3. **Vishal — Managing Director (MD)**
-   - Turnkey project deployment, client coordination aur operational commissioning dekhte hain.
-
-👉 Hamari core team se directly connect karne ya project discuss karne ke liye WhatsApp karein: **+91 70520 50656** ya email karein: **rvmaitech2026@gmail.com**`;
+Kya aapko kisi project ke silsile me team se connect karna hai?`;
   }
 
-  // 2. About RvmAiTech / What does company do
+  // 2. Smart Parking
+  if (q.includes('parking') || q.includes('boom barrier') || q.includes('anpr') || q.includes('number plate') || q.includes('car')) {
+    return `Sir / Madam, hamara Smart Parking System ek complete automated solution hai:
+
+1. **ANPR Camera**: Gaadi ka number plate sub-second me read karta hai (99%+ accuracy).
+2. **Automatic Boom Barrier**: Number verify hote hi barrier automatically khul jata hai.
+3. **Ultrasonic Bay Guidance**: Khali parking slots ki real-time green/red indicator se jankari milti hai.
+4. **POS Billing**: Exit par automated hourly fees calculation aur WhatsApp/UPI payment receipt milti hai.
+
+Kya aapko apne site ya mall/commercial building ke liye demo ya quote chahiye?`;
+  }
+
+  // 3. PCB Design & Hardware Prototyping
+  if (q.includes('pcb') || q.includes('circuit') || q.includes('schematic') || q.includes('kicad') || q.includes('prototype') || q.includes('hardware')) {
+    return `Sir / Madam, hum custom PCB design aur hardware prototyping deliver karte hain — concept schematic se lekar multi-layer layout (KiCad/EasyEDA), microcontroller firmware (ESP32/STM32) aur testing tak.
+
+Aapka hardware project kis type ka hai ya aapki kya requirements hain?`;
+  }
+
+  // 4. IoT, Modbus & Sensors
+  if (q.includes('iot') || q.includes('modbus') || q.includes('rs485') || q.includes('sensor') || q.includes('mqtt') || q.includes('telemetry') || q.includes('datalogger')) {
+    return `Sir / Madam, hamara Industrial IoT solution factory machines aur sensors ko cloud dashboard se jodta hai:
+• Modbus RTU/TCP over isolated RS-485
+• 4G LTE cellular gateways with local 30-day offline buffer memory
+• Real-time machine status, energy monitoring aur live alerts
+
+Aapko kaunsi machines ya sensors monitor karni hain?`;
+  }
+
+  // 5. Machine Vision & AI Camera
+  if (q.includes('vision') || q.includes('machine vision') || q.includes('ai camera') || q.includes('camera') || q.includes('ocr') || q.includes('defect') || q.includes('inspection')) {
+    return `Sir / Madam, hamari Machine Vision solutions me high-speed ANPR cameras, production line par surface defect inspection, aur OCR batch-code/expiry reading shamil hai.
+
+Aapka inspection ya vision use-case kis industry ke liye hai?`;
+  }
+
+  // 6. School ERP / Education
+  if (q.includes('school') || q.includes('college') || (q.includes('erp') && (q.includes('student') || q.includes('fee')))) {
+    return `Sir / Madam, hamare School ERP me fees collection, automated receipts, biometric/RFID attendance, WhatsApp alerts, exam marks entry aur report cards ka complete system milta hai.
+
+Kya aapko school ya institute ke liye demo dekhna hai?`;
+  }
+
+  // 7. Hotel ERP / PMS
+  if (q.includes('hotel') || q.includes('resort') || q.includes('pms') || q.includes('room billing')) {
+    return `Sir / Madam, hamare Hotel PMS me front-desk check-in/out, multi-counter restaurant POS (KOT billing), room service aur housekeeping management ek hi software me manage hota hai.
+
+Kya aapko hotel ya resort ke liye quotation chahiye?`;
+  }
+
+  // 8. Robotics & Process Automation
+  if (q.includes('robot') || q.includes('robotic') || q.includes('process automation') || q.includes('automation') || q.includes('plc') || q.includes('factory') || q.includes('conveyor')) {
+    return `Sir / Madam, hum industrial robotics aur assembly-line automation deliver karte hain, jisme PLC/SCADA programming (Siemens, Delta, Mitsubishi), custom pick-and-place actuators aur safety interlocks shamil hain.
+
+Aapka automation requirement kis machine ya process ke liye hai?`;
+  }
+
+  // 9. Pricing, Cost & Quote
+  if (q.includes('price') || q.includes('cost') || q.includes('budget') || q.includes('quote') || q.includes('rate') || q.includes('kitna') || q.includes('kharcha')) {
+    return `Sir / Madam, project ka cost uske scale aur requirements par depend karta hai:
+• **Custom IoT / PCB Prototype**: lagbhag ₹25,000 se ₹75,000
+• **Smart Parking / Factory Automation**: site size aur cameras/gates ke mutabiq custom quote banta hai.
+
+Exact quotation ke liye aap apni requirements hamare WhatsApp **+91 70520 50656** par share kar sakte hain, hum turant estimate de denge.`;
+  }
+
+  // 10. Contact Info
+  if (q.includes('contact') || q.includes('phone') || q.includes('number') || q.includes('email') || q.includes('whatsapp') || q.includes('call')) {
+    return `Sir / Madam, aap humse directly contact kar sakte hain:
+• 📞 **WhatsApp & Call**: +91 70520 50656
+• ✉️ **Email**: rvmaitech2026@gmail.com
+• 🌐 **Website**: https://rvmaitech.com
+
+Aap direct WhatsApp par message bhejkar consultation schedule kar sakte hain!`;
+  }
+
+  // 11. Office Location / Address
+  if (q.includes('location') || q.includes('office') || q.includes('address') || q.includes('kahan') || q.includes('city') || q.includes('where')) {
+    return `Sir / Madam, hamara office India me hai aur hum poore Bharat (PAN-India) me on-site deployment aur remote IoT support provide karte hain.
+
+Aap humse **+91 70520 50656** par contact karke meeting ya site visit plan kar sakte hain.`;
+  }
+
+  // 12. Careers / Hiring / Jobs
+  if (q.includes('career') || q.includes('job') || q.includes('hiring') || q.includes('intern') || q.includes('vacancy') || q.includes('apply')) {
+    return `Sir / Madam, hum Embedded Systems, IoT, Computer Vision, aur Full-Stack Development me talented engineers ko welcome karte hain.
+
+Aap apna resume **rvmaitech2026@gmail.com** par bhej sakte hain ya website ke Careers page par apply kar sakte hain!`;
+  }
+
+  // 13. About RvmAiTech / What does company do
   if (
     q.includes('about') ||
     q.includes('company') ||
@@ -105,218 +192,28 @@ RvmAiTech ki shuruat aur leadership high-skilled engineering professionals ke dw
     q.includes('mission') ||
     q.includes('kya banate')
   ) {
-    return `🏢 **About RvmAiTech (Robotics, Vision & Intelligence)**
+    return `Sir / Madam, RvmAiTech ek tech & engineering company hai jo Smart Parking Automation, Machine Vision AI, Industrial IoT, Robotics, Custom PCB aur Enterprise Software (School/Hotel ERP) build karti hai.
 
-RvmAiTech ek comprehensive **Technology & Engineering Solutions** company hai jo physical machines ko modern software aur electronics se jodata hai:
-
-- 🚗 **Smart Parking Automation**: AI ANPR number plate detection, automatic boom barriers, ultrasonic bay detection aur POS billing software.
-- 👁️ **Machine Vision & AI Cameras**: Real-time defect inspection, OCR text reading aur quality validation.
-- 🤖 **Industrial Robotics & Process Automation**: Custom controllers, assembly line automation aur PLC/SCADA integration.
-- ⚡ **Custom PCB & Hardware Engineering**: Schematics design, multi-layer PCB layout aur rapid hardware prototyping.
-- 📡 **Industrial IoT & Edge Telemetry**: Modbus RTU/TCP over RS-485, 4G cellular gateways, aur 30-day offline buffer memory.
-- 💻 **Enterprise Software & ERPs**: School & College ERP Suite, Hotel PMS aur custom React/Node.js web dashboards.
-
-👉 Hamara lakshya factory shopfloors aur modern facilities ko sub-second data aur automated intelligence provide karna hai.`;
+Aap inme se kis service ke baare me detail janna chahte hain?`;
   }
 
-  // 3. Machine Vision & AI Camera
-  if (
-    q.includes('vision') ||
-    q.includes('machine vision') ||
-    q.includes('ai camera') ||
-    q.includes('camera') ||
-    q.includes('ocr') ||
-    q.includes('defect') ||
-    q.includes('inspection')
-  ) {
-    return `👁️ **Machine Vision & AI Camera Systems**
-
-RvmAiTech custom Computer Vision aur Deep Learning solutions develop karta hai:
-
-- **High-Speed ANPR**: Vehicles ke license number plates ko sub-second speed aur 99%+ accuracy ke sath detect karna.
-- **Surface Defect Detection**: Packaging, printing, fabric, aur metal parts me flaws aur scratches detect karna.
-- **OCR Text & Barcode Extraction**: Batch numbers, expiry dates aur serial barcodes ko real-time read karke database me log karna.
-- **Robot Guidance Vision**: Robotic arms ke liye 2D/3D part positioning aur pick-and-place alignment.
-
-👉 Software: Python, OpenCV, PyTorch, Edge AI TensorRT. WhatsApp for demo: **+91 70520 50656**`;
-  }
-
-  // 4. Robotics & Process Automation
-  if (
-    q.includes('robot') ||
-    q.includes('robotic') ||
-    q.includes('process automation') ||
-    q.includes('automation') ||
-    q.includes('plc') ||
-    q.includes('factory') ||
-    q.includes('conveyor')
-  ) {
-    return `🤖 **Robotics & Industrial Process Automation**
-
-Hum manufacturing plants aur factories ke repetitive tasks ko automated intelligence me convert karte hain:
-
-- **PLC & SCADA Programming**: Siemens, Mitsubishi, Delta, aur Omron PLCs ka ladder logic programming.
-- **Custom Robotic Actuators & Grippers**: Pick-and-place, sorting machines aur automated packaging systems.
-- **I/O Integration & Safety**: Optical sensors, safety light curtains, emergency stop loops aur digital relay control.
-- **Process Telemetry**: Har machine step ka live cycle time, production count, aur reject rate monitor karna.
-
-👉 On-site survey aur automation feasibility discuss karne ke liye WhatsApp karein: **+91 70520 50656**`;
-  }
-
-  // 5. Smart Parking
-  if (q.includes('parking') || q.includes('boom barrier') || q.includes('anpr') || q.includes('number plate') || q.includes('car')) {
-    return `🚗 **RvmAiTech Smart Parking Automation System**
-
-Hamara Smart Parking System ek complete turnkey solution hai jo hardware aur software dono ko seamlessly jodata hai:
-
-1. **ANPR AI Camera**: Entry aur Exit gates par high-speed camera automatically gaadi ka number plate read karta hai (99%+ accuracy).
-2. **Automatic Boom Barrier**: Number detect hote hi automatic barrier lift ho jata hai, zero manual delay.
-3. **Ultrasonic Bay Guidance**: Har parking slot par ultrasonic sensor laga hota hai jo green/red LED indicator se free slot batata hai.
-4. **Thermal POS Billing**: Cashier counter ke liye offline-first billing software jo hourly fees calculate karke thermal receipt print karta hai.
-5. **WhatsApp & UPI Bill**: Driver ke WhatsApp par instant PDF receipt aur UPI QR code se digital payment.
-
-👉 Is solution ke live demo ya commercial quote ke liye aap direct hamare WhatsApp **+91 70520 50656** par connect kar sakte hain!`;
-  }
-
-  // 6. School ERP / Education
-  if (q.includes('school') || q.includes('college') || (q.includes('erp') && (q.includes('student') || q.includes('fee')))) {
-    return `🎓 **RvmAiTech Cloud School & College ERP Suite**
-
-Hamara School ERP ek all-in-one institutional software hai jo administrative tasks ko automate karta hai:
-
-- **Automated Fee Management**: Fee invoices, instant online payment gateway integration, aur automated receipt generation.
-- **Biometric & RFID Attendance**: Student aur staff punch karte hi parents ko automated WhatsApp/SMS notification deliver hoti hai.
-- **Academic & Examination**: Marks entry, automatic report card generation, CBSE/State board format compliance.
-- **Multi-Role Portals**: Principal, Accountant, Teacher, Student aur Parents ke liye alag secure portals.
-
-👉 Demo dekhne ya quotation ke liye hamare engineers se WhatsApp par baat karein: **+91 70520 50656**`;
-  }
-
-  // 7. Hotel ERP / PMS
-  if (q.includes('hotel') || q.includes('resort') || q.includes('pms') || q.includes('room billing')) {
-    return `🏨 **RvmAiTech Hotel & Resort PMS (Property Management System)**
-
-Hamara Hotel PMS modern hospitality ke liye tailor-made software hai:
-
-- **Front-Desk Operations**: Instant check-in, check-out, room allocation, aur guest ID records.
-- **Multi-Counter Restaurant POS**: Dining, bar aur room-service orders ka instant KOT (Kitchen Order Ticket) aur integrated room billing.
-- **Housekeeping & Inventory**: Real-time room clean/dirty status aur store inventory tracking.
-- **Channel Sync**: Online travel agencies (OTAs) ke sath room availability synchronization.
-
-👉 Apne hotel/resort ke size ke mutabiq custom quotation ke liye sampark karein: **+91 70520 50656**`;
-  }
-
-  // 8. PCB Design & Hardware Prototyping
-  if (q.includes('pcb') || q.includes('circuit') || q.includes('schematic') || q.includes('kicad') || q.includes('prototype') || q.includes('hardware')) {
-    return `⚡ **Custom PCB Design & Hardware Prototyping**
-
-RvmAiTech whiteboard concept se lekar commercial manufacturing tak electronics engineering deliver karta hai:
-
-- **Schematic & Layout**: KiCad, EasyEDA aur Altium me 2 se 6 layers tak multi-layer PCB design.
-- **Component Selection**: Industrial grade microcontrollers (ESP32, STM32), ESD/surge protection, aur power-efficient components.
-- **Prototype Manufacturing**: Rapid POC bench samples, SMT/THT assembly, aur 3D custom enclosure packaging.
-- **Testing & Debugging**: Signal integrity analysis, thermal testing, burn-in validation aur firmware testing.
-
-👉 Timeline: Initial prototype design aamtaur par 1 se 3 weeks me deliver ho jata hai. Requirements share karne ke liye WhatsApp karein: **+91 70520 50656**`;
-  }
-
-  // 9. IoT, Modbus & Sensors
-  if (q.includes('iot') || q.includes('modbus') || q.includes('rs485') || q.includes('sensor') || q.includes('mqtt') || q.includes('telemetry') || q.includes('datalogger')) {
-    return `🏭 **Industrial IoT & Edge Telemetry Solutions**
-
-Hum industrial machines aur shop floor sensors ko cloud aur mobile dashboards se connect karte hain:
-
-- **Protocols Supported**: Modbus RTU (over isolated RS-485), Modbus TCP, MQTT over TLS, CAN bus, HTTP REST APIs.
-- **Machine Interfacing**: Siemens, Mitsubishi, Delta PLCs, non-invasive CT current sensors, flowmeters, vibration probes.
-- **Hardware Gateways**: ESP32 aur STM32-based industrial controllers with 4G LTE cellular fallback.
-- **Data Safety**: Internet disconnect hone par bhi local SD/Flash memory me 30 din tak ka telemetry data safe rehta hai aur reconnect hote hi auto-sync ho jata hai.
-
-👉 Apne plant machine monitoring ke liye quote lene ke liye call/WhatsApp karein: **+91 70520 50656**`;
-  }
-
-  // 10. How We Work / Process / Workflow
+  // 14. How We Work / Process
   if (q.includes('process') || q.includes('workflow') || q.includes('step') || q.includes('kaise kaam') || q.includes('delivery')) {
-    return `🔄 **How RvmAiTech Delivers Projects (Our 6-Step Workflow)**
+    return `Sir / Madam, hamara project delivery process 6 simple steps me chalta hai:
+1. **Requirement Analysis**: Aapki zaroorat samajhna.
+2. **System Design**: Hardware & software architecture plan karna.
+3. **Prototype Development**: Working POC sample tayyar karna.
+4. **Integration**: Firmware, cloud aur mobile dashboard connect karna.
+5. **Testing**: Stress & reliability testing.
+6. **Deployment**: On-site installation aur dedicated support.
 
-1. **Requirement Analysis**: Client ki needs, machines, operational objectives aur constraints ko samajhna.
-2. **System Design**: Circuit schematics, hardware architecture, communication protocols aur database design.
-3. **Prototype Development**: Working POC model aur benchtop prototype assembly banana.
-4. **Programming & Integration**: Firmware (C/C++), cloud APIs, dashboards (React) aur mobile apps connect karna.
-5. **Testing & Validation**: Stress burn-in, noise filtering, electrical testing aur end-to-end audit.
-6. **Final Deployment**: On-site installation, technical documentation handoff, aur dedicated support.`;
+Kya aapka koi specific project hai jiska process aap janna chahte hain?`;
   }
 
-  // 11. Careers / Hiring / Jobs
-  if (q.includes('career') || q.includes('job') || q.includes('hiring') || q.includes('intern') || q.includes('vacancy') || q.includes('apply')) {
-    return `💼 **Careers at RvmAiTech**
+  // 15. General Fallback
+  return `Sir / Madam, main RvmAiTech ke projects (Smart Parking, Industrial IoT, Custom PCB, Machine Vision ya ERP Software) ke baare me aapki madad kar sakta hoon.
 
-Hum passionate engineers aur developers ke sath technology build karte hain:
-
-- **Key Domains**: Embedded C/C++, IoT Engineering, PLC Automation, Computer Vision / Python AI, React.js / Node.js Full-Stack Development.
-- **Open Applications**: Aap apna resume direct **/careers/apply** par submit kar sakte hain ya email bhej sakte hain: **rvmaitech2026@gmail.com**
-
-Hum live factory projects aur exciting hardware-software prototyping par direct work experience provide karte hain!`;
-  }
-
-  // 12. Office Location / Address
-  if (q.includes('location') || q.includes('office') || q.includes('address') || q.includes('kahan') || q.includes('city') || q.includes('where')) {
-    return `📍 **RvmAiTech Location & Availability**
-
-- **Headquarters**: India (Operating across NCR and PAN-India on-site deployment).
-- **Service Reach**: Hum poore Bharat me factory automation, smart parking installation aur remote IoT commissioning deliver karte hain.
-- **Digital / Remote Support**: Hamara IoT cloud platform 24/7 remote device monitoring aur diagnostics provide karta hai.
-
-Direct contact: **+91 70520 50656** | **rvmaitech2026@gmail.com**`;
-  }
-
-  // 13. Pricing, Cost & Quote
-  if (q.includes('price') || q.includes('cost') || q.includes('budget') || q.includes('quote') || q.includes('rate') || q.includes('kitna') || q.includes('kharcha')) {
-    return `💼 **RvmAiTech Project Pricing & Quotation**
-
-Hamari pricing transparent aur requirement-based hoti hai:
-
-- **Small Prototype / IoT Controller**: ₹25,000 – ₹75,000 (Testing POC, custom board design).
-- **Turnkey Machine Automation / Smart Parking**: Requirement ke size (gates, cameras, slots) ke mutabiq tailor-made.
-- **Custom ERP & Web Portals**: Module requirement ke anusaar one-time license ya maintenance support.
-
-👉 Exact quotation aur technical proposal ke liye apni requirements hamare WhatsApp par bhejein: **+91 70520 50656** ya email karein: **rvmaitech2026@gmail.com** (24 hours me technical proposal mil jata hai).`;
-  }
-
-  // 14. Contact Info
-  if (q.includes('contact') || q.includes('phone') || q.includes('number') || q.includes('email') || q.includes('whatsapp') || q.includes('call')) {
-    return `📞 **RvmAiTech Direct Contact Details**
-
-- **WhatsApp & Calling**: +91 70520 50656
-- **Official Email**: rvmaitech2026@gmail.com
-- **Website**: https://rvmaitech.com
-- **Hours**: Mon – Sat, 9:00 AM – 7:30 PM IST
-
-Aap direct WhatsApp par message bhejkar hamare Lead System Architect se instantly connect ho sakte hain!`;
-  }
-
-  // 15. Greetings
-  if (q === 'hi' || q === 'hello' || q === 'hey' || q.includes('namaste') || q.includes('kaise ho') || q.includes('good morning') || q.includes('good evening')) {
-    return `Namaste! 🙏 Welcome to **RvmAiTech**.
-
-Main RvmAiTech ka AI Technical Assistant hoon. Aap hamari company, leadership (Founders), services (Smart Parking, Industrial IoT, Machine Vision, Robotics, Custom PCB, ERPs), ya project cost ke baare me pooch sakte hain.
-
-Main aapki kis cheez me madad kar sakta hoon?`;
-  }
-
-  // 16. General Fallback
-  return `**Welcome to RvmAiTech Engineering & Intelligence.** 👋
-
-RvmAiTech ek complete **Electronics Hardware, Machine Vision, Industrial Automation & Intelligent Software** engineering company hai:
-
-1. **Smart Parking Automation** (ANPR AI Cameras, Automated Boom Barriers, Ultrasonic Guidance, Cloud POS Billing)
-2. **Industrial IoT & Automation** (Modbus RTU/TCP over RS-485, PLC Telemetry, 4G Cellular Gateways)
-3. **Custom PCB & Hardware Engineering** (Multi-Layer Schematics, Layout & Turnkey Prototyping)
-4. **Machine Vision & AI Cameras** (Defect Inspection, Optical Character Recognition)
-5. **Enterprise ERP Platforms** (School ERP & Hotel PMS Suites)
-6. **Full-Stack Web & Mobile Dashboards** (React.js, Node.js, Python, PostgreSQL)
-
-👉 Company Founder: **Mr. Vivek Bhardwaj** (Founder & CEO)
-👉 Direct WhatsApp Consultation: **+91 70520 50656** | **rvmaitech2026@gmail.com**`;
+Aapka jo sawaal hai kripya poochein, main to-the-point bata dunga. Ya direct baat karne ke liye aap hamare WhatsApp **+91 70520 50656** par bhi message kar sakte hain.`;
 }
 
 // Call Google Gemini API if key is present
