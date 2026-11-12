@@ -1,0 +1,61 @@
+services:
+  # ========================================================
+  # 1. RvmAiTech Backend API (Node.js Web Service)
+  # ========================================================
+  - type: web
+    name: rvmaitech-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node src/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: TRUST_PROXY
+        value: "1"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: CROSS_SITE_COOKIES
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: CONTACT_EMAIL
+        value: rvmaitech2026@gmail.com
+      - key: MAIL_FROM
+        value: bhardwaj7005@gmail.com
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+
+  # ========================================================
+  # 2. RvmAiTech Frontend (React + Vite Static Site)
+  # ========================================================
+  - type: web
+    name: rvmaitech-web
+    runtime: static
+    plan: free
+    region: oregon
+    rootDir: web
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        sync: false
