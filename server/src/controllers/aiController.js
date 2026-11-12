@@ -90,6 +90,51 @@ Hamari core leadership team:
 Kya aapko kisi project ke silsile me team se connect karna hai?`;
   }
 
+  // 1.5 Custom Software, Web Development, Mobile Apps & Dashboards
+  if (
+    q.includes('softwar') ||
+    q.includes('softwer') ||
+    q.includes('app') ||
+    q.includes('web') ||
+    q.includes('portal') ||
+    q.includes('dashboard') ||
+    q.includes('react') ||
+    q.includes('node') ||
+    q.includes('python') ||
+    q.includes('fullstack') ||
+    q.includes('full stack') ||
+    q.includes('coustom') ||
+    q.includes('custom soft')
+  ) {
+    return `Sir / Madam, hum enterprise-grade Custom Software aur Web/Mobile Apps develop karte hain:
+
+• **Full-Stack Web & Cloud Dashboards**: React.js, Node.js, Python FastAPI/Django, aur PostgreSQL/MongoDB ke sath fast aur secure web applications.
+• **IoT & Machine Dashboards**: Real-time sensor graphs, machine telemetry monitoring aur automated alerts.
+• **Enterprise Business Software**: School/College ERP, Hotel PMS, Billing & POS platforms.
+• **Mobile Applications**: Android aur cross-platform management apps.
+
+Aapko kis type ke custom software ya application ki requirement hai?`;
+  }
+
+  // 1.6 Services / Projects Overview
+  if (
+    q.includes('service') ||
+    q.includes('services') ||
+    q.includes('kya kya') ||
+    q.includes('capabilities') ||
+    q.includes('all project')
+  ) {
+    return `Sir / Madam, RvmAiTech yeh core engineering services deliver karta hai:
+1. 🚗 **Smart Parking Automation** (ANPR Cameras, Barriers & POS Billing)
+2. ⚡ **Custom PCB & Hardware Prototyping** (Schematics to Turnkey Production)
+3. 📡 **Industrial IoT & Edge Telemetry** (Modbus RS-485 & 4G Gateways)
+4. 💻 **Custom Software & ERP Platforms** (School ERP, Hotel PMS & Web Portals)
+5. 👁️ **Machine Vision & AI Cameras** (Defect Inspection & OCR)
+6. 🤖 **Industrial Robotics & Factory Automation** (PLCs & Actuators)
+
+Aap inme se kis project ya service ke baare me detail janna chahte hain?`;
+  }
+
   // 2. Smart Parking
   if (q.includes('parking') || q.includes('boom barrier') || q.includes('anpr') || q.includes('number plate') || q.includes('car')) {
     return `Sir / Madam, hamara Smart Parking System ek complete automated solution hai:
