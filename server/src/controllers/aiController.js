@@ -54,9 +54,9 @@ function getBuiltinKnowledgeResponse(query, language = 'hinglish') {
   if (isGreeting && q.length < 35 && !q.includes('parking') && !q.includes('founder') && !q.includes('pcb') && !q.includes('erp') && !q.includes('iot') && !q.includes('cost') && !q.includes('price')) {
     return `Hello Sir / Madam! 👋
 
-**RvmAiTech me aapka swagat hai.**
+**Welcome to RvmAiTech.**
 
-Main aapki kya madad kar sakta hoon?`;
+How can I assist you today?`;
   }
 
   // 0.1 "Kaise ho" / "How are you"

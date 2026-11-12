@@ -16,7 +16,7 @@ export default function AiAssistant() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: 'Hello Sir / Madam! 👋\n\n**RvmAiTech me aapka swagat hai.**\n\nMain aapki kya madad kar sakta hoon? Aap hamare projects (Smart Parking, Industrial IoT, Custom PCB, School/Hotel ERP) ya kisi bhi technical requirement ke baare me pooch sakte hain.',
+      text: 'Hello Sir / Madam! 👋\n\n**Welcome to RvmAiTech.**\n\nHow can I help you today? Feel free to ask about our projects (Smart Parking, Industrial IoT, Custom PCB, School/Hotel ERP) or any custom engineering requirements.',
     },
   ]);
   const [input, setInput] = useState('');
