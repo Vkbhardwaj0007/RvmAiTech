@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 *.log
 
 # Secrets. The broad .env* pattern matters: a file like
