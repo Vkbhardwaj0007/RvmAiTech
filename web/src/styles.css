@@ -530,31 +530,36 @@ section{padding:80px 0}
 .card h3,.card p,.card-num,.card-link,.tick li,.prod-cat,.quote p,.q-by,.step h3,.step p,.step-no,.job h3,.job-title-link,.job-meta,.job p,.stat b,.stat span,.cinfo b,.cinfo span,.ci-ico,.pd-spec span,.pd-spec b,.job-side-card h3,.job-side-card p,.job-side-label,.plc,.plc-label,.cat-intro h2,.cat-intro p,.general-apply h3,.general-apply p,.lead-body h3,.lead-body p,.lead-social button,.cap p,.wf-box p,.wf-box-label,.flow-step h3,.client img{transition:color .35s,background-color .35s,border-color .35s,filter .35s}
 .btn-ghost.dark{transition:transform .15s,background .15s,color .35s,border-color .35s}
 
-/* light cards -> navy */
-.card:hover,.quote:hover,.step:hover,.job:hover,.ind:hover,.client:hover,.stat:hover,.cinfo:hover,.pd-spec:hover,.pd-feat-item:hover,.job-side-card:hover,.cat-intro:hover,.general-apply:hover,.lead-card:hover,.wf-box:hover{background-color:var(--navy);border-color:var(--navy);color:#fff}
-.card:hover h3,.step:hover h3,.job:hover h3,.job:hover .job-title-link,.stat:hover b,.cinfo:hover b,.pd-spec:hover b,.job-side-card:hover h3,.cat-intro:hover h2,.general-apply:hover h3,.lead-card:hover .lead-body h3,.ind:hover,.client:hover,.pd-feat-item:hover,.cat-intro:hover .plc-label{color:#fff}
-.card:hover p,.card:hover .tick li,.quote:hover p,.step:hover p,.job:hover .job-meta,.job:hover p,.stat:hover span,.cinfo:hover span,.pd-spec:hover span,.job-side-card:hover p,.job-side-card:hover .job-side-label,.cat-intro:hover p,.general-apply:hover p,.lead-card:hover .lead-body p,.wf-box:hover p{color:#d3e0f4}
-.card:hover .card-num{color:rgba(255,255,255,.12)}
-.card:hover .card-ico{background:linear-gradient(135deg,var(--orange),var(--orange-soft));box-shadow:0 12px 24px -10px rgba(244,123,32,.7)}
-.card:hover .card-link,.quote:hover .q-by,.job-side-card:hover .card-link{color:var(--orange-soft)}
-.job:hover .job-title-link:hover{color:var(--orange-soft)}
-.card:hover .prod-cat,.cat-intro:hover .plc,.job-side-card:hover .plc{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25)}
-.step:hover .step-no,.job:hover .btn-primary{background:var(--orange)}
-.job:hover .btn-ghost.dark,.general-apply:hover .btn-ghost.dark{border-color:#fff;color:#fff}
-.job:hover .btn-ghost.dark:hover,.general-apply:hover .btn-ghost.dark:hover{background:rgba(255,255,255,.12)}
-.cinfo:hover .ci-ico,.lead-card:hover .lead-social button{background:rgba(255,255,255,.14);color:#fff}
+/* light cards -> navy (Image 2 style) */
+.card:hover,.quote:hover,.step:hover,.job:hover,.ind:hover,.client:hover,.stat:hover,.cinfo:hover,.pd-spec:hover,.pd-feat-item:hover,.job-side-card:hover,.cat-intro:hover,.general-apply:hover,.lead-card:hover,.wf-box:hover{background-color:#0d2649 !important;border-color:#38bdf8 !important;color:#fff !important;transform:translateY(-6px);box-shadow:0 22px 50px -12px rgba(13,38,73,.65) !important}
+.card:hover h3,.step:hover h3,.job:hover h3,.job:hover .job-title-link,.stat:hover b,.cinfo:hover b,.pd-spec:hover b,.job-side-card:hover h3,.cat-intro:hover h2,.general-apply:hover h3,.lead-card:hover .lead-body h3,.ind:hover,.client:hover,.pd-feat-item:hover,.cat-intro:hover .plc-label{color:#fff !important}
+.card:hover p,.card:hover .tick li,.quote:hover p,.step:hover p,.job:hover .job-meta,.job:hover p,.stat:hover span,.cinfo:hover span,.pd-spec:hover span,.job-side-card:hover p,.job-side-card:hover .job-side-label,.cat-intro:hover p,.general-apply:hover p,.lead-card:hover .lead-body p,.wf-box:hover p{color:#d3e0f4 !important}
+.card:hover .card-num{color:rgba(56,189,248,.35) !important}
+.card:hover .card-ico{background:rgba(56,189,248,.22) !important;border:1px solid rgba(56,189,248,.55) !important;color:#38bdf8 !important;box-shadow:0 8px 18px rgba(0,0,0,.25) !important}
+.card:hover .card-ico svg{color:#38bdf8 !important;stroke:#38bdf8 !important}
+.card:hover .card-link,.quote:hover .q-by,.job-side-card:hover .card-link{color:#38bdf8 !important}
+.job:hover .job-title-link:hover{color:#38bdf8 !important}
+.card:hover .prod-cat,.cat-intro:hover .plc,.job-side-card:hover .plc{color:#fff;background:rgba(56,189,248,.2) !important;border-color:rgba(56,189,248,.45) !important}
+.step:hover .step-no,.job:hover .btn-primary{background:#38bdf8 !important;color:#0d2649 !important}
+.job:hover .btn-ghost.dark,.general-apply:hover .btn-ghost.dark{border-color:#38bdf8 !important;color:#38bdf8 !important}
+.job:hover .btn-ghost.dark:hover,.general-apply:hover .btn-ghost.dark:hover{background:rgba(56,189,248,.18) !important}
+.cinfo:hover .ci-ico,.lead-card:hover .lead-social button{background:rgba(56,189,248,.2) !important;color:#38bdf8 !important}
 .client:hover img{filter:brightness(0) invert(1)}
-.wf-box:hover .wf-box-label{color:var(--orange-soft)}
-.flow-step:hover h3{color:var(--orange)}
-.flow-step:hover .flow-node{background:var(--orange);color:#fff}
+.wf-box:hover .wf-box-label{color:#38bdf8 !important}
+.flow-step:hover h3{color:#38bdf8 !important}
+.flow-step:hover .flow-node{background:#0d2649 !important;border-color:#38bdf8 !important;color:#38bdf8 !important}
 
-/* dark section cards -> orange */
-.cap:hover{background-color:var(--orange);border-color:var(--orange-soft);color:#fff}
-.cap:hover p{color:#fff2e6}
-.cap:hover .cap-ico{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45);color:#fff}
-.cap .card-link{color:var(--orange-soft)}
-.cap:hover .card-link{color:#fff!important}
-.cap:hover.t3d::after{background:radial-gradient(360px circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.3),rgba(255,255,255,0) 62%)}
+/* dark section / technology cards -> Deep Navy Blue with Cyan (Image 2 style) */
+.cap:hover,
+.cap.link:hover,
+.grid-3 .cap.link:hover{background-color:#0d2649 !important;border-color:#38bdf8 !important;color:#fff !important;transform:translateY(-6px);box-shadow:0 24px 50px -15px rgba(13,38,73,.75) !important}
+.cap:hover h3,.cap.link:hover h3{color:#fff !important}
+.cap:hover p,.cap.link:hover p{color:#d3e0f4 !important}
+.cap:hover .cap-ico,.cap.link:hover .cap-ico{background:rgba(56,189,248,.22) !important;border-color:rgba(56,189,248,.55) !important;color:#38bdf8 !important;box-shadow:0 8px 18px rgba(0,0,0,.25) !important}
+.cap:hover .cap-ico svg,.cap.link:hover .cap-ico svg{color:#38bdf8 !important;stroke:#38bdf8 !important}
+.cap .card-link{color:#38bdf8}
+.cap:hover .card-link,.cap.link:hover .card-link{color:#38bdf8 !important}
+.cap:hover.t3d::after,.cap.link:hover.t3d::after{background:radial-gradient(360px circle at var(--gx,50%) var(--gy,50%),rgba(56,189,248,.25),rgba(56,189,248,0) 62%) !important}
 
 /* =====================================================================
    HEADER 3D — glass slab, links lift, dropdowns flip open, logo/CTA tilt (Effects3D)
@@ -1125,16 +1130,16 @@ section[id]{scroll-margin-top:80px}
   transition: color .35s ease;
 }
 .metric-card:hover {
-  background: var(--orange) !important;
-  border-color: var(--orange-soft) !important;
+  background: #0d2649 !important;
+  border-color: #38bdf8 !important;
   color: #fff !important;
   transform: translateY(-6px);
-  box-shadow: 0 24px 50px -15px rgba(244, 123, 32, 0.48) !important;
+  box-shadow: 0 24px 50px -15px rgba(13, 38, 73, 0.6) !important;
 }
-.metric-card:hover .metric-val { color: #fff !important; }
+.metric-card:hover .metric-val { color: #38bdf8 !important; }
 .metric-card:hover .metric-label { color: #fff !important; }
-.metric-card:hover .metric-sub { color: #fff2e6 !important; }
-.metric-card:hover .metric-desc { color: #fff2e6 !important; }
+.metric-card:hover .metric-sub { color: #7dd3fc !important; }
+.metric-card:hover .metric-desc { color: #e2edf8 !important; }
 
 /* Quote / Testimonial cards base & HOVER */
 .quote-card {
@@ -1164,47 +1169,60 @@ section[id]{scroll-margin-top:80px}
   transition: all .35s ease;
 }
 .quote-card:hover {
-  background: var(--orange) !important;
-  border-color: var(--orange-soft) !important;
+  background: #0d2649 !important;
+  border-color: #38bdf8 !important;
   color: #fff !important;
   transform: translateY(-6px);
-  box-shadow: 0 24px 50px -15px rgba(244, 123, 32, 0.48) !important;
+  box-shadow: 0 24px 50px -15px rgba(13, 38, 73, 0.6) !important;
 }
-.quote-card:hover p { color: #fff !important; }
+.quote-card:hover p { color: #e2edf8 !important; }
 .quote-card:hover b { color: #fff !important; }
-.quote-card:hover .quote-meta { color: #fff2e6 !important; }
-.quote-card:hover .quote-loc { color: #ffe6d4 !important; }
-.quote-card:hover .star-ico { fill: #fff !important; color: #fff !important; }
+.quote-card:hover .quote-meta { color: #cbd5e1 !important; }
+.quote-card:hover .quote-loc { color: #7dd3fc !important; }
+.quote-card:hover .star-ico { fill: #facc15 !important; color: #facc15 !important; }
 .quote-card:hover .quote-tag {
-  background: rgba(255, 255, 255, 0.22) !important;
-  color: #fff !important;
+  background: rgba(56, 189, 248, 0.22) !important;
+  color: #38bdf8 !important;
 }
 .quote-card:hover .quote-avatar {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #fff !important;
+  background: #38bdf8 !important;
+  color: #0d2649 !important;
 }
-.quote-card:hover .quote-author-row { border-top-color: rgba(255, 255, 255, 0.2) !important; }
+.quote-card:hover .quote-author-row { border-top-color: rgba(255, 255, 255, 0.18) !important; }
 
-/* Services cards HOVER -> Turns ORANGE like Robotics */
-.grid-3 .card.link:hover {
-  background: var(--orange) !important;
-  border-color: var(--orange-soft) !important;
+/* Services cards HOVER -> Deep Navy Blue (Image 2 style) */
+.grid-3 .card.link:hover,
+.card.link:hover {
+  background: #0d2649 !important;
+  border-color: #38bdf8 !important;
   color: #fff !important;
   transform: translateY(-6px);
-  box-shadow: 0 24px 50px -15px rgba(244, 123, 32, 0.48) !important;
+  box-shadow: 0 24px 50px -15px rgba(13, 38, 73, 0.65) !important;
 }
-.grid-3 .card.link:hover h3 { color: #fff !important; }
-.grid-3 .card.link:hover p { color: #fff2e6 !important; }
-.grid-3 .card.link:hover .card-num { color: rgba(255, 255, 255, 0.2) !important; }
-.grid-3 .card.link:hover .card-link { color: #fff !important; }
-.grid-3 .card.link:hover .card-ico {
-  background: rgba(255, 255, 255, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  color: #fff !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+.grid-3 .card.link:hover h3,
+.card.link:hover h3 { color: #fff !important; }
+.grid-3 .card.link:hover p,
+.card.link:hover p { color: #e2edf8 !important; }
+.grid-3 .card.link:hover .card-num,
+.card.link:hover .card-num { color: rgba(56, 189, 248, 0.35) !important; }
+.grid-3 .card.link:hover .card-link,
+.card.link:hover .card-link { color: #38bdf8 !important; }
+.grid-3 .card.link:hover .card-ico,
+.card.link:hover .card-ico {
+  background: rgba(56, 189, 248, 0.22) !important;
+  border: 1px solid rgba(56, 189, 248, 0.55) !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25) !important;
 }
-.grid-3 .card.link:hover .tick li { color: #fff !important; }
-.grid-3 .card.link:hover .tick li::before { background: #fff !important; }
+.grid-3 .card.link:hover .card-ico svg,
+.card.link:hover .card-ico svg {
+  color: #38bdf8 !important;
+  stroke: #38bdf8 !important;
+}
+.grid-3 .card.link:hover .tick li,
+.card.link:hover .tick li { color: #e2edf8 !important; }
+.grid-3 .card.link:hover .tick li::before,
+.card.link:hover .tick li::before { background: #38bdf8 !important; }
 
 /* ==============================================================
    DYNAMIC DUAL-THEME HOVER EFFECTS (ORANGE vs NAVY BLUE)
