@@ -369,7 +369,7 @@ export default function ProductSolutionsSection() {
             }}
           >
             {/* Smart Parking */}
-            <div className="sol-card card link card-dynamic hover-orange" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="sol-card card link card-dynamic hover-blue" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div className="sol-ico card-icon-wrap">
                   <Car size={24} />
@@ -413,7 +413,7 @@ export default function ProductSolutionsSection() {
             </div>
 
             {/* Hotel ERP */}
-            <div className="sol-card card link card-dynamic hover-orange" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="sol-card card link card-dynamic hover-blue" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <div className="sol-ico card-icon-wrap">
                   <Hotel size={24} />

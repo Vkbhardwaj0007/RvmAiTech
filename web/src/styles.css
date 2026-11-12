@@ -1020,29 +1020,29 @@ section[id]{scroll-margin-top:80px}
 }
 .why-link { color: #1351b4; transition: all .35s ease; }
 
-/* Why Choose Card HOVER -> Turns ORANGE like Robotics */
+/* Why Choose Card HOVER -> Turns NAVY BLUE (Image 2 style) */
 .why-card:hover {
-  background: var(--orange) !important;
-  border-color: var(--orange-soft) !important;
+  background: #0d2649 !important;
+  border-color: #38bdf8 !important;
   color: #fff !important;
   transform: translateY(-6px);
-  box-shadow: 0 24px 50px -15px rgba(244, 123, 32, 0.48) !important;
+  box-shadow: 0 24px 50px -15px rgba(13, 38, 73, 0.6) !important;
 }
 .why-card:hover h3 { color: #fff !important; }
-.why-card:hover p { color: #fff2e6 !important; }
+.why-card:hover p { color: #e2edf8 !important; }
 .why-card:hover .why-ico {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #fff !important;
+  background: rgba(56, 189, 248, 0.22) !important;
+  color: #38bdf8 !important;
 }
 .why-card:hover .why-badge {
-  background: rgba(255, 255, 255, 0.22) !important;
-  color: #fff !important;
+  background: rgba(56, 189, 248, 0.2) !important;
+  color: #7dd3fc !important;
 }
-.why-card:hover .why-foot { border-top-color: rgba(255, 255, 255, 0.2) !important; }
+.why-card:hover .why-foot { border-top-color: rgba(255, 255, 255, 0.18) !important; }
 .why-card:hover .why-link { color: #fff !important; }
 .why-card:hover .why-top-bar { opacity: 0; }
 
-/* Solutions cards (Smart Parking, School ERP, Hotel ERP) base & HOVER */
+/* Solutions cards (Smart Parking, School ERP, Hotel ERP) base & HOVER (Image 2 style) */
 .sol-card {
   background: #ffffff;
   border: 1px solid #d0e1f7;
@@ -1065,28 +1065,29 @@ section[id]{scroll-margin-top:80px}
   transition: all .35s ease;
 }
 .sol-card:hover {
-  background: var(--orange) !important;
-  border-color: var(--orange-soft) !important;
+  background: #0d2649 !important;
+  border-color: #38bdf8 !important;
   color: #fff !important;
   transform: translateY(-6px);
-  box-shadow: 0 24px 50px -15px rgba(244, 123, 32, 0.48) !important;
+  box-shadow: 0 24px 50px -15px rgba(13, 38, 73, 0.6) !important;
 }
 .sol-card:hover h3 { color: #fff !important; }
-.sol-card:hover p { color: #fff2e6 !important; }
+.sol-card:hover p { color: #e2edf8 !important; }
 .sol-card:hover .sol-list li { color: #fff !important; }
-.sol-card:hover .sol-list li span { color: #ffe0cc !important; }
+.sol-card:hover .sol-list li span { color: #38bdf8 !important; }
 .sol-card:hover .card-link { color: #fff !important; }
 .sol-card:hover .sol-ico {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #fff !important;
+  background: rgba(56, 189, 248, 0.22) !important;
+  color: #38bdf8 !important;
 }
 .sol-card:hover .sol-tag {
-  color: #fff !important;
+  color: #7dd3fc !important;
 }
 .sol-card:hover .btn-primary {
-  background: #fff !important;
-  color: var(--orange) !important;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.2) !important;
+  background: #38bdf8 !important;
+  color: #0d2649 !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.25) !important;
 }
 
 /* Metric ROI cards base & HOVER */
@@ -1221,50 +1222,12 @@ section[id]{scroll-margin-top:80px}
   flex-direction: column !important;
 }
 
-/* 1. ORANGE HOVER THEME */
+/* ==============================================================
+   CARD HOVER THEME — Deep Navy Blue (Image 2 style) across all cards
+   ============================================================== */
 .hover-orange:hover,
-.card-dynamic.hover-orange:hover {
-  background: #f47b20 !important;
-  border-color: #ff9d52 !important;
-  color: #ffffff !important;
-  transform: translateY(-6px) !important;
-  box-shadow: 0 22px 50px -12px rgba(244, 123, 32, 0.52) !important;
-}
-.hover-orange:hover h2,
-.hover-orange:hover h3,
-.hover-orange:hover h4,
-.hover-orange:hover p,
-.hover-orange:hover b,
-.hover-orange:hover span:not(.static-badge):not(.card-tech-tag),
-.hover-orange:hover li {
-  color: #ffffff !important;
-}
-.hover-orange:hover .card-icon-wrap {
-  background: rgba(255, 255, 255, 0.28) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  color: #ffffff !important;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15) !important;
-}
-.hover-orange:hover .card-icon-wrap svg {
-  stroke: #ffffff !important;
-  color: #ffffff !important;
-}
-.hover-orange:hover .step-badge {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
-}
-.hover-orange:hover .card-action-link {
-  color: #ffffff !important;
-  font-weight: 700 !important;
-}
-.hover-orange:hover .tag-badge {
-  background: rgba(255, 255, 255, 0.22) !important;
-  color: #ffffff !important;
-}
-
-/* 2. BLUE HOVER THEME */
 .hover-blue:hover,
+.card-dynamic.hover-orange:hover,
 .card-dynamic.hover-blue:hover {
   background: #0d2649 !important;
   border-color: #38bdf8 !important;
@@ -1272,6 +1235,11 @@ section[id]{scroll-margin-top:80px}
   transform: translateY(-6px) !important;
   box-shadow: 0 22px 50px -12px rgba(13, 38, 73, 0.6) !important;
 }
+.hover-orange:hover h2,
+.hover-orange:hover h3,
+.hover-orange:hover h4,
+.hover-orange:hover b,
+.hover-orange:hover .card-action-link,
 .hover-blue:hover h2,
 .hover-blue:hover h3,
 .hover-blue:hover h4,
@@ -1279,28 +1247,35 @@ section[id]{scroll-margin-top:80px}
 .hover-blue:hover .card-action-link {
   color: #ffffff !important;
 }
+.hover-orange:hover p,
+.hover-orange:hover li,
 .hover-blue:hover p,
 .hover-blue:hover li {
   color: #e2edf8 !important;
 }
+.hover-orange:hover span:not(.static-badge):not(.card-tech-tag),
 .hover-blue:hover span:not(.static-badge):not(.card-tech-tag) {
-  color: #d7e6f8 !important;
+  color: #7dd3fc !important;
 }
+.hover-orange:hover .card-icon-wrap,
 .hover-blue:hover .card-icon-wrap {
   background: rgba(56, 189, 248, 0.22) !important;
   border-color: rgba(56, 189, 248, 0.55) !important;
   color: #38bdf8 !important;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25) !important;
 }
+.hover-orange:hover .card-icon-wrap svg,
 .hover-blue:hover .card-icon-wrap svg {
   stroke: #38bdf8 !important;
   color: #38bdf8 !important;
 }
+.hover-orange:hover .step-badge,
 .hover-blue:hover .step-badge {
   background: rgba(56, 189, 248, 0.2) !important;
   color: #38bdf8 !important;
   border-color: rgba(56, 189, 248, 0.45) !important;
 }
+.hover-orange:hover .tag-badge,
 .hover-blue:hover .tag-badge {
   background: rgba(56, 189, 248, 0.18) !important;
   color: #e0f2fe !important;
@@ -1379,14 +1354,8 @@ section[id]{scroll-margin-top:80px}
   transition: all 0.25s ease !important;
 }
 .hover-orange:hover .card-tech-tag,
-.card-dynamic.hover-orange:hover .card-tech-tag {
-  background: rgba(255, 255, 255, 0.28) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
-  font-weight: 700 !important;
-}
 .hover-blue:hover .card-tech-tag,
+.card-dynamic.hover-orange:hover .card-tech-tag,
 .card-dynamic.hover-blue:hover .card-tech-tag {
   background: rgba(56, 189, 248, 0.24) !important;
   color: #ffffff !important;

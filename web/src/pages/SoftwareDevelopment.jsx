@@ -607,8 +607,8 @@ export default function SoftwareDevelopment() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
-            <div className="card card-dynamic hover-orange" style={{ background: '#f8fbff', border: '1.5px solid #dce8f8', borderRadius: 16, padding: '30px 26px', cursor: 'pointer' }}>
-              <div className="card-icon-wrap" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(244,123,32,0.12)', border: '1px solid rgba(244,123,32,0.25)', color: '#f47b20', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, transition: 'all 0.3s ease' }}>
+            <div className="card card-dynamic hover-blue" style={{ background: '#f8fbff', border: '1.5px solid #dce8f8', borderRadius: 16, padding: '30px 26px', cursor: 'pointer' }}>
+              <div className="card-icon-wrap" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(19,81,180,0.12)', border: '1px solid rgba(19,81,180,0.25)', color: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, transition: 'all 0.3s ease' }}>
                 <Cpu size={24} />
               </div>
               <h3 style={{ fontSize: 20, color: '#0d2649', marginBottom: 10, fontWeight: 700 }}>Circuit-to-Cloud Integration</h3>
@@ -627,8 +627,8 @@ export default function SoftwareDevelopment() {
               </p>
             </div>
 
-            <div className="card card-dynamic hover-orange" style={{ background: '#f8fbff', border: '1.5px solid #dce8f8', borderRadius: 16, padding: '30px 26px', cursor: 'pointer' }}>
-              <div className="card-icon-wrap" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(244,123,32,0.12)', border: '1px solid rgba(244,123,32,0.25)', color: '#f47b20', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, transition: 'all 0.3s ease' }}>
+            <div className="card card-dynamic hover-blue" style={{ background: '#f8fbff', border: '1.5px solid #dce8f8', borderRadius: 16, padding: '30px 26px', cursor: 'pointer' }}>
+              <div className="card-icon-wrap" style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(19,81,180,0.12)', border: '1px solid rgba(19,81,180,0.25)', color: '#1351b4', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, transition: 'all 0.3s ease' }}>
                 <ShieldCheck size={24} />
               </div>
               <h3 style={{ fontSize: 20, color: '#0d2649', marginBottom: 10, fontWeight: 700 }}>Industrial Reliability &amp; Uptime</h3>
@@ -663,14 +663,12 @@ export default function SoftwareDevelopment() {
             {[...activeCapabilities]
               .sort((a, b) => (a.order || 0) - (b.order || 0))
               .map((c, i) => {
-                const isOrange = i % 2 === 0;
-                const hoverClass = isOrange ? 'hover-orange' : 'hover-blue';
                 const targetSlug = c.slug || `capability-${i + 1}`;
                 return (
                   <Link
                     key={c.slug || i}
                     to={`/software-development/${targetSlug}`}
-                    className={`card link card-dynamic ${hoverClass}`}
+                    className="card link card-dynamic hover-blue"
                     style={{
                       padding: '32px 28px',
                       border: '1.5px solid #dce8f8',
@@ -685,26 +683,26 @@ export default function SoftwareDevelopment() {
                           width: 52,
                           height: 52,
                           borderRadius: 14,
-                          background: isOrange ? 'rgba(244,123,32,0.1)' : 'rgba(19,81,180,0.1)',
-                          border: isOrange ? '1px solid rgba(244,123,32,0.25)' : '1px solid rgba(19,81,180,0.25)',
+                          background: 'rgba(19,81,180,0.1)',
+                          border: '1px solid rgba(19,81,180,0.25)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'all 0.3s ease',
                         }}
                       >
-                        {iconFor(c.icon, 26, isOrange ? '#f47b20' : '#1351b4')}
+                        {iconFor(c.icon, 26, '#1351b4')}
                       </div>
                       <span
                         className="step-badge"
                         style={{
                           fontSize: 12,
                           fontWeight: 800,
-                          color: isOrange ? '#f47b20' : '#1351b4',
-                          background: isOrange ? 'rgba(244,123,32,0.08)' : 'rgba(19,81,180,0.08)',
+                          color: '#1351b4',
+                          background: 'rgba(19,81,180,0.08)',
                           padding: '4px 10px',
                           borderRadius: 20,
-                          border: isOrange ? '1px solid rgba(244,123,32,0.2)' : '1px solid rgba(19,81,180,0.2)',
+                          border: '1px solid rgba(19,81,180,0.2)',
                         }}
                       >
                         Category 0{i + 1}
@@ -740,7 +738,7 @@ export default function SoftwareDevelopment() {
                         paddingTop: 12,
                         fontSize: 14,
                         fontWeight: 700,
-                        color: isOrange ? '#f47b20' : '#1351b4',
+                        color: '#1351b4',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: 6,
@@ -795,12 +793,10 @@ export default function SoftwareDevelopment() {
             }}
           >
             {TECH_STACK_MATRIX.map((item, idx) => {
-              const isOrange = idx % 2 === 0;
-              const hoverClass = isOrange ? 'hover-orange' : 'hover-blue';
               return (
                 <div
                   key={idx}
-                  className={`card card-dynamic ${hoverClass}`}
+                  className="card card-dynamic hover-blue"
                   style={{
                     background: '#f8fbff',
                     border: '1.5px solid #dce8f8',
@@ -818,7 +814,7 @@ export default function SoftwareDevelopment() {
                       fontWeight: 800,
                       textTransform: 'uppercase',
                       letterSpacing: '0.07em',
-                      color: isOrange ? '#f47b20' : '#1351b4',
+                      color: '#1351b4',
                       transition: 'color 0.25s ease',
                     }}
                   >
@@ -887,12 +883,10 @@ export default function SoftwareDevelopment() {
             }}
           >
             {INDUSTRIES_APPLICATIONS.map((ind, i) => {
-              const isOrange = i % 2 === 0;
-              const hoverClass = isOrange ? 'hover-orange' : 'hover-blue';
               return (
                 <div
                   key={i}
-                  className={`card card-dynamic ${hoverClass}`}
+                  className="card card-dynamic hover-blue"
                   style={{
                     background: '#fcfdfe',
                     border: '1.5px solid #dce8f8',
@@ -906,17 +900,17 @@ export default function SoftwareDevelopment() {
                       width: 48,
                       height: 48,
                       borderRadius: 12,
-                      background: isOrange ? 'rgba(244,123,32,0.1)' : 'rgba(19,81,180,0.1)',
+                      background: 'rgba(19,81,180,0.1)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       marginBottom: 14,
                     }}
                   >
-                    {iconFor(ind.icon, 24, isOrange ? '#f47b20' : '#1351b4')}
+                    {iconFor(ind.icon, 24, '#1351b4')}
                   </div>
                   <h3 style={{ fontSize: 20, color: '#0d2649', margin: '0 0 6px', fontWeight: 700 }}>{ind.title}</h3>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: isOrange ? '#f47b20' : '#1351b4', marginBottom: 10 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1351b4', marginBottom: 10 }}>
                     {ind.subtitle}
                   </div>
                   <p style={{ color: '#52637a', fontSize: 14.5, lineHeight: 1.6, margin: '0 0 16px' }}>{ind.desc}</p>
@@ -953,13 +947,11 @@ export default function SoftwareDevelopment() {
             }}
           >
             {FEATURED_PROJECTS.map((p, idx) => {
-              const isOrange = idx % 2 === 0;
-              const hoverClass = isOrange ? 'hover-orange' : 'hover-blue';
               return (
                 <Link
                   key={p.slug || idx}
                   to={`/software-development/${p.slug}`}
-                  className={`card link card-dynamic ${hoverClass}`}
+                  className="card link card-dynamic hover-blue"
                   style={{
                     background: '#ffffff',
                     border: '1.5px solid #dce8f8',
@@ -968,7 +960,7 @@ export default function SoftwareDevelopment() {
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: isOrange ? '#f47b20' : '#1351b4', textTransform: 'uppercase' }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#1351b4', textTransform: 'uppercase' }}>
                       {p.client}
                     </span>
                     <span
@@ -1011,7 +1003,7 @@ export default function SoftwareDevelopment() {
                       paddingTop: 12,
                       fontSize: 14,
                       fontWeight: 700,
-                      color: isOrange ? '#f47b20' : '#1351b4',
+                      color: '#1351b4',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 6,
@@ -1048,12 +1040,10 @@ export default function SoftwareDevelopment() {
             }}
           >
             {WHY_CHOOSE_POINTS.map((pt, i) => {
-              const isOrange = i % 2 === 0;
-              const hoverClass = isOrange ? 'hover-orange' : 'hover-blue';
               return (
                 <div
                   key={i}
-                  className={`card card-dynamic ${hoverClass}`}
+                  className="card card-dynamic hover-blue"
                   style={{
                     background: '#f8fbff',
                     border: '1.5px solid #dce8f8',
@@ -1070,9 +1060,9 @@ export default function SoftwareDevelopment() {
                       width: 48,
                       height: 48,
                       borderRadius: 12,
-                      background: isOrange ? 'rgba(244,123,32,0.12)' : 'rgba(19,81,180,0.12)',
-                      border: isOrange ? '1px solid rgba(244,123,32,0.25)' : '1px solid rgba(19,81,180,0.25)',
-                      color: isOrange ? '#f47b20' : '#1351b4',
+                      background: 'rgba(19,81,180,0.12)',
+                      border: '1px solid rgba(19,81,180,0.25)',
+                      color: '#1351b4',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1080,7 +1070,7 @@ export default function SoftwareDevelopment() {
                       transition: 'all 0.3s ease',
                     }}
                   >
-                    {iconFor(pt.icon, 24, isOrange ? '#f47b20' : '#1351b4')}
+                    {iconFor(pt.icon, 24, '#1351b4')}
                   </div>
                   <div>
                     <h3 style={{ fontSize: 19, color: '#0d2649', margin: '0 0 8px', fontWeight: 700 }}>{pt.title}</h3>

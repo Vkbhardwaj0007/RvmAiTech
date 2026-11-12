@@ -153,7 +153,7 @@ export default function Home() {
           </div>
           <div className="grid-3">
             {services.map((s, i) => (
-              <Link className={`card link card-dynamic ${i % 2 === 0 ? 'hover-orange' : 'hover-blue'}`} to={`/services/${s.slug}`} key={s._id || i}>
+              <Link className="card link card-dynamic hover-blue" to={`/services/${s.slug}`} key={s._id || i}>
                 <span className="card-num">{String(i + 1).padStart(2, '0')}</span>
                 <div className="card-ico card-icon-wrap">{iconFor(s.icon)}</div>
                 <h3>{s.title}</h3><p>{s.summary}</p>
@@ -204,7 +204,7 @@ export default function Home() {
           </div>
           <div className="grid-3">
             {tech.map((t, i) => (
-              <Link className={`cap link card-dynamic ${i % 2 === 0 ? 'hover-orange' : 'hover-blue'}`} to={`/technologies/${t.slug}`} key={t._id || i}>
+              <Link className="cap link card-dynamic hover-blue" to={`/technologies/${t.slug}`} key={t._id || i}>
                 <div className="cap-ico card-icon-wrap">{iconFor(t.icon)}</div>
                 <h3>{t.title}</h3><p>{t.summary}</p>
                 <span className="card-link card-action-link">Explore →</span>

@@ -67,7 +67,7 @@ export default function WhyChooseSection() {
             return (
               <div
                 key={i}
-                className={`why-card card link card-dynamic ${i % 2 === 0 ? 'hover-orange' : 'hover-blue'}`}
+                className="why-card card link card-dynamic hover-blue"
               >
                 <div className="why-top-bar" />
                 <div>
