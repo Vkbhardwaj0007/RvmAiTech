@@ -91,7 +91,7 @@ function toLogin(reason) {
   localStorage.removeItem(TOKEN_KEY);
   if (location.pathname.startsWith('/admin') && location.pathname !== '/admin/login') {
     location.href = `/admin/login?${reason}=1`;
-    return new Promise(() => {}); // the page is navigating away; swallow the error
+    return new Promise(() => { }); // the page is navigating away; swallow the error
   }
   return null;
 }
