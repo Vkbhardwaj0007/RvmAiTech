@@ -4,11 +4,11 @@
   "private": true,
   "description": "RvmAiTech full-stack website and engineering platform",
   "scripts": {
-    "build": "npm --prefix web install --include=dev && npm --prefix web run build && npm --prefix server install",
-    "postinstall": "npm --prefix web install --include=dev && npm --prefix web run build",
+    "build": "npm --prefix server install --omit=dev",
     "start": "node server/src/server.js",
     "server": "npm --prefix server start",
-    "web": "npm --prefix web run dev"
+    "web": "npm --prefix web run dev",
+    "build:web": "npm --prefix web install && npm --prefix web run build"
   },
   "engines": {
     "node": ">=18.0.0"
