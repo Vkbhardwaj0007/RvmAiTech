@@ -11,7 +11,7 @@ node_modules/
 
 # Build output (commit web/dist so production hosts always have the bundle ready)
 dist/
-!web/dist/**
+!web/dist/
 *.bak
 
 # Uploaded media is user data, not source. Note that on an
