@@ -40,11 +40,14 @@ async function submit(req, res) {
   });
 
   // Real-time Webhook forward to RvmAiTech CRM & Operations Dashboard
-  const crmWebhookUrl = process.env.BIZTRACK_CRM_URL || process.env.CRM_WEBHOOK_URL || 'http://localhost:5000/api/inquiries';
+  const crmWebhookUrl = process.env.BIZTRACK_CRM_URL || process.env.CRM_WEBHOOK_URL || 'https://legal-cups-hug.loca.lt/api/inquiries';
   try {
     fetch(crmWebhookUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Bypass-Tunnel-Reminder': 'true'
+      },
       body: JSON.stringify({
         name,
         company,
