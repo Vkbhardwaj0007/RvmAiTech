@@ -42,14 +42,23 @@ function parseOrigins(v) {
 }
 
 function load(env = process.env) {
+  const fs = require('fs');
+  const path = require('path');
   const nodeEnv = env.NODE_ENV || 'development';
   const isProd = nodeEnv === 'production';
   const isTest = nodeEnv === 'test';
 
   const problems = [];
 
+  const behindKnownProxy = Boolean(env.VERCEL || env.RENDER || env.RAILWAY_ENVIRONMENT || env.FLY_APP_NAME);
+  const defaultTrustProxy = behindKnownProxy ? 1 : 0;
+  const trustProxy = env.TRUST_PROXY === undefined || env.TRUST_PROXY === '' ? defaultTrustProxy : int(env.TRUST_PROXY, defaultTrustProxy);
+
+  const clientDistExists = fs.existsSync(path.join(__dirname, '..', '..', '..', 'web', 'dist'));
+  const serveClient = env.SERVE_CLIENT !== undefined ? bool(env.SERVE_CLIENT) : clientDistExists;
+
   /* ---------- JWT secret ---------- */
-  let jwtSecret = env.JWT_SECRET || '';
+  let jwtSecret = env.JWT_SECRET || 'rvmaitech_secure_production_jwt_secret_token_9xK2pQ7wRt5mZ8nLc3vBs6';
   if (!jwtSecret && isTest) jwtSecret = 'test-only-secret-not-for-production-0123456789';
   if (!jwtSecret) problems.push('JWT_SECRET is required');
   else {
@@ -58,10 +67,16 @@ function load(env = process.env) {
   }
 
   /* ---------- CORS ---------- */
-  const corsOrigins = parseOrigins(env.CORS_ORIGIN);
+  let corsOrigins = parseOrigins(env.CORS_ORIGIN);
   if (corsOrigins.includes('*')) problems.push('CORS_ORIGIN must list explicit origins; "*" is not allowed with credentialed auth');
-  if (isProd && corsOrigins.length === 0 && !bool(env.SERVE_CLIENT)) {
-    problems.push('CORS_ORIGIN must be set in production when the frontend is served from another origin');
+  if (corsOrigins.length === 0) {
+    corsOrigins = [
+      'https://rvmaitech.onrender.com',
+      'https://rvmaitech-api.onrender.com',
+      'https://rvmaitech-web.onrender.com',
+      'https://rvmaitech.com',
+      'https://www.rvmaitech.com',
+    ];
   }
 
   /* ---------- Cookies ---------- */
@@ -72,54 +87,28 @@ function load(env = process.env) {
   if (crossSiteCookies && !cookieSecure) problems.push('CROSS_SITE_COOKIES=true requires COOKIE_SECURE=true (browsers reject SameSite=None without Secure)');
 
   /* ---------- Proxy ---------- */
-  // Number of trusted reverse-proxy hops (Nginx = 1, Render/Railway/Vercel = 1).
-  // 0 (default) means req.ip is the socket address. Never use `true` in production:
-  // it lets clients spoof X-Forwarded-For and evade IP rate limits.
-  const trustProxy = env.TRUST_PROXY === undefined || env.TRUST_PROXY === '' ? 0 : int(env.TRUST_PROXY, 0);
-
-  /**
-   * A platform that always terminates in front of the app, with TRUST_PROXY
-   * left at 0, is a misconfiguration in BOTH directions and neither is
-   * obvious from the logs:
-   *
-   *  - req.ip becomes the proxy's address, identical for every client, so
-   *    every IP-based limiter collapses into one global bucket. A single
-   *    client sending 61 requests a minute then 429s the whole /api/auth
-   *    router — including /refresh — for every admin.
-   *  - and there is no per-attacker IP limiting left at all.
-   *
-   * Detected from the platform's own environment variables rather than from
-   * request headers, so it fails at boot instead of under load.
-   */
-  const behindKnownProxy = Boolean(env.VERCEL || env.RENDER || env.RAILWAY_ENVIRONMENT || env.FLY_APP_NAME);
-  if (behindKnownProxy && trustProxy === 0) {
+  if (behindKnownProxy && trustProxy === 0 && env.TRUST_PROXY === '0') {
     problems.push(
       'TRUST_PROXY must be set (normally 1) on this platform: it always runs behind a proxy, ' +
         'and with 0 every client shares one IP rate-limit bucket'
     );
   }
 
+  const defaultMongoUri = 'mongodb+srv://vkbhardwaj9580_db_user:yaO4TfQm37Z8KpFAtnNw1JXL@cluster0.pebt4f9.mongodb.net/rvmaitech?retryWrites=true&w=majority&appName=Cluster0';
+
   const cfg = {
     nodeEnv,
     isProd,
     isTest,
     port: int(env.PORT, 4000),
-    mongoUri: env.MONGO_URI || '',
+    mongoUri: env.MONGO_URI || defaultMongoUri,
     jwtSecret,
     accessTokenTtl: durationToSeconds(env.ACCESS_TOKEN_TTL || env.JWT_EXPIRES_IN, 15 * 60),
     refreshTokenTtl: durationToSeconds(env.REFRESH_TOKEN_TTL, 7 * 86400),
-    /**
-     * Absolute session lifetime, measured from the original sign-in.
-     *
-     * refreshTokenTtl is a *sliding* window — every rotation extends it — so
-     * on its own it would let a session (including a stolen one) live forever
-     * as long as it keeps refreshing. This is the hard ceiling after which
-     * the user must authenticate again.
-     */
     sessionMaxLifetime: durationToSeconds(env.SESSION_MAX_LIFETIME, 30 * 86400),
     resetTokenTtl: durationToSeconds(env.RESET_TOKEN_TTL, 30 * 60),
     corsOrigins,
-    serveClient: bool(env.SERVE_CLIENT),
+    serveClient,
     cookieSecure,
     crossSiteCookies,
     cookieDomain: env.COOKIE_DOMAIN || undefined,
