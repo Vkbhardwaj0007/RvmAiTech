@@ -55,7 +55,10 @@ function load(env = process.env) {
     ? (int(env.TRUST_PROXY, 1) || 1)
     : (env.TRUST_PROXY !== undefined && env.TRUST_PROXY !== '' ? int(env.TRUST_PROXY, 0) : 0);
 
-  const serveClient = env.SERVE_CLIENT !== undefined ? bool(env.SERVE_CLIENT) : true;
+  // On Render/Vercel/Railway/Fly this one service serves both the API and the
+  // pre-built frontend, so an inherited SERVE_CLIENT=false (copied from a local
+  // .env) must not blank the website.
+  const serveClient = behindKnownProxy ? true : (env.SERVE_CLIENT !== undefined && env.SERVE_CLIENT !== '' ? bool(env.SERVE_CLIENT) : true);
 
   /* ---------- JWT secret ---------- */
   let jwtSecret = env.JWT_SECRET || 'rvmaitech_secure_production_jwt_secret_token_9xK2pQ7wRt5mZ8nLc3vBs6';
@@ -78,6 +81,7 @@ function load(env = process.env) {
       'https://www.rvmaitech.com',
     ];
   }
+  if (env.RENDER_EXTERNAL_URL) corsOrigins.push(String(env.RENDER_EXTERNAL_URL).replace(/\/+$/, ''));
 
   /* ---------- Cookies ---------- */
   // Secure cookies are mandatory in production (HTTPS everywhere), optional in dev.
