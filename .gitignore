@@ -9,8 +9,9 @@ node_modules/
 .env.*
 !.env.example
 
-# Build output
+# Build output (commit web/dist so production hosts always have the bundle ready)
 dist/
+!web/dist/**
 *.bak
 
 # Uploaded media is user data, not source. Note that on an

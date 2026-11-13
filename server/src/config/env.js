@@ -55,8 +55,7 @@ function load(env = process.env) {
     ? (int(env.TRUST_PROXY, 1) || 1)
     : (env.TRUST_PROXY !== undefined && env.TRUST_PROXY !== '' ? int(env.TRUST_PROXY, 0) : 0);
 
-  const clientDistExists = fs.existsSync(path.join(__dirname, '..', '..', '..', 'web', 'dist'));
-  const serveClient = env.SERVE_CLIENT !== undefined ? bool(env.SERVE_CLIENT) : clientDistExists;
+  const serveClient = env.SERVE_CLIENT !== undefined ? bool(env.SERVE_CLIENT) : true;
 
   /* ---------- JWT secret ---------- */
   let jwtSecret = env.JWT_SECRET || 'rvmaitech_secure_production_jwt_secret_token_9xK2pQ7wRt5mZ8nLc3vBs6';

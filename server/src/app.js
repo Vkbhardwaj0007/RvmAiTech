@@ -45,7 +45,23 @@ const app = express();
    INLINE SCRIPT HASHES
    ========================= */
 
-const CLIENT_DIST = path.join(__dirname, '..', '..', 'web', 'dist');
+function findClientDist() {
+  const candidates = [
+    path.resolve(__dirname, '../../web/dist'),
+    path.resolve(process.cwd(), 'web/dist'),
+    path.resolve(process.cwd(), 'dist'),
+    path.resolve(__dirname, '../web/dist'),
+    path.resolve(__dirname, '../../../web/dist'),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(path.join(c, 'index.html'))) {
+      return c;
+    }
+  }
+  return null;
+}
+
+const CLIENT_DIST = findClientDist() || path.resolve(__dirname, '../../web/dist');
 
 /**
  * When this server also serves the built frontend, its index.html contains an
@@ -352,19 +368,26 @@ app.get('/api/menu', (req, res) => {
 });
 
 /* =========================
-   OPTIONAL FRONTEND SERVING
+   FRONTEND SERVING
    ========================= */
 
-if (config.serveClient) {
-  if (fs.existsSync(CLIENT_DIST)) {
-    app.use(express.static(CLIENT_DIST));
-    app.get(/^(?!\/api|\/uploads|\/sitemap|\/robots).*/, (req, res) => {
-      res.sendFile(path.join(CLIENT_DIST, 'index.html'));
-    });
-    console.log('Serving frontend from web/dist');
-  } else {
-    console.warn('SERVE_CLIENT=true but web/dist does not exist — run `npm run build` in web/');
-  }
+const resolvedClientDist = findClientDist();
+if (config.serveClient !== false && resolvedClientDist) {
+  app.use(express.static(resolvedClientDist));
+  app.get('*', (req, res, next) => {
+    if (
+      req.path.startsWith('/api') ||
+      req.path.startsWith('/uploads') ||
+      req.path === '/sitemap.xml' ||
+      req.path === '/robots.txt'
+    ) {
+      return next();
+    }
+    res.sendFile(path.join(resolvedClientDist, 'index.html'));
+  });
+  console.log(`Serving frontend from: ${resolvedClientDist}`);
+} else {
+  console.warn('⚠️ Frontend dist folder not found or SERVE_CLIENT=false');
 }
 
 /* =========================
