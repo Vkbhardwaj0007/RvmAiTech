@@ -97,7 +97,17 @@ function toLogin(reason) {
 }
 
 client.interceptors.response.use(
-  (r) => r,
+  (r) => {
+    if (r?.data) {
+      const isString = typeof r.data === 'string';
+      const text = isString ? r.data : JSON.stringify(r.data);
+      if (text.includes('localhost:4000/uploads/')) {
+        const fixed = text.replace(/https?:\/\/localhost:4000\/uploads\//g, '/uploads/');
+        r.data = isString ? fixed : JSON.parse(fixed);
+      }
+    }
+    return r;
+  },
   async (err) => {
     const status = err?.response?.status;
     const original = err?.config || {};

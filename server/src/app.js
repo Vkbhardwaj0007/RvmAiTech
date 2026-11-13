@@ -221,6 +221,30 @@ app.use(express.urlencoded({ extended: false, limit: config.jsonBodyLimit }));
 app.use(cookieParser());
 
 /**
+ * Automatically normalizes any localhost:4000/uploads/... or absolute uploads
+ * URLs in JSON responses to same-origin relative /uploads/... so images load
+ * properly across any environment (Render, domain, or dev).
+ */
+app.use((req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = function (body) {
+    if (body && typeof body === 'object') {
+      try {
+        const text = JSON.stringify(body);
+        if (text.includes('/uploads/')) {
+          const cleaned = text.replace(/https?:\/\/[a-zA-Z0-9.-]+(?::\d+)?\/uploads\//g, '/uploads/');
+          return originalJson(JSON.parse(cleaned));
+        }
+      } catch (e) {
+        // pass through
+      }
+    }
+    return originalJson(body);
+  };
+  next();
+});
+
+/**
  * Strips MongoDB operators from every request. The route schemas would catch
  * these anyway on the endpoints that have them; this is the backstop for any
  * route added later without one.

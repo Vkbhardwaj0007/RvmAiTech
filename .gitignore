@@ -14,8 +14,13 @@ dist/
 !web/dist/
 *.bak
 
-# Uploaded media is user data, not source. Note that on an
-# ephemeral host (Render, Railway, Vercel) this directory does not
-# survive a redeploy — see DEPLOY.md.
-server/uploads/*
+# Uploaded media: ignore large videos and resumes, but track image uploads
+server/uploads/*.mp4
+server/uploads/*.webm
+server/uploads/resumes/*
+!server/uploads/*.jpg
+!server/uploads/*.jpeg
+!server/uploads/*.png
+!server/uploads/*.webp
+!server/uploads/*.svg
 !server/uploads/.gitkeep
