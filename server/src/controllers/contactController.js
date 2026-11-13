@@ -38,6 +38,29 @@ async function submit(req, res) {
   ).catch((err) => {
     console.error('Contact email notification error:', err?.message || err);
   });
+
+  // Real-time Webhook forward to RvmAiTech CRM & Operations Dashboard
+  const crmWebhookUrl = process.env.BIZTRACK_CRM_URL || process.env.CRM_WEBHOOK_URL || 'http://localhost:5000/api/inquiries';
+  try {
+    fetch(crmWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        company,
+        email,
+        phone,
+        service: finalSubject,
+        budget,
+        timeline,
+        message: finalMessage,
+        source: 'https://rvmaitech-com.onrender.com/contact'
+      })
+    }).catch((err) => {
+      // Non-blocking: fail quietly if CRM is offline or unconfigured
+    });
+  } catch (err) {}
+
   res.status(201).json({ ok: true, id: m._id });
 }
 async function list(req, res) {
