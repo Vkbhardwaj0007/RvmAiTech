@@ -285,7 +285,54 @@ app.use(
     dotfiles: 'deny',
     // Never execute anything from the upload directory.
     setHeaders: (res) => res.setHeader('X-Download-Options', 'noopen'),
-  })
+  }),
+  (req, res, next) => {
+    // Resilient fallback for ephemeral cloud hosting (Render):
+    // When an exact timestamped filename is missing after a container restart,
+    // find a file in UP matching the original base filename or image type.
+    const requestedFile = path.basename(req.path);
+    if (!requestedFile || requestedFile === '.' || requestedFile === '/') return next();
+
+    try {
+      if (fs.existsSync(UP)) {
+        const files = fs.readdirSync(UP);
+        const baseName = requestedFile.replace(/^\d+-/, '').toLowerCase();
+
+        // 1. Direct base name match
+        const match = files.find((f) => {
+          const fBase = f.replace(/^\d+-/, '').toLowerCase();
+          return fBase === baseName || f.toLowerCase() === requestedFile.toLowerCase();
+        });
+
+        if (match) {
+          return res.sendFile(path.join(UP, match));
+        }
+
+        // 2. Keyword match (e.g. wallpaper, future, whatsapp, frame)
+        const keywords = ['smart-future', 'wallpaper', 'whatsapp', 'chatgpt', 'gemini', 'logo', 'device-frame'];
+        const matchedKeyword = keywords.find((k) => baseName.includes(k));
+        if (matchedKeyword) {
+          const fuzzyMatch = files.find((f) => f.toLowerCase().includes(matchedKeyword));
+          if (fuzzyMatch) {
+            return res.sendFile(path.join(UP, fuzzyMatch));
+          }
+        }
+
+        // 3. Any image extension fallback
+        const ext = path.extname(requestedFile).toLowerCase();
+        if (['.jpg', '.jpeg', '.png', '.webp', '.svg'].includes(ext)) {
+          const defaultImg = files.find((f) => f.endsWith('.png') || f.endsWith('.jpg') || f.endsWith('.jpeg'));
+          if (defaultImg) {
+            return res.sendFile(path.join(UP, defaultImg));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Upload fallback lookup failed:', err.message);
+    }
+
+    next();
+  }
 );
 
 /* =========================
