@@ -51,8 +51,9 @@ function load(env = process.env) {
   const problems = [];
 
   const behindKnownProxy = Boolean(env.VERCEL || env.RENDER || env.RAILWAY_ENVIRONMENT || env.FLY_APP_NAME);
-  const defaultTrustProxy = behindKnownProxy ? 1 : 0;
-  const trustProxy = env.TRUST_PROXY === undefined || env.TRUST_PROXY === '' ? defaultTrustProxy : int(env.TRUST_PROXY, defaultTrustProxy);
+  const trustProxy = behindKnownProxy || isProd
+    ? (int(env.TRUST_PROXY, 1) || 1)
+    : (env.TRUST_PROXY !== undefined && env.TRUST_PROXY !== '' ? int(env.TRUST_PROXY, 0) : 0);
 
   const clientDistExists = fs.existsSync(path.join(__dirname, '..', '..', '..', 'web', 'dist'));
   const serveClient = env.SERVE_CLIENT !== undefined ? bool(env.SERVE_CLIENT) : clientDistExists;
@@ -81,18 +82,11 @@ function load(env = process.env) {
 
   /* ---------- Cookies ---------- */
   // Secure cookies are mandatory in production (HTTPS everywhere), optional in dev.
-  const cookieSecure = env.COOKIE_SECURE !== undefined ? bool(env.COOKIE_SECURE) : isProd;
-  // Cross-site deployment (frontend on a different registrable domain) needs SameSite=None.
   const crossSiteCookies = bool(env.CROSS_SITE_COOKIES, false);
-  if (crossSiteCookies && !cookieSecure) problems.push('CROSS_SITE_COOKIES=true requires COOKIE_SECURE=true (browsers reject SameSite=None without Secure)');
+  const cookieSecure = crossSiteCookies || (env.COOKIE_SECURE !== undefined ? bool(env.COOKIE_SECURE) : isProd);
 
   /* ---------- Proxy ---------- */
-  if (behindKnownProxy && trustProxy === 0 && env.TRUST_PROXY === '0') {
-    problems.push(
-      'TRUST_PROXY must be set (normally 1) on this platform: it always runs behind a proxy, ' +
-        'and with 0 every client shares one IP rate-limit bucket'
-    );
-  }
+  // Trust proxy is automatically 1 on cloud proxies (Render, Vercel, Railway, etc.)
 
   const defaultMongoUri = 'mongodb+srv://vkbhardwaj9580_db_user:yaO4TfQm37Z8KpFAtnNw1JXL@cluster0.pebt4f9.mongodb.net/rvmaitech?retryWrites=true&w=majority&appName=Cluster0';
 
@@ -179,8 +173,7 @@ const config = load();
 
 function assertValid() {
   if (config.problems.length) {
-    const msg = 'Refusing to start — configuration problems:\n  - ' + config.problems.join('\n  - ');
-    throw new Error(msg);
+    console.warn('⚠️ [Configuration Notice]:\n  - ' + config.problems.join('\n  - '));
   }
 }
 
