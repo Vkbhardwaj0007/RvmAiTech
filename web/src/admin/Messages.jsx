@@ -30,19 +30,27 @@ export function Messages() {
         <table className="adm-table">
           <thead><tr><th>When</th><th>Name</th><th>Email/Phone</th><th>Subject</th><th>Message</th><th></th></tr></thead>
           <tbody>
-            {msgs.map((m) => (
-              <tr key={m._id} style={{ opacity: m.read ? 0.55 : 1 }}>
-                <td>{new Date(m.createdAt).toLocaleString('en-IN')}</td>
-                <td>
-                  <b>{m.name}</b>
-                  {m.company && <div style={{ fontSize: 12, color: '#f47b20', fontWeight: 600 }}>{m.company}</div>}
-                </td>
-                <td>{m.email || '—'}<br />{m.phone || ''}</td>
-                <td>{m.subject || '—'}</td>
-                <td>{(m.message || '').slice(0, 80)}</td>
-                <td>{!m.read && <button className="adm-ic" onClick={() => markRead(m)}>Mark read</button>}</td>
-              </tr>
-            ))}
+            {msgs.map((m) => {
+              const isAudit = (m.subject || '').includes('[COMPANY AUDIT]');
+              const isDemo = (m.subject || '').includes('[DEMO REQUEST]');
+              return (
+                <tr key={m._id} style={{ opacity: m.read ? 0.6 : 1 }}>
+                  <td style={{ whiteSpace: 'nowrap', fontSize: 13 }}>{new Date(m.createdAt).toLocaleString('en-IN')}</td>
+                  <td>
+                    <b>{m.name}</b>
+                    {m.company && <div style={{ fontSize: 12, color: '#f47b20', fontWeight: 600 }}>{m.company}</div>}
+                  </td>
+                  <td style={{ fontSize: 13 }}>{m.email || '—'}<br />{m.phone || ''}</td>
+                  <td>
+                    {isAudit && <span style={{ display: 'inline-block', background: '#0ea5e9', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 12, marginBottom: 4 }}>COMPANY AUDIT</span>}
+                    {isDemo && <span style={{ display: 'inline-block', background: '#f47b20', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 12, marginBottom: 4 }}>DEMO REQUEST</span>}
+                    <div style={{ fontWeight: 600 }}>{(m.subject || '—').replace('[COMPANY AUDIT] ', '').replace('[DEMO REQUEST] ', '')}</div>
+                  </td>
+                  <td style={{ whiteSpace: 'pre-line', fontSize: 13, maxWidth: 420, lineHeight: 1.5 }}>{m.message || '—'}</td>
+                  <td>{!m.read && <button className="adm-ic" onClick={() => markRead(m)}>Mark read</button>}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

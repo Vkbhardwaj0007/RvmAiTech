@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import WhatsAppFloat from './components/WhatsAppFloat';
 import AiAssistant from './components/AiAssistant';
+import AuditBookingModal from './components/AuditBookingModal';
 import GA from './components/GA';
 import Effects3D from './components/Effects3D';
 import ScrollTop from './components/ScrollTop';
@@ -55,6 +56,7 @@ function Layout() {
       <Footer />
       <WhatsAppFloat />
       <AiAssistant />
+      <AuditBookingModal />
       <GA />
       <Effects3D />
     </>

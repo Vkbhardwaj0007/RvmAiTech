@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import client from '../api/client';
 import Logo from './Logo';
 import { useLang } from '../api/Lang';
+import { openAuditModal } from './AuditBookingModal';
 
 // fallback menu if API not reachable
 const FALLBACK = [
@@ -69,6 +70,20 @@ export default function Header() {
           ))}
           <button className="lang-toggle" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} title="Language">
             {lang === 'en' ? 'हिंदी' : 'ENG'}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setOpen(false); openAuditModal(); }}
+            className="nav-cta"
+            style={{
+              background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
+              border: '1px solid rgba(56, 189, 248, 0.55)',
+              cursor: 'pointer',
+              marginRight: 6,
+              boxShadow: '0 4px 14px rgba(14, 165, 233, 0.25)',
+            }}
+          >
+            {t('book_audit')}
           </button>
           <Link to="/contact" className="nav-cta">{t('get_quote')}</Link>
         </nav>

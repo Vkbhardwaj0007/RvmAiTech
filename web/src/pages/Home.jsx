@@ -13,6 +13,7 @@ import WhyChooseSection from '../components/WhyChooseSection';
 import ProjectResultsAndTestimonials from '../components/ProjectResultsAndTestimonials';
 import FaqSection from '../components/FaqSection';
 import DemoRequestModal from '../components/DemoRequestModal';
+import { openAuditModal } from '../components/AuditBookingModal';
 import { canRun3D } from '../components/heroScene3DSupport';
 
 /**
@@ -120,6 +121,20 @@ export default function Home() {
               style={{ cursor: 'pointer', border: 'none' }}
             >
               {t('hero_cta1')}
+            </button>
+            <button
+              type="button"
+              onClick={() => openAuditModal()}
+              className="btn"
+              style={{
+                cursor: 'pointer',
+                background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
+                color: '#fff',
+                border: '1px solid rgba(56, 189, 248, 0.55)',
+                boxShadow: '0 8px 24px rgba(14, 165, 233, 0.35)',
+              }}
+            >
+              Book Company Audit
             </button>
             <a href="#solutions" className="btn btn-ghost">{t('hero_cta2')}</a>
           </div>
@@ -258,6 +273,71 @@ export default function Home() {
       {/* FAQ SECTION */}
       <FaqSection />
 
+      {/* COMPANY AUTOMATION AUDIT BANNER */}
+      <section style={{ padding: '64px 0 24px' }}>
+        <div className="wrap">
+          <div style={{
+            background: 'linear-gradient(135deg, #091a33 0%, #0d2649 60%, #103260 100%)',
+            borderRadius: 24,
+            padding: '44px 40px',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+            boxShadow: '0 24px 60px rgba(9, 26, 51, 0.18)',
+            color: '#fff',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14, 165, 233, 0.18)', border: '1px solid rgba(56, 189, 248, 0.45)', color: '#7dd3fc', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 16 }}>
+              <span>●</span> On-Site &amp; Online Technical Assessment
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 32, alignItems: 'center' }}>
+              <div>
+                <h2 style={{ color: '#fff', fontSize: 'clamp(24px, 3.2vw, 34px)', margin: '0 0 12px', lineHeight: 1.2 }}>
+                  Book an Automation &amp; Technical Audit for Your Company
+                </h2>
+                <p style={{ color: '#cbd5e1', fontSize: 16, lineHeight: 1.65, margin: '0 0 24px', maxWidth: 620 }}>
+                  Want to reduce machine downtime, eliminate manual quality defects, or digitize your plant operations? Our engineering team conducts a complete assessment of your facility and delivers a clear ROI &amp; automation roadmap.
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                  <button
+                    type="button"
+                    onClick={() => openAuditModal('Factory / Plant Automation & OEE Audit')}
+                    className="btn btn-primary"
+                    style={{ cursor: 'pointer', border: 'none', padding: '13px 26px', fontSize: 15 }}
+                  >
+                    Schedule Company Audit →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openAuditModal('Machine Vision & Quality Inspection Audit')}
+                    className="btn btn-ghost"
+                    style={{ cursor: 'pointer', color: '#e2e8f0', borderColor: 'rgba(255,255,255,0.28)' }}
+                  >
+                    Vision &amp; QC Audit
+                  </button>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gap: 14 }}>
+                {[
+                  { step: '01', title: 'Plant & Workflow Inspection', desc: 'On-site visit or virtual walkthrough of your machines, sensors, PLCs, and manual bottlenecks.' },
+                  { step: '02', title: 'Gap & OEE Loss Analysis', desc: 'Identify hidden downtime, cycle-time losses, rejection causes, and telemetry gaps.' },
+                  { step: '03', title: 'Custom Automation & ROI Report', desc: 'Receive a practical implementation architecture, hardware/software BOM, and payback timeline.' },
+                ].map((item) => (
+                  <div key={item.step} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '14px 18px' }}>
+                    <span style={{ background: 'linear-gradient(135deg, #f47b20, #e06610)', color: '#fff', fontWeight: 800, fontSize: 13, padding: '5px 10px', borderRadius: 8, flexShrink: 0 }}>
+                      {item.step}
+                    </span>
+                    <div>
+                      <h4 style={{ color: '#fff', margin: '0 0 4px', fontSize: 15.5, fontWeight: 700 }}>{item.title}</h4>
+                      <p style={{ color: '#94a3b8', margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section>
         <div className="wrap">
@@ -267,6 +347,19 @@ export default function Home() {
               <p>Tell us the process you want to improve. We'll propose the right mix of robotics, vision and intelligence — with a clear payback.</p>
             </div>
             <div className="cta-actions">
+              <button
+                type="button"
+                onClick={() => openAuditModal()}
+                className="btn"
+                style={{
+                  cursor: 'pointer',
+                  background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
+                  color: '#fff',
+                  border: '1px solid rgba(56, 189, 248, 0.55)',
+                }}
+              >
+                Book Company Audit
+              </button>
               <button
                 type="button"
                 onClick={() => { setDemoProduct('MDMS (Machine Data Monitoring)'); setDemoOpen(true); }}

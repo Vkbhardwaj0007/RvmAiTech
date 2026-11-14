@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const STR = {
   en: {
     get_quote: 'Get a quote',
+    book_audit: 'Book Audit',
     hero_eyebrow: 'MDMS Intelligence · 30%+ Downtime Reduction · Live OEE',
     hero_l1: 'Smarter Machines.', hero_l2: 'Measurable ROI.',
     hero_lead: 'Transform factory operations with MDMS (Machine Data Management System) and non-intrusive edge datalogging. Track live machine status, automate shift OEE, and cut unplanned downtime by 30% or more.',
@@ -10,6 +11,7 @@ const STR = {
   },
   hi: {
     get_quote: 'कोटेशन लें',
+    book_audit: 'ऑडिट बुक करें',
     hero_eyebrow: 'MDMS इंटेलिजेंस · 30%+ डाउनटाइम में कमी · लाइव OEE',
     hero_l1: 'स्मार्ट मशीनें।', hero_l2: 'मापने योग्य ROI।',
     hero_lead: 'MDMS (मशीन डेटा मैनेजमेंट सिस्टम) और एज डेटालॉगर से अपनी फैक्ट्री को स्मार्ट बनाएं। रियल-टाइम मशीन स्टेटस ट्रैक करें, शिफ्ट OEE कैलकुलेट करें और डाउनटाइम 30% तक घटाएं।',
