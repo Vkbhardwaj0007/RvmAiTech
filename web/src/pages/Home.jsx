@@ -280,39 +280,48 @@ export default function Home() {
             background: 'linear-gradient(135deg, #091a33 0%, #0d2649 60%, #103260 100%)',
             borderRadius: 24,
             padding: '44px 40px',
-            border: '1px solid rgba(56, 189, 248, 0.3)',
-            boxShadow: '0 24px 60px rgba(9, 26, 51, 0.18)',
+            border: '1.5px solid rgba(56, 189, 248, 0.45)',
+            boxShadow: '0 24px 60px rgba(9, 26, 51, 0.22)',
             color: '#fff',
             position: 'relative',
             overflow: 'hidden',
           }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14, 165, 233, 0.18)', border: '1px solid rgba(56, 189, 248, 0.45)', color: '#7dd3fc', padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 16 }}>
-              <span>●</span> On-Site &amp; Online Technical Assessment
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14, 165, 233, 0.25)', border: '1px solid #38bdf8', color: '#e0f2fe', padding: '6px 16px', borderRadius: 20, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 18 }}>
+              <span style={{ color: '#38bdf8' }}>●</span> On-Site &amp; Online Technical Assessment
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 32, alignItems: 'center' }}>
               <div>
-                <h2 style={{ color: '#fff', fontSize: 'clamp(24px, 3.2vw, 34px)', margin: '0 0 12px', lineHeight: 1.2 }}>
+                <h2 style={{ color: '#ffffff', fontSize: 'clamp(24px, 3.2vw, 34px)', margin: '0 0 14px', lineHeight: 1.22, fontWeight: 800 }}>
                   Book an Automation &amp; Technical Audit for Your Company
                 </h2>
-                <p style={{ color: '#cbd5e1', fontSize: 16, lineHeight: 1.65, margin: '0 0 24px', maxWidth: 620 }}>
+                <p style={{ color: '#f1f5f9', fontSize: 16, lineHeight: 1.68, margin: '0 0 26px', maxWidth: 620, fontWeight: 400 }}>
                   Want to reduce machine downtime, eliminate manual quality defects, or digitize your plant operations? Our engineering team conducts a complete assessment of your facility and delivers a clear ROI &amp; automation roadmap.
                 </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
                   <button
                     type="button"
-                    onClick={() => openAuditModal('Factory / Plant Automation & OEE Audit')}
+                    onClick={() => openAuditModal('Factory / Plant Automation & OEE Audit (MDMS & PLC)')}
                     className="btn btn-primary"
-                    style={{ cursor: 'pointer', border: 'none', padding: '13px 26px', fontSize: 15 }}
+                    style={{ cursor: 'pointer', border: 'none', padding: '14px 26px', fontSize: 15, fontWeight: 700 }}
                   >
                     Schedule Company Audit →
                   </button>
                   <button
                     type="button"
                     onClick={() => openAuditModal('Machine Vision & Quality Inspection Audit')}
-                    className="btn btn-ghost"
-                    style={{ cursor: 'pointer', color: '#e2e8f0', borderColor: 'rgba(255,255,255,0.28)' }}
+                    className="btn"
+                    style={{
+                      cursor: 'pointer',
+                      background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
+                      color: '#ffffff',
+                      border: '1.5px solid #7dd3fc',
+                      padding: '14px 24px',
+                      fontSize: 15,
+                      fontWeight: 700,
+                      boxShadow: '0 8px 22px rgba(14, 165, 233, 0.35)',
+                    }}
                   >
-                    Vision &amp; QC Audit
+                    Vision &amp; QC Audit →
                   </button>
                 </div>
               </div>
@@ -322,13 +331,25 @@ export default function Home() {
                   { step: '02', title: 'Gap & OEE Loss Analysis', desc: 'Identify hidden downtime, cycle-time losses, rejection causes, and telemetry gaps.' },
                   { step: '03', title: 'Custom Automation & ROI Report', desc: 'Receive a practical implementation architecture, hardware/software BOM, and payback timeline.' },
                 ].map((item) => (
-                  <div key={item.step} style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '14px 18px' }}>
-                    <span style={{ background: 'linear-gradient(135deg, #f47b20, #e06610)', color: '#fff', fontWeight: 800, fontSize: 13, padding: '5px 10px', borderRadius: 8, flexShrink: 0 }}>
+                  <div
+                    key={item.step}
+                    style={{
+                      display: 'flex',
+                      gap: 16,
+                      alignItems: 'flex-start',
+                      background: 'rgba(19, 54, 105, 0.92)',
+                      border: '1.5px solid rgba(56, 189, 248, 0.45)',
+                      borderRadius: 14,
+                      padding: '16px 20px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+                    }}
+                  >
+                    <span style={{ background: 'linear-gradient(135deg, #f47b20, #e06610)', color: '#ffffff', fontWeight: 800, fontSize: 13.5, padding: '6px 11px', borderRadius: 8, flexShrink: 0, boxShadow: '0 4px 12px rgba(244, 123, 32, 0.35)' }}>
                       {item.step}
                     </span>
                     <div>
-                      <h4 style={{ color: '#fff', margin: '0 0 4px', fontSize: 15.5, fontWeight: 700 }}>{item.title}</h4>
-                      <p style={{ color: '#94a3b8', margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>{item.desc}</p>
+                      <h4 style={{ color: '#ffffff', margin: '0 0 5px', fontSize: 16.5, fontWeight: 700 }}>{item.title}</h4>
+                      <p style={{ color: '#e2e8f0', margin: 0, fontSize: 14, lineHeight: 1.55 }}>{item.desc}</p>
                     </div>
                   </div>
                 ))}
