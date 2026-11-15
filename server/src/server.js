@@ -37,6 +37,19 @@ if (process.env.VERCEL !== '1') {
     .then(() => {
       const server = app.listen(config.port, () => {
         console.log(`Rvmaitech API on http://localhost:${config.port} (${config.nodeEnv})`);
+
+        // Render Free Tier Keep-Alive: ping external URL every 10 minutes
+        // so Render's 15-minute idle sleep timer does not spin down the instance.
+        const externalUrl = process.env.RENDER_EXTERNAL_URL || (process.env.RENDER ? 'https://rvmaitech-com.onrender.com' : '');
+        if (externalUrl) {
+          const https = require('https');
+          const pingUrl = `${externalUrl.replace(/\/$/, '')}/api/health`;
+          setInterval(() => {
+            https.get(pingUrl, (res) => {
+              res.resume();
+            }).on('error', () => {});
+          }, 10 * 60 * 1000).unref();
+        }
       });
 
       const shutdown = async (signal) => {
