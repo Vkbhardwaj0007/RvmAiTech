@@ -2588,52 +2588,99 @@ section.dark > .wrap {
 /* =====================================================================
    12. 3D EXTRUDED TYPOGRAPHY SITE-WIDE & CLEAN PAGE INTRO + FOOTER (NO CARDS)
    ===================================================================== */
-.page-intro .intro-text {
+.page-intro .intro-text,
+.sec-head,
+.people-head,
+.split-body > div {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
+  cursor: default;
+  transform-origin: center center;
+}
+
+.page-intro .intro-text {
   padding: 0 !important;
 }
 
-.page-intro h2 {
-  text-shadow:
-    0 1px 0 #ffffff,
-    0 2px 0 #dbe6f5,
-    0 3px 0 #c5d6ec,
-    0 4px 0 #b0c6e3,
-    0 10px 22px rgba(13, 38, 73, 0.22);
-}
-
-.page-intro p,
-.page-intro li {
-  text-shadow:
-    0 1px 0 #ffffff,
-    0 2px 5px rgba(13, 38, 73, 0.12);
-}
-
-/* Global 3D Extruded Headings & Text across Light Sections */
+.page-intro h2,
 .sec-head h2,
+.people-head h2,
+.split-body h2,
 .prod-showcase-3d h3,
 .faq-q-text {
   text-shadow:
     0 1px 0 #ffffff,
-    0 2px 0 #dbe6f5,
-    0 3px 0 #c5d6ec,
-    0 4px 0 #b0c6e3,
-    0 10px 22px rgba(13, 38, 73, 0.22);
+    0 2px 0 #d5e2f4,
+    0 3px 0 #bdd0ea,
+    0 4px 0 #a5bee0,
+    0 5px 0 #8fadcf,
+    0 12px 24px rgba(13, 38, 73, 0.25);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+              color 0.3s ease,
+              text-shadow 0.3s ease;
 }
 
-.sec-head p {
+/* Cursor hover / 3D tilt reaction on headings (no card box, pure 3D text movement) */
+.page-intro .intro-text:hover h2,
+.page-intro .intro-text.tilting h2,
+.sec-head:hover h2,
+.sec-head.tilting h2,
+.people-head:hover h2,
+.people-head.tilting h2,
+.split-body > div:hover h2,
+.split-body > div.tilting h2 {
+  color: #1351b4;
+  transform: translateY(-3px) scale(1.015);
   text-shadow:
     0 1px 0 #ffffff,
-    0 2px 5px rgba(13, 38, 73, 0.12);
+    0 2px 0 #cfe0f8,
+    0 3px 0 #b3cef3,
+    0 4px 0 #96bced,
+    0 6px 0 #7aaae6,
+    0 16px 30px rgba(19, 81, 180, 0.32);
+}
+
+section.dark .sec-head:hover h2,
+section.dark .sec-head.tilting h2 {
+  color: #7dd3fc !important;
+  text-shadow:
+    0 1px 0 #07254a,
+    0 2px 0 #051b38,
+    0 3px 0 #031226,
+    0 4px 0 #020a16,
+    0 14px 28px rgba(56, 189, 248, 0.45) !important;
+}
+
+.page-intro p,
+.page-intro li,
+.sec-head p,
+.people-intro p,
+.split-body p {
+  text-shadow:
+    0 1px 0 #ffffff,
+    0 2px 0 #e4ecf7,
+    0 4px 10px rgba(13, 38, 73, 0.14);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.25s ease;
+}
+
+.page-intro .intro-text:hover p,
+.page-intro .intro-text:hover li,
+.sec-head:hover p {
+  color: #0d2649;
 }
 
 .sec-kicker {
+  display: inline-block;
   text-shadow:
     0 1px 0 #ffffff,
-    0 2px 0 rgba(244, 123, 32, 0.25),
-    0 4px 10px rgba(244, 123, 32, 0.22);
+    0 2px 0 rgba(244, 123, 32, 0.28),
+    0 5px 12px rgba(244, 123, 32, 0.25);
+  transition: transform 0.3s ease;
+}
+
+.sec-head:hover .sec-kicker {
+  transform: translateY(-2px) scale(1.04);
 }
 
 .svc-card h3,
@@ -2717,7 +2764,8 @@ section.dark .sec-head p,
 }
 
 .foot-col a {
-  display: inline-block;
+  display: block !important;
+  padding: 5px 0;
   transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
               color 0.2s ease,
               text-shadow 0.22s ease !important;
@@ -2725,7 +2773,7 @@ section.dark .sec-head p,
 
 .foot-col a:hover {
   color: #7dd3fc !important;
-  transform: perspective(500px) translateX(5px) translateY(-2px) translateZ(10px);
+  transform: translateX(8px) translateY(-1px);
   text-shadow:
     0 1px 0 #07254a,
     0 2px 0 #04152b,

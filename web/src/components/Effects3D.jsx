@@ -22,6 +22,7 @@ const TILT_SEL = [
   '.pd-spec', '.pd-feat-item', '.job-side-card', '.cat-intro', '.general-apply', '.cta-band',
   '.flow-step', '.stat-b', '.wf-box', '.post-card',
   '.logo', '.nav-cta',                                  // header logo + CTA buttons
+  '.intro-text', '.sec-head', '.people-head', '.split-body > div', '.foot-col', // 3D tilting headings & text blocks (no card box)
   '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',
   '.audit-banner-3d', '.audit-step-3d',
   '.hero-pill', '.tech-pill', '.cloud-tech-pill',
@@ -34,6 +35,8 @@ const TILT_SEL = [
 const TILT_CFG = [
   { sel: '.logo', max: 12, lift: 0, glare: false },
   { sel: '.nav-cta', max: 10, lift: -2, glare: false },
+  { sel: '.intro-text, .sec-head, .people-head, .split-body > div', max: 9, lift: -6, glare: false },
+  { sel: '.foot-col', max: 8, lift: -4, glare: false },
   { sel: '.prod-tab-3d', max: 9, lift: -4, glare: true },
   { sel: '.hero-pill, .tech-pill, .cloud-tech-pill', max: 11, lift: -4, glare: false },
   { sel: '.audit-step-3d, .prod-highlight-3d', max: 8, lift: -5, glare: true },
