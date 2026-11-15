@@ -17,37 +17,41 @@ import { useEffect, useLayoutEffect } from 'react';
  */
 
 const TILT_SEL = [
-  '.card', '.cap', '.quote', '.lead-card', '.step', '.job', '.client', '.ind', '.stat', '.cinfo',
+  '.card', '.cap', '.why-card', '.sol-card', '.metric-card', '.quote-card',
+  '.quote', '.lead-card', '.step', '.job', '.client', '.ind', '.stat', '.cinfo',
   '.pd-spec', '.pd-feat-item', '.job-side-card', '.cat-intro', '.general-apply', '.cta-band',
   '.flow-step', '.stat-b', '.wf-box', '.post-card',
   '.logo', '.nav-cta', '.foot-col',                    // header + footer
   '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',   // intro image, service points/image, leader photo, founder card
-  '.audit-banner-3d', '.audit-step-3d', '.btn-3d-cyan', '.btn-3d-orange',
+  '.audit-banner-3d', '.audit-step-3d', '.btn-3d-cyan', '.btn-3d-orange', '.btn-primary',
+  '.hero-pill', '.tech-pill', '.cloud-tech-pill',
 ].join(',');
 
 // Per-element tilt settings: max angle (deg), lift (px), glare on/off.
 // Anything not listed here is a card: angle by width, 6px lift, glare on.
 const TILT_CFG = [
   { sel: '.logo', max: 12, lift: 0, glare: false },
-  { sel: '.nav-cta', max: 10, lift: -1, glare: false },
-  { sel: '.btn-3d-cyan, .btn-3d-orange', max: 12, lift: -4, glare: true },
+  { sel: '.nav-cta', max: 10, lift: -2, glare: false },
+  { sel: '.btn-3d-cyan, .btn-3d-orange, .btn-primary', max: 12, lift: -4, glare: true },
+  { sel: '.hero-pill, .tech-pill, .cloud-tech-pill', max: 11, lift: -4, glare: false },
   { sel: '.audit-step-3d', max: 9, lift: -6, glare: true },
-  { sel: '.audit-banner-3d', max: 3.5, lift: -4, glare: true },
+  { sel: '.audit-banner-3d, .cta-band', max: 3.5, lift: -4, glare: true },
   { sel: '.foot-col', max: 6, lift: -3, glare: false },
-  { sel: '.stat-b, .flow-step', max: 8, lift: -6, glare: false },
-  { sel: '.intro-media', max: 6, lift: -4, glare: true },
-  { sel: '.split-item', max: 10, lift: -3, glare: false },
-  { sel: '.split-media', max: 5, lift: -4, glare: true },
-  { sel: '.people-photo', max: 7, lift: -6, glare: true },
+  { sel: '.stat-b, .flow-step', max: 10, lift: -7, glare: true },
+  { sel: '.intro-media', max: 7, lift: -5, glare: true },
+  { sel: '.split-item', max: 10, lift: -4, glare: false },
+  { sel: '.split-media', max: 6, lift: -5, glare: true },
+  { sel: '.people-photo', max: 8, lift: -6, glare: true },
 ];
 const cfgFor = (el, r) => {
   const c = TILT_CFG.find((x) => el.matches(x.sel));
   if (c) return c;
-  return { max: el.dataset.tilt ? +el.dataset.tilt : r.width > 720 ? 3 : r.width > 420 ? 5 : 8, lift: -6, glare: true };
+  return { max: el.dataset.tilt ? +el.dataset.tilt : r.width > 720 ? 4 : r.width > 420 ? 7 : 10, lift: -8, glare: true };
 };
 
 const REVEAL_SEL = [
   '.sec-head', '.grid-3 > *', '.flow-step', '.stat-b', '.ind', '.client', '.cta-band', '.job',
+  '.why-card', '.sol-card', '.metric-card', '.quote-card',
   '.lead-card', '.steps > *', '.pd-spec', '.pd-feat-item', '.pd-block', '.cat-intro', '.general-apply',
   '.about-grid > *', '.contact-grid > *', '.quote', '.stat', '.wf-box', '.post-wrap > *', '.member > *',
   '.foot-top > *', '.foot-bottom', '.intro-text', '.intro-media', '.split-body > div', '.split-media', '.people-head', '.people-card', '.founder-card',
@@ -55,7 +59,7 @@ const REVEAL_SEL = [
 ].join(',');
 
 const reduceMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-const finePointer = () => !!window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches;
+const finePointer = () => !!(window.matchMedia?.('(any-pointer: fine)')?.matches || window.matchMedia?.('(hover: hover)')?.matches);
 
 /* ---------- 1. pointer tilt on cards ---------- */
 function useTilt() {
@@ -98,9 +102,12 @@ function useTilt() {
       const { max, lift } = cfg;
       el.style.setProperty('--gx', `${((cur.x + 0.5) * 100).toFixed(1)}%`);
       el.style.setProperty('--gy', `${((cur.y + 0.5) * 100).toFixed(1)}%`);
-      el.style.transform =
-        `perspective(1100px) rotateX(${(-cur.y * max).toFixed(2)}deg) ` +
-        `rotateY(${(cur.x * max).toFixed(2)}deg) translate3d(0,${lift}px,0)`;
+      el.style.setProperty(
+        'transform',
+        `perspective(1050px) rotateX(${(-cur.y * max).toFixed(2)}deg) ` +
+        `rotateY(${(cur.x * max).toFixed(2)}deg) translate3d(0,${lift}px,0)`,
+        'important'
+      );
 
       // Keep going only while there is still visible movement left.
       const dx = target.x - cur.x;
@@ -115,7 +122,7 @@ function useTilt() {
       // Dropping the inline transform hands the card back to the .t3d CSS
       // transition, which eases it home over .55s.
       el.classList.remove('tilting', 'no-glare');
-      el.style.transform = '';
+      el.style.removeProperty('transform');
       el.style.removeProperty('--gx');
       el.style.removeProperty('--gy');
       el = null;
@@ -195,7 +202,7 @@ function useHeroParallax() {
       hero = null;
     };
     const onMove = (e) => {
-      const h = e.target instanceof Element ? e.target.closest('.hero') : null;
+      const h = e.target instanceof Element ? e.target.closest('.hero, .page-hero') : null;
       if (h !== hero) { reset(); hero = h; }
       if (!hero) return;
       last = e;

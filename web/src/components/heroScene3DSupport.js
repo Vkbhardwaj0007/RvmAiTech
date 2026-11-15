@@ -12,27 +12,9 @@
 export function canRun3D() {
   if (typeof window === 'undefined') return false;
 
-  // Someone who asked the OS for less motion gets less motion.
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return false;
-
-  // Desktop flourish only. On touch devices there is no pointer to react to,
-  // and a continuously rendering canvas is the most expensive thing on the
-  // page for the device least able to afford it.
-  if (!window.matchMedia?.('(hover: hover) and (pointer: fine)')?.matches) return false;
-
-  // Explicit user signal that bytes are precious.
   if (navigator.connection?.saveData) return false;
 
-  // A slow connection: the chunk would arrive long after it was wanted.
-  const type = navigator.connection?.effectiveType;
-  if (type && /(^|-)2g$/.test(type)) return false;
-
-  // Few cores usually means a machine that will struggle with a continuous
-  // render loop alongside a playing background video.
-  const cores = navigator.hardwareConcurrency;
-  if (typeof cores === 'number' && cores > 0 && cores <= 4) return false;
-
-  // Finally, is WebGL actually there? Created and discarded immediately.
   try {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');

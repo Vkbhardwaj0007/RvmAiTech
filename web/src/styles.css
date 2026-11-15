@@ -26,21 +26,30 @@ section{padding:80px 0}
 .logo-word .b{color:#fff} .logo-word .o{color:var(--orange)}
 .logo-tag{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#9fb2ce;font-weight:600;margin-top:2px}
 
-/* header + dropdown nav (like the reference) */
-.site-header{position:sticky;top:0;z-index:60;background:rgba(13,38,73,.94);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08)}
+/* header + dropdown nav (RvmAiTech 3D Design System) */
+.site-header{position:sticky;top:0;z-index:60;background:linear-gradient(180deg, rgba(22, 56, 102, 0.96) 0%, rgba(13, 38, 73, 0.94) 100%);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.09);box-shadow:0 4px 20px rgba(7,22,44,.4)}
 .header-inner{display:flex;align-items:center;justify-content:space-between;height:76px}
 .site-header .wrap,.site-footer .wrap{max-width:none;padding:0 40px}
 .main-nav{display:flex;align-items:center;flex:1;justify-content:space-between;gap:0;margin-left:clamp(28px,4vw,72px)}
 .nav-item{position:relative}
-.nav-link{display:flex;align-items:center;gap:5px;white-space:nowrap;color:#d3deee;font-family:var(--display);font-weight:500;font-size:15px;padding:10px 13px;border-radius:8px}
+.nav-link{display:flex;align-items:center;gap:5px;white-space:nowrap;color:#d3deee;font-family:var(--display);font-weight:600;font-size:15px;padding:8px 12px;border-radius:6px;position:relative;transition:color .2s ease}
+.nav-link::after{content:'';position:absolute;bottom:0;left:12px;right:12px;height:2px;background:#f47b20;transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
 .nav-link:hover{color:#fff;background:rgba(255,255,255,.07)}
+.nav-link:hover::after{transform:scaleX(1)}
 .caret{font-size:10px;opacity:.8}
 .dropdown{position:absolute;top:100%;left:0;min-width:190px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 24px 50px -20px rgba(9,25,50,.4);padding:8px;opacity:0;visibility:hidden;transform:translateY(8px);transition:.16s;z-index:70}
 .nav-item.has-drop:hover .dropdown{opacity:1;visibility:visible;transform:translateY(4px)}
 .drop-link{display:block;padding:10px 12px;border-radius:8px;font-size:14.5px;color:#26364e;font-weight:500}
 .drop-link:hover{background:#f1f5fb;color:var(--navy)}
-.nav-cta{margin-left:0;background:var(--orange);color:#fff;font-family:var(--display);font-weight:600;font-size:14px;padding:10px 18px;border-radius:9px}
-.nav-cta:hover{filter:brightness(1.08)}
+
+/* 3D CTA Buttons in Header */
+.nav-cta{margin-left:0;background:linear-gradient(180deg, #ff9848 0%, #f47b20 50%, #d95d08 100%);color:#fff;font-family:var(--display);font-weight:700;font-size:14px;padding:10px 18px;border-radius:9px;border:none;box-shadow:0 3px 0 #9e3f00, 0 6px 14px rgba(244,123,32,.35);transition:all .15s ease-out;transform-style:preserve-3d;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 0 #9e3f00, 0 8px 18px rgba(244,123,32,.45);filter:brightness(1.04);color:#fff}
+.nav-cta:active{transform:translateY(2px);box-shadow:0 1px 0 #9e3f00}
+
+.nav-cta-audit-3d{background:linear-gradient(180deg, #38bdf8 0%, #0ea5e9 50%, #1351b4 100%) !important;color:#fff !important;border:none !important;box-shadow:0 3px 0 #07477a, 0 6px 14px rgba(14,165,233,.4) !important}
+.nav-cta-audit-3d:hover{transform:translateY(-1px);box-shadow:0 4px 0 #07477a, 0 8px 18px rgba(14,165,233,.5) !important}
+.nav-cta-audit-3d:active{transform:translateY(2px);box-shadow:0 1px 0 #07477a !important}
 .nav-toggle{display:none;background:none;border:0;color:#fff;font-size:26px;cursor:pointer}
 
 /* hero — full-bleed shop-floor video, content centered on top */
@@ -1713,4 +1722,447 @@ section[id]{scroll-margin-top:80px}
   .audit-banner-3d {
     padding: 30px 22px;
   }
+}
+
+/* =====================================================================
+   FULL SITE-WIDE 3D WEBSITE TRANSFORMATION
+   - 3D Extruded Bevel & Depth on ALL Cards, Buttons, Stats, Pills & Sections
+   - 3D Multi-Layer Pop-Out (translateZ) for Icons, Headings, Numbers & Badges
+   - 3D Perspective Grid Floors on Dark Sections, Stats Band & CTA Band
+   ===================================================================== */
+
+/* 1. Site-Wide 3D Extruded Primary & Ghost Buttons + Header CTA */
+.btn-primary,
+.nav-cta:not(.nav-cta-audit-3d) {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  background: linear-gradient(180deg, #ff9848 0%, #f47b20 55%, #d95d08 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 220, 185, 0.65) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 5px 0 #9e3f00,
+    0 14px 28px -4px rgba(244, 123, 32, 0.6),
+    inset 0 2px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.22) !important;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.2s ease !important;
+}
+
+.btn-primary:hover,
+.nav-cta:not(.nav-cta-audit-3d):hover {
+  transform: perspective(700px) translateY(-4px) rotateX(8deg) scale(1.03);
+  box-shadow:
+    0 8px 0 #9e3f00,
+    0 20px 36px -4px rgba(244, 123, 32, 0.8),
+    inset 0 2px 2px rgba(255, 255, 255, 0.7),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25) !important;
+  filter: brightness(1.05);
+}
+
+.btn-primary:active,
+.nav-cta:not(.nav-cta-audit-3d):active {
+  transform: perspective(700px) translateY(3px) rotateX(0deg) scale(0.99) !important;
+  box-shadow:
+    0 2px 0 #9e3f00,
+    0 6px 14px rgba(244, 123, 32, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+}
+
+.btn-primary::before,
+.nav-cta:not(.nav-cta-audit-3d)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 65%;
+  height: 100%;
+  background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.42) 50%, transparent 100%);
+  transform: skewX(-22deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-primary:hover::before,
+.nav-cta:not(.nav-cta-audit-3d):hover::before {
+  left: 140%;
+}
+
+.hero .btn-ghost,
+.cta-band .btn-ghost {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(13, 38, 73, 0.65));
+  border: 1.5px solid rgba(125, 211, 252, 0.6) !important;
+  box-shadow:
+    0 5px 0 rgba(5, 16, 35, 0.85),
+    0 12px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(8px);
+}
+
+.hero .btn-ghost:hover,
+.cta-band .btn-ghost:hover {
+  transform: perspective(700px) translateY(-4px) rotateX(8deg);
+  border-color: #38bdf8 !important;
+  box-shadow:
+    0 8px 0 rgba(5, 16, 35, 0.9),
+    0 18px 32px rgba(56, 189, 248, 0.35),
+    inset 0 2px 2px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 2. 3D Extruded Depth on All Cards (Rest State) */
+.card,
+.cap,
+.why-card,
+.sol-card,
+.metric-card,
+.quote-card,
+.flow-step,
+.ind,
+.client,
+.cinfo,
+.lead-card,
+.founder-card,
+.pd-spec,
+.pd-feat-item,
+.wf-box,
+.post-card,
+.job,
+.cat-intro,
+.general-apply {
+  transform-style: preserve-3d !important;
+  perspective: 1000px;
+  border: 1.5px solid #cfddef !important;
+  box-shadow:
+    0 7px 0 #c1d2e9,
+    0 20px 40px -12px rgba(13, 38, 73, 0.16),
+    inset 0 2px 0 #ffffff !important;
+}
+
+/* Dark section cards (.dark .cap) 3D Rest State */
+.dark .cap {
+  background: linear-gradient(145deg, rgba(20, 54, 102, 0.92), rgba(11, 31, 62, 0.96)) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
+  box-shadow:
+    0 8px 0 #051124,
+    0 22px 44px -10px rgba(0, 0, 0, 0.6),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.22) !important;
+}
+
+/* 3. 3D Hover & Tilt State on All Cards (Deep Navy + Neon Cyan + 3D Extruded Lip) */
+.card:hover,
+.card.tilting,
+.cap:hover,
+.cap.tilting,
+.why-card:hover,
+.why-card.tilting,
+.sol-card:hover,
+.sol-card.tilting,
+.metric-card:hover,
+.metric-card.tilting,
+.quote-card:hover,
+.quote-card.tilting,
+.flow-step:hover,
+.flow-step.tilting,
+.ind:hover,
+.ind.tilting,
+.client:hover,
+.client.tilting,
+.cinfo:hover,
+.cinfo.tilting,
+.lead-card:hover,
+.lead-card.tilting,
+.founder-card:hover,
+.founder-card.tilting,
+.pd-spec:hover,
+.pd-spec.tilting,
+.pd-feat-item:hover,
+.pd-feat-item.tilting,
+.wf-box:hover,
+.wf-box.tilting,
+.post-card:hover,
+.post-card.tilting,
+.job:hover,
+.job.tilting {
+  background: linear-gradient(145deg, #123566 0%, #0d2649 60%, #081a35 100%) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 11px 0 #051226,
+    0 30px 60px -12px rgba(8, 26, 53, 0.78),
+    0 0 28px rgba(56, 189, 248, 0.32),
+    inset 0 2px 2px rgba(255, 255, 255, 0.35) !important;
+}
+
+/* 4. 3D Multi-Layer Z-Space Pop-Out Inside All Cards */
+.card-ico,
+.cap-ico,
+.why-ico,
+.sol-ico,
+.flow-node,
+.si-ico,
+.ci-ico,
+.quote-avatar {
+  transform-style: preserve-3d;
+  box-shadow:
+    0 5px 0 rgba(18, 58, 114, 0.22),
+    0 12px 22px -6px rgba(13, 38, 73, 0.25),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.7) !important;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+              background 0.3s ease,
+              color 0.3s ease,
+              box-shadow 0.35s ease !important;
+}
+
+.card:hover .card-ico,
+.card.tilting .card-ico,
+.cap:hover .cap-ico,
+.cap.tilting .cap-ico,
+.why-card:hover .why-ico,
+.why-card.tilting .why-ico,
+.sol-card:hover .sol-ico,
+.sol-card.tilting .sol-ico,
+.flow-step:hover .flow-node,
+.flow-step.tilting .flow-node,
+.cinfo:hover .ci-ico,
+.cinfo.tilting .ci-ico,
+.quote-card:hover .quote-avatar,
+.quote-card.tilting .quote-avatar {
+  transform: translateZ(36px) translateY(-4px) scale(1.08) !important;
+  box-shadow:
+    0 6px 0 #061b3a,
+    0 16px 28px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(56, 189, 248, 0.45),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.45) !important;
+}
+
+.card h3,
+.cap h3,
+.why-card h3,
+.sol-card h3,
+.flow-step h3,
+.metric-card .metric-val,
+.metric-card .metric-label,
+.quote-card p,
+.lead-card h3,
+.founder-card h3,
+.card-link,
+.why-badge,
+.sol-tag,
+.quote-tag,
+.card-num {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.3s ease !important;
+}
+
+.card:hover h3,
+.card.tilting h3,
+.cap:hover h3,
+.cap.tilting h3,
+.why-card:hover h3,
+.why-card.tilting h3,
+.sol-card:hover h3,
+.sol-card.tilting h3,
+.flow-step:hover h3,
+.flow-step.tilting h3,
+.metric-card:hover .metric-val,
+.metric-card.tilting .metric-val {
+  transform: translateZ(26px) !important;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.card:hover .card-link,
+.card.tilting .card-link,
+.cap:hover .card-link,
+.cap.tilting .card-link,
+.why-card:hover .why-badge,
+.why-card.tilting .why-badge,
+.sol-card:hover .sol-tag,
+.sol-card.tilting .sol-tag,
+.quote-card:hover .quote-tag,
+.quote-card.tilting .quote-tag,
+.card:hover .card-num,
+.card.tilting .card-num {
+  transform: translateZ(20px) !important;
+}
+
+/* 5. 3D Workflow Cards (.flow-step) */
+.flow-step {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px 18px !important;
+}
+.flow-step:hover p,
+.flow-step.tilting p {
+  color: #e2e8f0 !important;
+}
+.flow-node {
+  background: linear-gradient(180deg, #ff9848 0%, #f47b20 55%, #c85200 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(255, 224, 194, 0.7) !important;
+  box-shadow:
+    0 5px 0 #8a3600,
+    0 12px 22px rgba(244, 123, 32, 0.45),
+    inset 0 2px 1px rgba(255, 255, 255, 0.55) !important;
+}
+
+/* 6. 3D Stats Band (.stats-band & .stat-b) */
+.stats-band {
+  position: relative;
+  overflow: hidden;
+  perspective: 1000px;
+  background: linear-gradient(180deg, #091d3a 0%, #0d2649 55%, #113262 100%) !important;
+  border-top: 1px solid rgba(56, 189, 248, 0.35);
+  border-bottom: 4px solid #061428;
+  box-shadow: 0 20px 44px -14px rgba(7, 22, 44, 0.55);
+}
+
+.stats-band::before {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -35%;
+  height: 85%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.16) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transform: perspective(550px) rotateX(64deg);
+  transform-origin: 50% 100%;
+  animation: h3dFloor 7s linear infinite;
+  opacity: 0.65;
+}
+
+.stats-grid {
+  position: relative;
+  z-index: 2;
+}
+
+.stat-b {
+  background: linear-gradient(145deg, rgba(22, 62, 118, 0.85), rgba(11, 33, 68, 0.9));
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  border-radius: 18px;
+  padding: 20px 18px;
+  transform-style: preserve-3d;
+  box-shadow:
+    0 7px 0 #051226,
+    0 18px 34px -8px rgba(0, 0, 0, 0.5),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.25);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.35s ease,
+              border-color 0.3s ease;
+}
+
+.stat-b:hover,
+.stat-b.tilting {
+  border-color: #7dd3fc;
+  box-shadow:
+    0 10px 0 #051226,
+    0 26px 46px -8px rgba(14, 165, 233, 0.45),
+    0 0 22px rgba(56, 189, 248, 0.3),
+    inset 0 2px 2px rgba(255, 255, 255, 0.38);
+}
+
+.stat-b b {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-shadow: 0 4px 14px rgba(244, 123, 32, 0.45);
+}
+
+.stat-b:hover b,
+.stat-b.tilting b {
+  transform: translateZ(30px) scale(1.06);
+}
+
+/* 7. 3D Hero Pills (.hero-pill) */
+.hero-pill {
+  transform-style: preserve-3d;
+  background: linear-gradient(145deg, rgba(16, 48, 94, 0.82), rgba(9, 27, 56, 0.88)) !important;
+  border: 1px solid rgba(56, 189, 248, 0.5) !important;
+  box-shadow:
+    0 5px 0 rgba(5, 15, 32, 0.88),
+    0 12px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.28) !important;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.hero-pill:hover {
+  border-color: #38bdf8 !important;
+  box-shadow:
+    0 8px 0 rgba(5, 15, 32, 0.92),
+    0 18px 32px rgba(14, 165, 233, 0.4),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* 8. 3D Dark Sections & 3D CTA Band */
+section.dark {
+  position: relative;
+  overflow: hidden;
+  perspective: 1100px;
+}
+
+section.dark::before {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -25%;
+  height: 65%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.14) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(650px) rotateX(64deg);
+  transform-origin: 50% 100%;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 60%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 60%);
+  animation: h3dFloor 8s linear infinite;
+  opacity: 0.65;
+}
+
+section.dark > .wrap {
+  position: relative;
+  z-index: 2;
+}
+
+.cta-band {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  border: 1.5px solid rgba(56, 189, 248, 0.5) !important;
+  box-shadow:
+    0 12px 0 #051122,
+    0 32px 68px -12px rgba(7, 22, 44, 0.72),
+    inset 0 2px 1px rgba(255, 255, 255, 0.25) !important;
+}
+
+.cta-band::before {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -30%;
+  height: 75%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.15) 1px, transparent 1px);
+  background-size: 52px 52px;
+  transform: perspective(600px) rotateX(64deg);
+  transform-origin: 50% 100%;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 60%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 60%);
+  animation: h3dFloor 7s linear infinite;
+  opacity: 0.65;
+}
+
+.cta-band > * {
+  position: relative;
+  z-index: 2;
 }

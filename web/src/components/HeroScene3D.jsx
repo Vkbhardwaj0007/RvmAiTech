@@ -9,6 +9,11 @@ import {
   PointsMaterial,
   LineSegments,
   LineBasicMaterial,
+  IcosahedronGeometry,
+  OctahedronGeometry,
+  TorusGeometry,
+  MeshBasicMaterial,
+  Mesh,
   AdditiveBlending,
   Color,
   Group,
@@ -41,17 +46,17 @@ import {
 
 /* --------------------------------------------------------------- tuning */
 
-const NODES_DESKTOP = 90;
-const NODES_SMALL = 55;
-const LINK_DISTANCE = 2.4; // world units; nodes closer than this get a line
-const MAX_LINKS = 420; // hard cap on line segments drawn per frame
-const DRIFT = 0.018; // node speed
+const NODES_DESKTOP = 105;
+const NODES_SMALL = 65;
+const LINK_DISTANCE = 2.6; // world units; nodes closer than this get a line
+const MAX_LINKS = 520; // hard cap on line segments drawn per frame
+const DRIFT = 0.02; // node speed
 const FIELD = { x: 16, y: 9, z: 6 }; // the box nodes move inside
 
-// Pulled from styles.css (--blue, --orange, a lighter tint for depth).
-const PALETTE = [new Color('#4f8fe8'), new Color('#1e5bbf'), new Color('#9fc4f5')];
+// Pulled from styles.css (--blue, --orange, cyan highlights for 3D depth).
+const PALETTE = [new Color('#38bdf8'), new Color('#4f8fe8'), new Color('#9fc4f5')];
 const ACCENT = new Color('#f47b20');
-const ACCENT_EVERY = 9; // roughly one node in nine is orange
+const ACCENT_EVERY = 6; // roughly one node in six is orange
 
 /* ------------------------------------------------------------ capability */
 
@@ -66,7 +71,7 @@ function hasFinePointer() {
 function isLowPowered() {
   if (navigator.connection?.saveData) return true;
   const cores = navigator.hardwareConcurrency;
-  return typeof cores === 'number' && cores > 0 && cores <= 4;
+  return typeof cores === 'number' && cores > 0 && cores <= 2;
 }
 
 function webglAvailable() {
@@ -87,7 +92,7 @@ export default function HeroScene3D() {
     const host = hostRef.current;
     if (!host) return undefined;
 
-    if (prefersReducedMotion() || !hasFinePointer() || isLowPowered() || !webglAvailable()) {
+    if (prefersReducedMotion() || !webglAvailable()) {
       return undefined;
     }
 
@@ -146,16 +151,58 @@ export default function HeroScene3D() {
     nodeGeo.setAttribute('color', new BufferAttribute(colors, 3));
 
     const nodeMat = new PointsMaterial({
-      size: 0.13,
+      size: 0.16,
       vertexColors: true,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.92,
       depthWrite: false,
       blending: AdditiveBlending,
       sizeAttenuation: true,
     });
 
     group.add(new Points(nodeGeo, nodeMat));
+
+    /* ---------------- 3D wireframe polyhedra & rings ---------------- */
+
+    const shapesGroup = new Group();
+    scene.add(shapesGroup);
+
+    const icoGeo = new IcosahedronGeometry(1.55, 1);
+    const icoMat = new MeshBasicMaterial({
+      color: 0x38bdf8,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.24,
+      blending: AdditiveBlending,
+    });
+    const icoMesh = new Mesh(icoGeo, icoMat);
+    icoMesh.position.set(5.2, 1.4, -1.5);
+    shapesGroup.add(icoMesh);
+
+    const octGeo = new OctahedronGeometry(1.2, 0);
+    const octMat = new MeshBasicMaterial({
+      color: 0xf47b20,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.26,
+      blending: AdditiveBlending,
+    });
+    const octMesh = new Mesh(octGeo, octMat);
+    octMesh.position.set(-5.4, -1.3, -1.2);
+    shapesGroup.add(octMesh);
+
+    const torusGeo = new TorusGeometry(2.1, 0.04, 12, 48);
+    const torusMat = new MeshBasicMaterial({
+      color: 0x7dd3fc,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.2,
+      blending: AdditiveBlending,
+    });
+    const torusMesh = new Mesh(torusGeo, torusMat);
+    torusMesh.position.set(5.2, 1.4, -1.5);
+    torusMesh.rotation.x = 0.8;
+    shapesGroup.add(torusMesh);
 
     /* ---------------- links ---------------- */
 
@@ -169,9 +216,9 @@ export default function HeroScene3D() {
     linkGeo.setAttribute('position', linkAttr);
 
     const linkMat = new LineBasicMaterial({
-      color: 0x6ea8ee,
+      color: 0x38bdf8,
       transparent: true,
-      opacity: 0.17,
+      opacity: 0.24,
       depthWrite: false,
       blending: AdditiveBlending,
     });
@@ -279,8 +326,15 @@ export default function HeroScene3D() {
       pointer.x += (target.x - pointer.x) * 0.035;
       pointer.y += (target.y - pointer.y) * 0.035;
 
-      group.rotation.y = pointer.x * 0.18 + now * 0.000035;
-      group.rotation.x = -pointer.y * 0.12;
+      group.rotation.y = pointer.x * 0.22 + now * 0.000045;
+      group.rotation.x = -pointer.y * 0.15;
+
+      icoMesh.rotation.x = now * 0.00035 + pointer.y * 0.3;
+      icoMesh.rotation.y = now * 0.00045 + pointer.x * 0.3;
+      torusMesh.rotation.z = -now * 0.0005;
+      torusMesh.rotation.y = pointer.x * 0.25;
+      octMesh.rotation.x = -now * 0.0004 - pointer.y * 0.25;
+      octMesh.rotation.y = now * 0.0005 + pointer.x * 0.25;
 
       renderer.render(scene, camera);
     }
@@ -343,6 +397,12 @@ export default function HeroScene3D() {
       nodeMat.dispose();
       linkGeo.dispose();
       linkMat.dispose();
+      icoGeo.dispose();
+      icoMat.dispose();
+      octGeo.dispose();
+      octMat.dispose();
+      torusGeo.dispose();
+      torusMat.dispose();
       renderer.dispose();
       // Frees the GPU context immediately rather than waiting for GC — a SPA
       // can mount and unmount this many times in one session.

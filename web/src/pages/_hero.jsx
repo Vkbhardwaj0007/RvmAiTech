@@ -1,8 +1,12 @@
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSite } from '../api/SiteContext';
 import HeroVideo from '../components/HeroVideo';
 import { pageKeyFromPath, resolveHeroMedia, itemHeroMedia } from '../components/heroMedia';
 import PageIntro from '../components/PageIntro';
+import { canRun3D } from '../components/heroScene3DSupport';
+
+const HeroScene3D = lazy(() => import('../components/HeroScene3D'));
 
 /**
  * Hero band for inner pages (About, Services, Products, Careers, Contact…).
@@ -19,6 +23,8 @@ import PageIntro from '../components/PageIntro';
 export function PageHero({ kicker, title, sub, page, intro = true, media: item, children }) {
   const { content } = useSite();
   const { pathname } = useLocation();
+  const [use3D, setUse3D] = useState(false);
+  useEffect(() => { setUse3D(canRun3D()); }, []);
   const key = page || pageKeyFromPath(pathname);
   const media = itemHeroMedia(item) || resolveHeroMedia(key, content);
   const mediaKey = media.embed || media.image || (media.videos || []).map((v) => (typeof v === 'string' ? v : v.mp4)).join('|');
@@ -35,6 +41,11 @@ export function PageHero({ kicker, title, sub, page, intro = true, media: item, 
       ) : media.image
         ? <div className="hero-video on" aria-hidden="true"><img src={media.image} alt="" /></div>
         : <HeroVideo key={mediaKey || key} sources={media.videos} poster={media.poster} />}
+      {use3D && (
+        <Suspense fallback={null}>
+          <HeroScene3D />
+        </Suspense>
+      )}
       <div className="wrap">
         {kicker && <span className="eyebrow">{kicker}</span>}
         <h1>{title}</h1>
