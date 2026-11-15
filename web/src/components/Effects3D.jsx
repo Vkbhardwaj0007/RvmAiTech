@@ -21,8 +21,8 @@ const TILT_SEL = [
   '.quote', '.lead-card', '.step', '.job', '.client', '.ind', '.stat', '.cinfo',
   '.pd-spec', '.pd-feat-item', '.job-side-card', '.cat-intro', '.general-apply', '.cta-band',
   '.flow-step', '.stat-b', '.wf-box', '.post-card',
-  '.logo', '.nav-cta', '.foot-col', '.foot-top > div',  // header + footer
-  '.intro-text', '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',
+  '.logo', '.nav-cta',                                  // header logo + CTA buttons
+  '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',
   '.audit-banner-3d', '.audit-step-3d', '.btn-3d-cyan', '.btn-3d-orange', '.btn-primary',
   '.hero-pill', '.tech-pill', '.cloud-tech-pill',
   '.prod-tab-3d', '.prod-showcase-3d', '.prod-highlight-3d',
@@ -38,9 +38,9 @@ const TILT_CFG = [
   { sel: '.hero-pill, .tech-pill, .cloud-tech-pill', max: 11, lift: -4, glare: false },
   { sel: '.audit-step-3d, .prod-highlight-3d', max: 8, lift: -5, glare: true },
   { sel: '.faq-item-3d', max: 4.5, lift: -4, glare: true },
-  { sel: '.audit-banner-3d, .cta-band, .prod-showcase-3d, .faq-cta-3d, .intro-text', max: 3.5, lift: -4, glare: true },
-  { sel: '.foot-col, .foot-top > div', max: 6, lift: -4, glare: true },
-  { sel: '.stat-b, .flow-step', max: 10, lift: -6, glare: true },
+  { sel: '.audit-banner-3d, .cta-band, .prod-showcase-3d, .faq-cta-3d', max: 3.5, lift: -4, glare: true },
+  { sel: '.stat-b', max: 10, lift: -6, glare: true },
+  { sel: '.flow-step', max: 8, lift: -4, glare: false },
   { sel: '.intro-media', max: 7, lift: -5, glare: true },
   { sel: '.split-item', max: 10, lift: -4, glare: false },
   { sel: '.split-media', max: 6, lift: -5, glare: true },
