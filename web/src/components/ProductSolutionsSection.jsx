@@ -21,34 +21,20 @@ export default function ProductSolutionsSection() {
           </p>
         </div>
 
-        {/* Product Navigation Pills */}
+        {/* Product Navigation Pills (3D) */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'center',
-            gap: 10,
+            gap: 14,
             flexWrap: 'wrap',
-            marginBottom: 44,
+            marginBottom: 46,
           }}
         >
           <button
             type="button"
             onClick={() => setActiveTab('mdms')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '12px 24px',
-              borderRadius: 30,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: 'pointer',
-              border: activeTab === 'mdms' ? '2px solid #1351b4' : '1px solid #d0deef',
-              background: activeTab === 'mdms' ? '#1351b4' : '#ffffff',
-              color: activeTab === 'mdms' ? '#ffffff' : '#33475b',
-              boxShadow: activeTab === 'mdms' ? '0 8px 20px -6px rgba(19, 81, 180, 0.4)' : 'none',
-              transition: 'all 0.25s ease',
-            }}
+            className={`prod-tab-3d ${activeTab === 'mdms' ? 'active' : ''}`}
           >
             <Activity size={18} /> MDMS (Machine Monitoring)
           </button>
@@ -56,21 +42,7 @@ export default function ProductSolutionsSection() {
           <button
             type="button"
             onClick={() => setActiveTab('datalogger')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '12px 24px',
-              borderRadius: 30,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: 'pointer',
-              border: activeTab === 'datalogger' ? '2px solid #1351b4' : '1px solid #d0deef',
-              background: activeTab === 'datalogger' ? '#1351b4' : '#ffffff',
-              color: activeTab === 'datalogger' ? '#ffffff' : '#33475b',
-              boxShadow: activeTab === 'datalogger' ? '0 8px 20px -6px rgba(19, 81, 180, 0.4)' : 'none',
-              transition: 'all 0.25s ease',
-            }}
+            className={`prod-tab-3d ${activeTab === 'datalogger' ? 'active' : ''}`}
           >
             <Cpu size={18} /> Industrial Datalogger
           </button>
@@ -78,21 +50,7 @@ export default function ProductSolutionsSection() {
           <button
             type="button"
             onClick={() => setActiveTab('home')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '12px 24px',
-              borderRadius: 30,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: 'pointer',
-              border: activeTab === 'home' ? '2px solid #1351b4' : '1px solid #d0deef',
-              background: activeTab === 'home' ? '#1351b4' : '#ffffff',
-              color: activeTab === 'home' ? '#ffffff' : '#33475b',
-              boxShadow: activeTab === 'home' ? '0 8px 20px -6px rgba(19, 81, 180, 0.4)' : 'none',
-              transition: 'all 0.25s ease',
-            }}
+            className={`prod-tab-3d ${activeTab === 'home' ? 'active' : ''}`}
           >
             <HomeIcon size={18} /> Smart Home Automation
           </button>
@@ -100,21 +58,7 @@ export default function ProductSolutionsSection() {
           <button
             type="button"
             onClick={() => setActiveTab('enterprise')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '12px 24px',
-              borderRadius: 30,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: 'pointer',
-              border: activeTab === 'enterprise' ? '2px solid #1351b4' : '1px solid #d0deef',
-              background: activeTab === 'enterprise' ? '#1351b4' : '#ffffff',
-              color: activeTab === 'enterprise' ? '#ffffff' : '#33475b',
-              boxShadow: activeTab === 'enterprise' ? '0 8px 20px -6px rgba(19, 81, 180, 0.4)' : 'none',
-              transition: 'all 0.25s ease',
-            }}
+            className={`prod-tab-3d ${activeTab === 'enterprise' ? 'active' : ''}`}
           >
             <Car size={18} /> Parking &amp; ERP Solutions
           </button>
@@ -122,18 +66,10 @@ export default function ProductSolutionsSection() {
 
         {/* Tab 1: MDMS */}
         {activeTab === 'mdms' && (
-          <div
-            style={{
-              background: '#ffffff',
-              border: '1.5px solid #cce0f8',
-              borderRadius: 20,
-              padding: '42px 40px',
-              boxShadow: '0 20px 45px -15px rgba(13, 38, 73, 0.08)',
-            }}
-          >
+          <div className="prod-showcase-3d">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 40, alignItems: 'center' }}>
               <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#eaf2fd', color: '#1351b4', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 700, marginBottom: 16 }}>
+                <div className="prod-badge-3d" style={{ background: '#eaf2fd', color: '#1351b4' }}>
                   <Activity size={16} /> FLAGSHIP PLATFORM
                 </div>
                 <h3 style={{ fontSize: 32, color: '#0d2649', fontWeight: 800, margin: '0 0 16px', lineHeight: 1.25 }}>
@@ -144,19 +80,19 @@ export default function ProductSolutionsSection() {
                 </p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 28 }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#f47b20" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Live OEE Tracking:</b> Availability, Performance, Quality</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#f47b20" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Auto Downtime Logs:</b> Eliminate manual paper logs</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#f47b20" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Predictive Health:</b> Temperature, vibration &amp; load alerts</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#f47b20" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>ERP &amp; Cloud API:</b> Push data to SAP, Oracle or custom ERP</span>
                   </div>
@@ -166,40 +102,40 @@ export default function ProductSolutionsSection() {
                   <Link to="/contact?product=MDMS" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: 15 }}>
                     Request MDMS Quotation &amp; Demo
                   </Link>
-                  <Link to="/products?category=MDMS" className="btn btn-ghost" style={{ padding: '12px 20px', fontSize: 15 }}>
+                  <Link to="/products?category=MDMS" className="btn btn-3d-cyan" style={{ padding: '12px 22px', fontSize: 15 }}>
                     Explore All 6 MDMS Versions →
                   </Link>
                 </div>
               </div>
 
-              {/* MDMS Value Box */}
-              <div style={{ background: '#f8fbff', border: '1px solid #d4e4f7', borderRadius: 16, padding: '32px 28px' }}>
-                <h4 style={{ color: '#0d2649', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <BarChart3 size={20} color="#1351b4" /> Quantifiable Business ROI
+              {/* MDMS Value Box (3D) */}
+              <div className="prod-side-3d">
+                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <BarChart3 size={20} color="#38bdf8" /> Quantifiable Business ROI
                 </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                  <div style={{ background: '#ffffff', padding: '16px 18px', borderRadius: 10, border: '1px solid #e2edf8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div className="prod-highlight-3d">
                     <div>
                       <b style={{ color: '#0d2649', fontSize: 15 }}>Unplanned Downtime Reduction</b>
-                      <div style={{ color: '#687b95', fontSize: 13 }}>Average improvement across deployed plants</div>
+                      <div style={{ color: '#52637a', fontSize: 13 }}>Average improvement across deployed plants</div>
                     </div>
                     <span style={{ fontSize: 24, fontWeight: 800, color: '#1351b4' }}>30% - 40%</span>
                   </div>
 
-                  <div style={{ background: '#ffffff', padding: '16px 18px', borderRadius: 10, border: '1px solid #e2edf8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div className="prod-highlight-3d">
                     <div>
                       <b style={{ color: '#0d2649', fontSize: 15 }}>Average Payback Period</b>
-                      <div style={{ color: '#687b95', fontSize: 13 }}>Recover system investment in record time</div>
+                      <div style={{ color: '#52637a', fontSize: 13 }}>Recover system investment in record time</div>
                     </div>
                     <span style={{ fontSize: 24, fontWeight: 800, color: '#f47b20' }}>&lt; 4 Months</span>
                   </div>
 
-                  <div style={{ background: '#ffffff', padding: '16px 18px', borderRadius: 10, border: '1px solid #e2edf8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div className="prod-highlight-3d">
                     <div>
                       <b style={{ color: '#0d2649', fontSize: 15 }}>Pricing Tier</b>
-                      <div style={{ color: '#687b95', fontSize: 13 }}>Modular per machine or plant-wide license</div>
+                      <div style={{ color: '#52637a', fontSize: 13 }}>Modular per machine or plant-wide license</div>
                     </div>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#0d2649', background: '#eaf2fd', padding: '6px 12px', borderRadius: 6 }}>Custom Quote</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#ffffff', background: 'linear-gradient(135deg, #1351b4, #0ea5e9)', padding: '6px 12px', borderRadius: 8, boxShadow: '0 3px 0 #07285e' }}>Custom Quote</span>
                   </div>
                 </div>
               </div>
@@ -209,18 +145,10 @@ export default function ProductSolutionsSection() {
 
         {/* Tab 2: Datalogger */}
         {activeTab === 'datalogger' && (
-          <div
-            style={{
-              background: '#ffffff',
-              border: '1.5px solid #cce0f8',
-              borderRadius: 20,
-              padding: '42px 40px',
-              boxShadow: '0 20px 45px -15px rgba(13, 38, 73, 0.08)',
-            }}
-          >
+          <div className="prod-showcase-3d">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 40, alignItems: 'center' }}>
               <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff2e8', color: '#f47b20', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 700, marginBottom: 16 }}>
+                <div className="prod-badge-3d" style={{ background: '#fff2e8', color: '#f47b20' }}>
                   <Cpu size={16} /> INDUSTRIAL EDGE HARDWARE
                 </div>
                 <h3 style={{ fontSize: 32, color: '#0d2649', fontWeight: 800, margin: '0 0 16px', lineHeight: 1.25 }}>
@@ -231,19 +159,19 @@ export default function ProductSolutionsSection() {
                 </p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 28 }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#1351b4" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Multi-PLC Support:</b> Siemens, Mitsubishi, Delta, Omron</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#1351b4" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Non-Intrusive:</b> Reads data without code changes</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#1351b4" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Local Buffering:</b> Stores offline data during network drops</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#1351b4" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>DIN-Rail Mount:</b> Rugged IP-rated industrial enclosure</span>
                   </div>
@@ -253,29 +181,29 @@ export default function ProductSolutionsSection() {
                   <Link to="/contact?product=Industrial%20Datalogger" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: 15 }}>
                     Request Hardware Quotation
                   </Link>
-                  <Link to="/products?category=Datalogger" className="btn btn-ghost" style={{ padding: '12px 20px', fontSize: 15 }}>
+                  <Link to="/products?category=Datalogger" className="btn btn-3d-cyan" style={{ padding: '12px 22px', fontSize: 15 }}>
                     View Datalogger Models →
                   </Link>
                 </div>
               </div>
 
-              {/* Datalogger Specs Box */}
-              <div style={{ background: '#f8fbff', border: '1px solid #d4e4f7', borderRadius: 16, padding: '32px 28px' }}>
-                <h4 style={{ color: '#0d2649', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* Datalogger Specs Box (3D) */}
+              <div className="prod-side-3d">
+                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Database size={20} color="#f47b20" /> Hardware Highlights
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div style={{ background: '#fff', padding: '14px 16px', borderRadius: 8, border: '1px solid #e4edf8' }}>
-                    <span style={{ fontSize: 12.5, color: '#687b95', textTransform: 'uppercase', fontWeight: 700 }}>Communication Interfaces</span>
-                    <div style={{ color: '#0d2649', fontSize: 15, fontWeight: 600, marginTop: 4 }}>RS485 (Modbus RTU), Ethernet (Modbus TCP/IP), Wi-Fi, 4G LTE</div>
+                  <div className="prod-highlight-3d" style={{ display: 'block' }}>
+                    <span style={{ fontSize: 12, color: '#1351b4', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.04em' }}>Communication Interfaces</span>
+                    <div style={{ color: '#0d2649', fontSize: 15, fontWeight: 700, marginTop: 4 }}>RS485 (Modbus RTU), Ethernet (Modbus TCP/IP), Wi-Fi, 4G LTE</div>
                   </div>
-                  <div style={{ background: '#fff', padding: '14px 16px', borderRadius: 8, border: '1px solid #e4edf8' }}>
-                    <span style={{ fontSize: 12.5, color: '#687b95', textTransform: 'uppercase', fontWeight: 700 }}>Analog &amp; Digital I/O</span>
-                    <div style={{ color: '#0d2649', fontSize: 15, fontWeight: 600, marginTop: 4 }}>Opto-isolated 24V inputs, 4-20mA, 0-10V, thermocouple sensors</div>
+                  <div className="prod-highlight-3d" style={{ display: 'block' }}>
+                    <span style={{ fontSize: 12, color: '#1351b4', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.04em' }}>Analog &amp; Digital I/O</span>
+                    <div style={{ color: '#0d2649', fontSize: 15, fontWeight: 700, marginTop: 4 }}>Opto-isolated 24V inputs, 4-20mA, 0-10V, thermocouple sensors</div>
                   </div>
-                  <div style={{ background: '#fff', padding: '14px 16px', borderRadius: 8, border: '1px solid #e4edf8' }}>
-                    <span style={{ fontSize: 12.5, color: '#687b95', textTransform: 'uppercase', fontWeight: 700 }}>Pricing Structure</span>
-                    <div style={{ color: '#1351b4', fontSize: 15, fontWeight: 700, marginTop: 4 }}>Direct Manufacturer Pricing · Volume Discounts for OEMs</div>
+                  <div className="prod-highlight-3d" style={{ display: 'block' }}>
+                    <span style={{ fontSize: 12, color: '#f47b20', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.04em' }}>Pricing Structure</span>
+                    <div style={{ color: '#0d2649', fontSize: 15, fontWeight: 800, marginTop: 4 }}>Direct Manufacturer Pricing · Volume Discounts for OEMs</div>
                   </div>
                 </div>
               </div>
@@ -285,18 +213,10 @@ export default function ProductSolutionsSection() {
 
         {/* Tab 3: Home Automation */}
         {activeTab === 'home' && (
-          <div
-            style={{
-              background: '#ffffff',
-              border: '1.5px solid #cce0f8',
-              borderRadius: 20,
-              padding: '42px 40px',
-              boxShadow: '0 20px 45px -15px rgba(13, 38, 73, 0.08)',
-            }}
-          >
+          <div className="prod-showcase-3d">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 40, alignItems: 'center' }}>
               <div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#eafaf1', color: '#107e44', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 700, marginBottom: 16 }}>
+                <div className="prod-badge-3d" style={{ background: '#eafaf1', color: '#107e44' }}>
                   <HomeIcon size={16} /> RESIDENTIAL &amp; COMMERCIAL AUTOMATION
                 </div>
                 <h3 style={{ fontSize: 32, color: '#0d2649', fontWeight: 800, margin: '0 0 16px', lineHeight: 1.25 }}>
@@ -307,19 +227,19 @@ export default function ProductSolutionsSection() {
                 </p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 28 }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#107e44" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Retrofit Switches:</b> Fits behind existing switchboards</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#107e44" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Offline Functionality:</b> Operates locally without internet</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#107e44" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Voice &amp; App Control:</b> Alexa, Google Assistant &amp; iOS/Android</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div className="prod-check-3d">
                     <CheckCircle2 size={18} color="#107e44" style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{ fontSize: 14.5, color: '#2a3a52' }}><b>Energy Monitoring:</b> Track appliance power consumption live</span>
                   </div>
@@ -329,29 +249,29 @@ export default function ProductSolutionsSection() {
                   <Link to="/contact?product=Smart%20Home%20Automation" className="btn btn-primary" style={{ padding: '12px 24px', fontSize: 15 }}>
                     Book Free Site Survey &amp; Estimate
                   </Link>
-                  <Link to="/products?category=Smart%20Home%20Automation" className="btn btn-ghost" style={{ padding: '12px 20px', fontSize: 15 }}>
+                  <Link to="/products?category=Smart%20Home%20Automation" className="btn btn-3d-cyan" style={{ padding: '12px 22px', fontSize: 15 }}>
                     See Home Automation Kits →
                   </Link>
                 </div>
               </div>
 
-              {/* Home Packages Box */}
-              <div style={{ background: '#f8fbff', border: '1px solid #d4e4f7', borderRadius: 16, padding: '32px 28px' }}>
-                <h4 style={{ color: '#0d2649', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Zap size={20} color="#107e44" /> Package Options
+              {/* Home Packages Box (3D) */}
+              <div className="prod-side-3d">
+                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Zap size={20} color="#38bdf8" /> Package Options
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div style={{ background: '#fff', padding: '14px 16px', borderRadius: 8, border: '1px solid #e4edf8' }}>
+                  <div className="prod-highlight-3d" style={{ display: 'block' }}>
                     <b style={{ color: '#0d2649', fontSize: 15 }}>HA-Lite (Retrofit Switch Kit)</b>
-                    <div style={{ color: '#687b95', fontSize: 13, marginTop: 3 }}>Ideal for 1–3 BHK flats, rental apartments (lighting &amp; fans)</div>
+                    <div style={{ color: '#52637a', fontSize: 13, marginTop: 3 }}>Ideal for 1–3 BHK flats, rental apartments (lighting &amp; fans)</div>
                   </div>
-                  <div style={{ background: '#fff', padding: '14px 16px', borderRadius: 8, border: '1px solid #e4edf8' }}>
+                  <div className="prod-highlight-3d" style={{ display: 'block' }}>
                     <b style={{ color: '#0d2649', fontSize: 15 }}>HA-Home (Whole-Home Controller)</b>
-                    <div style={{ color: '#687b95', fontSize: 13, marginTop: 3 }}>AC, curtains, scenes, energy telemetry, water tank controller</div>
+                    <div style={{ color: '#52637a', fontSize: 13, marginTop: 3 }}>AC, curtains, scenes, energy telemetry, water tank controller</div>
                   </div>
-                  <div style={{ background: '#fff', padding: '14px 16px', borderRadius: 8, border: '1px solid #e4edf8' }}>
+                  <div className="prod-highlight-3d" style={{ display: 'block' }}>
                     <b style={{ color: '#0d2649', fontSize: 15 }}>HA-Building (Commercial &amp; Villa BMS)</b>
-                    <div style={{ color: '#687b95', fontSize: 13, marginTop: 3 }}>Multi-floor centralized dashboard, access control, energy reports</div>
+                    <div style={{ color: '#52637a', fontSize: 13, marginTop: 3 }}>Multi-floor centralized dashboard, access control, energy reports</div>
                   </div>
                 </div>
               </div>

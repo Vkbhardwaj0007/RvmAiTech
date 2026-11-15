@@ -55,71 +55,32 @@ export default function FaqSection() {
           </p>
         </div>
 
-        <div className="faq-list" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="faq-list" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {FAQS.map((faq, i) => {
             const isOpen = openIdx === i;
             return (
               <div
                 key={i}
-                className={`faq-item ${isOpen ? 'active' : ''}`}
-                style={{
-                  background: '#ffffff',
-                  border: isOpen ? '1.5px solid #1351b4' : '1px solid #dce5f2',
-                  borderRadius: 14,
-                  overflow: 'hidden',
-                  transition: 'all 0.25s ease',
-                  boxShadow: isOpen ? '0 10px 24px -10px rgba(19, 81, 180, 0.18)' : '0 2px 6px rgba(0,0,0,0.03)',
-                }}
+                className={`faq-item faq-item-3d ${isOpen ? 'active' : ''}`}
               >
                 <button
                   type="button"
                   onClick={() => toggle(i)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '20px 24px',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    gap: 16,
-                  }}
+                  className="faq-btn-3d"
                   aria-expanded={isOpen}
                 >
-                  <span style={{ fontSize: 17, fontWeight: 600, color: isOpen ? '#1351b4' : '#0d2649', lineHeight: 1.4 }}>
-                    {faq.q}
-                  </span>
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      background: isOpen ? '#eef4ff' : '#f1f5fa',
-                      color: isOpen ? '#1351b4' : '#62758f',
-                      flexShrink: 0,
-                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                      transition: 'transform 0.25s ease',
-                    }}
-                  >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <span className="faq-num-3d">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="faq-q-text">
+                      {faq.q}
+                    </span>
+                  </div>
+                  <span className={`faq-arrow-3d ${isOpen ? 'open' : ''}`}>
                     <ChevronDown size={18} />
                   </span>
                 </button>
                 {isOpen && (
-                  <div
-                    style={{
-                      padding: '0 24px 22px',
-                      color: '#42526e',
-                      fontSize: 15.5,
-                      lineHeight: 1.7,
-                      borderTop: '1px solid #f0f4fa',
-                      paddingTop: 16,
-                    }}
-                  >
+                  <div className="faq-ans-3d">
                     {faq.a}
                   </div>
                 )}
@@ -128,30 +89,17 @@ export default function FaqSection() {
           })}
         </div>
 
-        <div
-          style={{
-            marginTop: 40,
-            padding: '22px 28px',
-            background: '#ffffff',
-            border: '1px dashed #b9d3f5',
-            borderRadius: 14,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#eaf2fd', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1351b4' }}>
+        <div className="faq-cta-3d">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div className="faq-cta-ico-3d">
               <MessageSquare size={22} />
             </div>
             <div>
-              <b style={{ color: '#0d2649', fontSize: 16 }}>Have a specific technical question?</b>
-              <div style={{ color: '#55657d', fontSize: 14 }}>Talk directly to our automation &amp; robotics engineers.</div>
+              <b style={{ color: '#ffffff', fontSize: 17, display: 'block', marginBottom: 2 }}>Have a specific technical question?</b>
+              <div style={{ color: '#cbd5e1', fontSize: 14.5 }}>Talk directly to our automation &amp; robotics engineers.</div>
             </div>
           </div>
-          <Link to="/contact" className="btn btn-primary" style={{ padding: '10px 20px', fontSize: 14 }}>
+          <Link to="/contact" className="btn-3d-orange" style={{ padding: '12px 22px', fontSize: 14.5 }}>
             Ask Our Engineering Team →
           </Link>
         </div>
