@@ -22,7 +22,7 @@ const TILT_SEL = [
   '.pd-spec', '.pd-feat-item', '.job-side-card', '.cat-intro', '.general-apply', '.cta-band',
   '.flow-step', '.stat-b', '.wf-box', '.post-card',
   '.logo', '.nav-cta',                                  // header logo + CTA buttons
-  '.intro-text', '.sec-head', '.people-head', '.split-body > div', '.foot-col', // 3D tilting headings & text blocks (no card box)
+  '.intro-text', '.sec-head', '.people-head', '.split-body > div', '.foot-top > div', '.foot-bottom', // 3D tilting headings & footer text (no card box)
   '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',
   '.audit-banner-3d', '.audit-step-3d',
   '.hero-pill', '.tech-pill', '.cloud-tech-pill',
@@ -36,7 +36,7 @@ const TILT_CFG = [
   { sel: '.logo', max: 12, lift: 0, glare: false },
   { sel: '.nav-cta', max: 10, lift: -2, glare: false },
   { sel: '.intro-text, .sec-head, .people-head, .split-body > div', max: 9, lift: -6, glare: false },
-  { sel: '.foot-col', max: 8, lift: -4, glare: false },
+  { sel: '.foot-top > div, .foot-bottom', max: 9, lift: -5, glare: false },
   { sel: '.prod-tab-3d', max: 9, lift: -4, glare: true },
   { sel: '.hero-pill, .tech-pill, .cloud-tech-pill', max: 11, lift: -4, glare: false },
   { sel: '.audit-step-3d, .prod-highlight-3d', max: 8, lift: -5, glare: true },
@@ -219,37 +219,56 @@ function useHeroParallax() {
   }, []);
 }
 
-/* ---------- 3. 3D scroll reveal ---------- */
+/* ---------- 3. 3D scroll-build reveal (scrolling down AND scrolling back up) ---------- */
 function useReveal() {
-  // layout effect: hide-before-paint, so nothing flashes visible and then re-animates
   useLayoutEffect(() => {
     if (reduceMotion() || !('IntersectionObserver' in window) || !('MutationObserver' in window)) return undefined;
     const main = document.body;
+    const timers = new WeakMap();
 
     const io = new IntersectionObserver((entries) => {
       for (const en of entries) {
-        if (!en.isIntersecting) continue;
-        en.target.classList.add('r3d-in');
-        io.unobserve(en.target);
+        const el = en.target;
+        const prevTimer = timers.get(el);
+        if (prevTimer) {
+          clearTimeout(prevTimer);
+          timers.delete(el);
+        }
+
+        if (en.isIntersecting) {
+          // Element entered viewport -> build/assemble in 3D
+          el.classList.add('r3d', 'r3d-in');
+          const delayMs = parseFloat(el.style.getPropertyValue('--rd') || '0') || 0;
+          const t = setTimeout(() => {
+            // Once built in place, remove r3d classes so cursor 3D tilt works cleanly
+            el.classList.remove('r3d', 'r3d-in', 'r3d-from-top');
+            timers.delete(el);
+          }, 760 + delayMs);
+          timers.set(el, t);
+        } else {
+          // Element left viewport -> re-arm 3D build state for next scroll (up or down)
+          el.classList.remove('r3d-in');
+          el.classList.add('r3d');
+          if (en.boundingClientRect.top < 0) {
+            el.classList.add('r3d-from-top');
+          } else {
+            el.classList.remove('r3d-from-top');
+          }
+        }
       }
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 });
+    }, { rootMargin: '0px 0px -5% 0px', threshold: 0.06 });
 
     const seen = new WeakSet();
     const prep = (el) => {
       if (seen.has(el)) return;
       seen.add(el);
-      const r = el.getBoundingClientRect();
-      if (r.bottom < 0) return;                       // already scrolled past — leave it alone
       const i = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
-      el.style.setProperty('--rd', `${Math.min(i, 8) * 70}ms`);
-      el.classList.add('r3d');
-      const done = (e) => {
-        if (e.target !== el || e.propertyName !== 'opacity' || e.pseudoElement) return;
-        el.classList.remove('r3d', 'r3d-in');       // hand the element back to its own CSS
-        el.style.removeProperty('--rd');
-        el.removeEventListener('transitionend', done);
-      };
-      el.addEventListener('transitionend', done);
+      el.style.setProperty('--rd', `${Math.min(i, 8) * 75}ms`);
+      const r = el.getBoundingClientRect();
+      if (r.top > window.innerHeight || r.bottom < 0) {
+        el.classList.add('r3d');
+        if (r.bottom < 0) el.classList.add('r3d-from-top');
+      }
       io.observe(el);
     };
     const scan = (root) => {

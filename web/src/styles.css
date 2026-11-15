@@ -2755,20 +2755,50 @@ section.dark .sec-head p,
 }
 
 .site-footer p,
+.foot-tagline,
 .foot-col a,
-.foot-bottom {
+.foot-col span,
+.foot-addr,
+.foot-bottom,
+.foot-bottom span {
   text-shadow:
-    0 1px 0 #051226,
-    0 2px 0 #030b18,
-    0 4px 10px rgba(0, 0, 0, 0.65);
+    0 1px 0 #071b38,
+    0 2px 0 #051328,
+    0 3px 0 #030b18,
+    0 6px 14px rgba(0, 0, 0, 0.78) !important;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+              color 0.25s ease,
+              text-shadow 0.28s ease !important;
+}
+
+.site-footer p:hover,
+.foot-tagline:hover,
+.foot-brand-col:hover .foot-tagline,
+.foot-col span:hover,
+.foot-addr:hover {
+  color: #e0f2fe !important;
+  transform: translateY(-2px) translateX(4px) scale(1.015);
+  text-shadow:
+    0 1px 0 #082f61,
+    0 2px 0 #062146,
+    0 3px 0 #04152d,
+    0 4px 0 #020b18,
+    0 8px 20px rgba(56, 189, 248, 0.55) !important;
+}
+
+.foot-col:hover h4 {
+  color: #7dd3fc !important;
+  transform: translateY(-2px);
+  text-shadow:
+    0 1px 0 #082f61,
+    0 2px 0 #051d3d,
+    0 3px 0 #031022,
+    0 8px 18px rgba(56, 189, 248, 0.6) !important;
 }
 
 .foot-col a {
   display: block !important;
   padding: 5px 0;
-  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-              color 0.2s ease,
-              text-shadow 0.22s ease !important;
 }
 
 .foot-col a:hover {
@@ -2879,4 +2909,30 @@ section.dark .sec-head p,
 .btn-3d-cyan:active,
 .nav-cta:not(.nav-cta-audit-3d):active {
   transform: translateY(2px) scale(0.99) !important;
+}
+
+/* =====================================================================
+   14. 3D SCROLL-BUILD / 3D ASSEMBLY REVEAL ANIMATION
+   When scrolling down OR scrolling back up, sections, headings, cards,
+   and footer columns assemble/build into 3D space right before your eyes.
+   ===================================================================== */
+.r3d {
+  opacity: 0 !important;
+  transform: perspective(1100px) translate3d(0, 64px, -130px) rotateX(28deg) rotateY(-6deg) scale(0.86) !important;
+  transform-origin: 50% 80%;
+  transition: none !important;
+  will-change: opacity, transform;
+}
+
+.r3d.r3d-from-top {
+  transform: perspective(1100px) translate3d(0, -64px, -130px) rotateX(-28deg) rotateY(6deg) scale(0.86) !important;
+  transform-origin: 50% 20%;
+}
+
+.r3d.r3d-in {
+  opacity: 1 !important;
+  transform: perspective(1100px) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1) !important;
+  transition:
+    opacity 0.68s cubic-bezier(0.16, 1, 0.3, 1) var(--rd, 0ms),
+    transform 0.72s cubic-bezier(0.16, 1, 0.3, 1) var(--rd, 0ms) !important;
 }

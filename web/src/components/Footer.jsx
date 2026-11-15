@@ -19,9 +19,9 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="wrap foot-top">
-        <div>
+        <div className="foot-brand-col">
           <Logo />
-          <p>Robotics, Vision &amp; Machine Intelligence. We build intelligent automation for process, home and industry.</p>
+          <p className="foot-tagline">Robotics, Vision &amp; Machine Intelligence. We build intelligent automation for process, home and industry.</p>
           {links.length > 0 && (
             <div className="foot-social">
               {links.map(([k, url]) => ICONS[k] && (
@@ -53,7 +53,7 @@ export default function Footer() {
           <h4>Get in touch</h4>
           {contact.email && <a href={`mailto:${contact.email}`}>{contact.email}</a>}
           {contact.phone && <a href={`tel:${contact.phone}`}>{contact.phone}</a>}
-          {contact.address && <span style={{ display: 'block', color: '#9fb2ce', fontSize: 14, padding: '5px 0' }}>{contact.address}</span>}
+          {contact.address && <span className="foot-addr" style={{ display: 'block', color: '#9fb2ce', fontSize: 14, padding: '5px 0' }}>{contact.address}</span>}
         </div>
       </div>
       <div className="wrap foot-bottom">
