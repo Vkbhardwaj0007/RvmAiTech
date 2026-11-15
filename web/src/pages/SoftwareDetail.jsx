@@ -188,7 +188,7 @@ export default function SoftwareDetail() {
           )}
 
           {/* Problem Statement */}
-          <div style={{ background: '#fff9f7', border: '1.5px solid #fbd8cd', borderRadius: 18, padding: '28px 24px', marginBottom: 32 }}>
+          <div className="card card-dynamic hover-blue" style={{ background: '#fff9f7', border: '1.5px solid #fbd8cd', borderRadius: 18, padding: '28px 24px', marginBottom: 32 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#d9381e', fontWeight: 700, fontSize: 18, marginBottom: 12 }}>
               Operational Problem Statement
             </div>
@@ -198,7 +198,7 @@ export default function SoftwareDetail() {
           </div>
 
           {/* Solution Delivered */}
-          <div style={{ background: '#f5faf7', border: '1.5px solid #cce8d9', borderRadius: 18, padding: '28px 24px', marginBottom: 32 }}>
+          <div className="card card-dynamic hover-blue" style={{ background: '#f5faf7', border: '1.5px solid #cce8d9', borderRadius: 18, padding: '28px 24px', marginBottom: 32 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#107e44', fontWeight: 700, fontSize: 18, marginBottom: 12 }}>
               Solution &amp; Engineering Delivered
             </div>
@@ -209,7 +209,7 @@ export default function SoftwareDetail() {
 
           {/* Key Capabilities / Features */}
           {featuresList.length > 0 && (
-            <div style={{ background: '#ffffff', border: '1.5px solid #e1ecf8', borderRadius: 18, padding: '28px 24px', marginBottom: 32 }}>
+            <div className="card card-dynamic hover-blue" style={{ background: '#ffffff', border: '1.5px solid #e1ecf8', borderRadius: 18, padding: '28px 24px', marginBottom: 32 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0d2649', fontWeight: 700, fontSize: 18, marginBottom: 16 }}>
                 <Sparkles size={19} color="#f47b20" /> Key Features &amp; Capabilities
               </div>
@@ -228,13 +228,13 @@ export default function SoftwareDetail() {
           {(hardwareList.length > 0 || stackList.length > 0) && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, marginBottom: 36 }}>
               {hardwareList.length > 0 && (
-                <div style={{ background: '#fcfdfe', border: '1px solid #dce8f8', borderRadius: 16, padding: '22px 20px' }}>
+                <div className="card card-dynamic hover-blue" style={{ background: '#fcfdfe', border: '1px solid #dce8f8', borderRadius: 16, padding: '22px 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0d2649', fontWeight: 700, fontSize: 16, marginBottom: 12 }}>
                     <Cpu size={18} color="#f47b20" /> Hardware Components
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
                     {hardwareList.map((h, i) => (
-                      <span key={i} style={{ background: '#fff5ee', color: '#c05621', border: '1px solid #fed7aa', borderRadius: 6, padding: '5px 11px', fontSize: 13, fontWeight: 600 }}>
+                      <span key={i} className="card-tech-tag">
                         {h}
                       </span>
                     ))}
@@ -243,13 +243,13 @@ export default function SoftwareDetail() {
               )}
 
               {stackList.length > 0 && (
-                <div style={{ background: '#fcfdfe', border: '1px solid #dce8f8', borderRadius: 16, padding: '22px 20px' }}>
+                <div className="card card-dynamic hover-blue" style={{ background: '#fcfdfe', border: '1px solid #dce8f8', borderRadius: 16, padding: '22px 20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#0d2649', fontWeight: 700, fontSize: 16, marginBottom: 12 }}>
                     <Layers size={18} color="#1351b4" /> Software Technologies
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
                     {stackList.map((s, i) => (
-                      <span key={i} style={{ background: '#eef4ff', color: '#1351b4', border: '1px solid #d0e1f7', borderRadius: 6, padding: '5px 11px', fontSize: 13, fontWeight: 600 }}>
+                      <span key={i} className="card-tech-tag">
                         {s}
                       </span>
                     ))}
@@ -270,10 +270,11 @@ export default function SoftwareDetail() {
                   <div
                     key={i}
                     onClick={() => setActivePhoto(photo)}
-                    style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #dce8f8', background: '#0a1d37', cursor: 'pointer', aspectRatio: '16/10', position: 'relative', boxShadow: '0 8px 20px -8px rgba(0,0,0,0.15)' }}
+                    className="intro-media"
+                    style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid #dce8f8', background: '#0a1d37', cursor: 'pointer', aspectRatio: '16/10', position: 'relative', boxShadow: '0 8px 20px -8px rgba(0,0,0,0.15)', padding: 0 }}
                   >
                     <img src={photo} alt={`${p.title} photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: 11, padding: '3px 8px', borderRadius: 4 }}>Click to expand</div>
+                    <div style={{ position: 'absolute', bottom: 8, right: 8, background: 'rgba(0,0,0,0.65)', color: '#fff', fontSize: 11, padding: '3px 8px', borderRadius: 4, zIndex: 2 }}>Click to expand</div>
                   </div>
                 ))}
               </div>
@@ -291,58 +292,35 @@ export default function SoftwareDetail() {
 
           {/* Action Callout with WhatsApp & Quote */}
           <div
+            className="audit-banner-3d"
             style={{
-              background: 'linear-gradient(135deg, #0d2649 0%, #173d75 100%)',
-              borderRadius: 20,
               padding: '40px 32px',
-              color: '#fff',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: 20,
-              boxShadow: '0 20px 50px -15px rgba(13,38,73,0.4)',
             }}
           >
-            <div style={{ maxWidth: 500 }}>
-              <h3 style={{ fontSize: 23, color: '#fff', margin: '0 0 8px', fontWeight: 800 }}>
+            <div style={{ maxWidth: 500, position: 'relative', zIndex: 2 }}>
+              <h3 style={{ fontSize: 23, color: '#fff', margin: '0 0 8px', fontWeight: 800, textShadow: '0 2px 0 #06152d, 0 4px 0 #030b18, 0 8px 18px rgba(0,0,0,0.65)' }}>
                 Ready to deploy {p.title}?
               </h3>
-              <p style={{ color: '#b9d2f3', margin: 0, fontSize: 15.5, lineHeight: 1.6 }}>
+              <p style={{ color: '#c4d4ea', margin: 0, fontSize: 15.5, lineHeight: 1.6 }}>
                 Speak directly with our technical lead to discuss architecture, timeline, custom sensor interfaces, and live pilot demonstration.
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', position: 'relative', zIndex: 2 }}>
               <button
                 type="button"
                 onClick={handleWhatsApp}
-                style={{
-                  background: '#25D366',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 10,
-                  padding: '13px 22px',
-                  fontSize: 15,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
+                className="btn btn-3d-whatsapp"
               >
                 <MessageSquare size={17} /> Instant WhatsApp
               </button>
               <Link
                 to={`/contact?subject=${encodeURIComponent('Enquiry regarding: ' + p.title)}`}
-                className="btn btn-primary"
-                style={{
-                  padding: '13px 24px',
-                  fontSize: 15,
-                  fontWeight: 700,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
+                className="btn btn-primary btn-3d-orange"
               >
                 Request Quotation <Send size={15} />
               </Link>

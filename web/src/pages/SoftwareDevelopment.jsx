@@ -450,6 +450,7 @@ export default function SoftwareDevelopment() {
     <>
       {/* 01. HERO SECTION */}
       <section
+        className="dark"
         style={{
           background: 'radial-gradient(120% 120% at 85% 0%, #1a4a8f 0%, #081a36 60%, #050e1f 100%)',
           color: '#ffffff',
@@ -459,126 +460,92 @@ export default function SoftwareDevelopment() {
         }}
       >
         <div className="wrap" style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 960 }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              background: 'rgba(244, 123, 32, 0.16)',
-              border: '1px solid rgba(244, 123, 32, 0.4)',
-              padding: '6px 16px',
-              borderRadius: 30,
-              fontSize: 13,
-              fontWeight: 700,
-              color: '#ff9d52',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              marginBottom: 20,
-            }}
-          >
-            <Sparkles size={15} /> End-to-End Product Engineering
+          <div className="sec-head" style={{ margin: '0 auto 36px', maxWidth: 880 }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'rgba(244, 123, 32, 0.16)',
+                border: '1px solid rgba(244, 123, 32, 0.4)',
+                padding: '6px 16px',
+                borderRadius: 30,
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#ff9d52',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                marginBottom: 20,
+              }}
+            >
+              <Sparkles size={15} /> End-to-End Product Engineering
+            </div>
+
+            <h2
+              style={{
+                fontSize: 'clamp(32px, 5vw, 54px)',
+                fontWeight: 800,
+                lineHeight: 1.15,
+                color: '#ffffff',
+                margin: '0 auto 20px',
+                maxWidth: 880,
+              }}
+            >
+              Custom Hardware &amp; Software Development
+            </h2>
+
+            <p
+              style={{
+                fontSize: 'clamp(16px, 2.2vw, 20px)',
+                color: '#c2d4ec',
+                lineHeight: 1.6,
+                maxWidth: 760,
+                margin: '0 auto',
+              }}
+            >
+              From electronic circuit design to intelligent software, we engineer complete technology solutions tailored to your requirements.
+            </p>
           </div>
-
-          <h1
-            style={{
-              fontSize: 'clamp(32px, 5vw, 54px)',
-              fontWeight: 800,
-              lineHeight: 1.15,
-              color: '#ffffff',
-              margin: '0 auto 20px',
-              maxWidth: 880,
-            }}
-          >
-            Custom Hardware &amp; Software Development
-          </h1>
-
-          <p
-            style={{
-              fontSize: 'clamp(16px, 2.2vw, 20px)',
-              color: '#c2d4ec',
-              lineHeight: 1.6,
-              maxWidth: 760,
-              margin: '0 auto 36px',
-            }}
-          >
-            From electronic circuit design to intelligent software, we engineer complete technology solutions tailored to your requirements.
-          </p>
 
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 46 }}>
             <Link
               to="/contact?subject=Custom%20Hardware%20%26%20Software%20Development%20Project"
-              className="btn btn-primary"
-              style={{
-                background: '#f47b20',
-                borderColor: '#f47b20',
-                color: '#ffffff',
-                padding: '14px 34px',
-                fontSize: 16,
-                fontWeight: 700,
-                borderRadius: 10,
-                boxShadow: '0 12px 30px -8px rgba(244, 123, 32, 0.65)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
+              className="btn btn-primary btn-3d-orange"
             >
               Discuss Your Project <ArrowRight size={17} />
             </Link>
 
             <a
               href="#categories"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1.5px solid rgba(255, 255, 255, 0.25)',
-                color: '#ffffff',
-                padding: '14px 30px',
-                fontSize: 16,
-                fontWeight: 700,
-                borderRadius: 10,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                transition: 'all 0.25s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-              }}
+              className="btn btn-3d-cyan"
             >
               Explore Our Capabilities
             </a>
           </div>
 
-          {/* 4 Proof Badges */}
+          {/* 4 Proof Badges (3D Stat Cards) */}
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
               gap: 16,
-              padding: '24px 20px',
-              borderRadius: 16,
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              backdropFilter: 'blur(10px)',
             }}
           >
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#f47b20' }}>Unified</div>
-              <div style={{ color: '#b6c6de', fontSize: 13, marginTop: 4 }}>Hardware + Software Under One Roof</div>
+            <div className="stat-b">
+              <b style={{ fontSize: 26, color: '#f47b20' }}>Unified</b>
+              <span style={{ color: '#c4d3ea', fontSize: 13.5, marginTop: 6 }}>Hardware + Software Under One Roof</span>
             </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#38bdf8' }}>Custom</div>
-              <div style={{ color: '#b6c6de', fontSize: 13, marginTop: 4 }}>PCB &amp; Embedded Firmware</div>
+            <div className="stat-b">
+              <b style={{ fontSize: 26, color: '#38bdf8' }}>Custom</b>
+              <span style={{ color: '#c4d3ea', fontSize: 13.5, marginTop: 6 }}>PCB &amp; Embedded Firmware</span>
             </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#4ade80' }}>Real-Time</div>
-              <div style={{ color: '#b6c6de', fontSize: 13, marginTop: 4 }}>Cloud Telemetry &amp; SCADA UI</div>
+            <div className="stat-b">
+              <b style={{ fontSize: 26, color: '#4ade80' }}>Real-Time</b>
+              <span style={{ color: '#c4d3ea', fontSize: 13.5, marginTop: 6 }}>Cloud Telemetry &amp; SCADA UI</span>
             </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#facc15' }}>Working</div>
-              <div style={{ color: '#b6c6de', fontSize: 13, marginTop: 4 }}>Bench Prototypes &amp; SLAs</div>
+            <div className="stat-b">
+              <b style={{ fontSize: 26, color: '#facc15' }}>Working</b>
+              <span style={{ color: '#c4d3ea', fontSize: 13.5, marginTop: 6 }}>Bench Prototypes &amp; SLAs</span>
             </div>
           </div>
         </div>
@@ -1096,47 +1063,32 @@ export default function SoftwareDevelopment() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="faq-list" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {FAQ_ITEMS.map((item, idx) => {
               const isOpen = openFaq === idx;
               return (
                 <div
                   key={idx}
-                  style={{
-                    background: '#ffffff',
-                    border: isOpen ? '1.5px solid #f47b20' : '1.5px solid #dce8f8',
-                    borderRadius: 14,
-                    overflow: 'hidden',
-                    transition: 'all 0.25s ease',
-                    boxShadow: isOpen ? '0 8px 24px -10px rgba(244,123,32,0.25)' : 'none',
-                  }}
+                  className={`faq-item faq-item-3d ${isOpen ? 'active' : ''}`}
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? -1 : idx)}
-                    style={{
-                      width: '100%',
-                      padding: '20px 24px',
-                      background: 'none',
-                      border: 'none',
-                      textAlign: 'left',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      gap: 14,
-                    }}
+                    className="faq-btn-3d"
                   >
-                    <span style={{ fontSize: 17, fontWeight: 700, color: isOpen ? '#f47b20' : '#0d2649' }}>
-                      {item.q}
-                    </span>
-                    <span style={{ color: isOpen ? '#f47b20' : '#718096', flexShrink: 0 }}>
-                      {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <span className="faq-num-3d">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="faq-q-text">
+                        {item.q}
+                      </span>
+                    </div>
+                    <span className={`faq-arrow-3d ${isOpen ? 'open' : ''}`}>
+                      <ChevronDown size={20} />
                     </span>
                   </button>
 
                   {isOpen && (
-                    <div style={{ padding: '0 24px 22px', color: '#4a5b73', fontSize: 15.5, lineHeight: 1.7, borderTop: '1px solid #f0f5fa', paddingTop: 14 }}>
+                    <div className="faq-ans-3d">
                       {item.a}
                     </div>
                   )}
@@ -1150,100 +1102,101 @@ export default function SoftwareDevelopment() {
       {/* 10. PROJECT INQUIRY FORM */}
       <section id="inquiry" style={{ padding: '80px 0', background: '#ffffff' }}>
         <div className="wrap" style={{ maxWidth: 960 }}>
-          <div
-            style={{
-              borderRadius: 24,
-              background: 'linear-gradient(135deg, #0d2649 0%, #153c6d 100%)',
-              color: '#ffffff',
-              padding: '48px 36px',
-              boxShadow: '0 24px 60px -15px rgba(13,38,73,0.4)',
-            }}
-          >
-            <div style={{ maxWidth: 680, marginBottom: 32 }}>
+          <div className="audit-banner-3d">
+            <div style={{ maxWidth: 680, marginBottom: 32, position: 'relative', zIndex: 2 }}>
               <div
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 8,
                   background: 'rgba(244, 123, 32, 0.2)',
-                  border: '1px solid rgba(244, 123, 32, 0.4)',
-                  padding: '4px 14px',
+                  border: '1px solid rgba(244, 123, 32, 0.45)',
+                  padding: '5px 15px',
                   borderRadius: 20,
                   fontSize: 12.5,
                   fontWeight: 700,
                   color: '#ff9d52',
                   textTransform: 'uppercase',
                   marginBottom: 14,
+                  boxShadow: '0 4px 12px rgba(244, 123, 32, 0.25)',
                 }}
               >
                 <Sparkles size={15} /> 10. Start Your Project Consultation
               </div>
 
-              <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', color: '#ffffff', margin: '0 0 10px', fontWeight: 800 }}>
+              <h2
+                style={{
+                  fontSize: 'clamp(26px, 3.5vw, 38px)',
+                  color: '#ffffff',
+                  margin: '0 0 10px',
+                  fontWeight: 800,
+                  textShadow: '0 2px 0 #06152d, 0 4px 0 #030b18, 0 10px 24px rgba(0,0,0,0.65)',
+                }}
+              >
                 Request a Proposal &amp; Technical Consultation
               </h2>
-              <p style={{ color: '#b6c6de', fontSize: 16, lineHeight: 1.6, margin: 0 }}>
+              <p style={{ color: '#c4d4ea', fontSize: 16, lineHeight: 1.6, margin: 0 }}>
                 Tell us about your machine signals, application requirements, or prototype goals. Our lead system architect will review your technical specifications and share a tailored engineering proposal within 24 hours.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18, position: 'relative', zIndex: 2 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   Full Name <span style={{ color: '#f47b20' }}>*</span>
                 </label>
                 <input
                   name="name"
                   required
+                  className="input-3d"
                   placeholder="e.g. Vivek Bhardwaj"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   WhatsApp / Phone Number <span style={{ color: '#f47b20' }}>*</span>
                 </label>
                 <input
                   name="phone"
                   type="tel"
                   required
+                  className="input-3d"
                   placeholder="+91 70520 50656"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   Business Email
                 </label>
                 <input
                   name="email"
                   type="email"
+                  className="input-3d"
                   placeholder="rahul@company.com"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   Company Name / Organization
                 </label>
                 <input
                   name="company"
+                  className="input-3d"
                   placeholder="e.g. Apex Engineering Ltd."
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
                 />
               </div>
 
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   Project Category
                 </label>
                 <select
                   name="projectCategory"
                   defaultValue="Custom PCB Design & Development"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
+                  className="input-3d"
                 >
                   <option value="Custom PCB Design & Development">A. Custom PCB Design &amp; Development</option>
                   <option value="Embedded Systems Development">B. Embedded Systems Development (ESP32 / STM32)</option>
@@ -1259,13 +1212,13 @@ export default function SoftwareDevelopment() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   Expected Budget Range
                 </label>
                 <select
                   name="budget"
                   defaultValue="₹50,000 – ₹1,50,000"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
+                  className="input-3d"
                 >
                   <option value="Under ₹50,000">Under ₹50,000 (Small Prototype / Diagnostic)</option>
                   <option value="₹50,000 – ₹1,50,000">₹50,000 – ₹1,50,000 (POC / Controller)</option>
@@ -1276,13 +1229,13 @@ export default function SoftwareDevelopment() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   Project Timeline
                 </label>
                 <select
                   name="timeline"
                   defaultValue="1 to 3 Months"
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
+                  className="input-3d"
                 >
                   <option value="Immediate (< 1 Month)">Immediate (&lt; 1 Month - Urgent Prototype)</option>
                   <option value="1 to 3 Months">1 to 3 Months (Standard Engineering Cycle)</option>
@@ -1292,15 +1245,15 @@ export default function SoftwareDevelopment() {
               </div>
 
               <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontSize: 13, color: '#c9d6e8', marginBottom: 6, fontWeight: 600 }}>
+                <label className="label-3d">
                   Project Description &amp; Technical Requirements
                 </label>
                 <textarea
                   name="message"
                   rows="4"
                   required
+                  className="input-3d"
                   placeholder="Please describe sensor inputs, communication protocols, number of units, dimensions, or cloud software features needed..."
-                  style={{ width: '100%', padding: '12px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.95)', color: '#0d2649', fontSize: 14.5 }}
                 />
               </div>
 
@@ -1308,20 +1261,8 @@ export default function SoftwareDevelopment() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="btn btn-primary"
-                  style={{
-                    padding: '14px 34px',
-                    fontSize: 15.5,
-                    background: '#f47b20',
-                    borderColor: '#f47b20',
-                    color: '#ffffff',
-                    fontWeight: 700,
-                    cursor: busy ? 'not-allowed' : 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    borderRadius: 10,
-                  }}
+                  className="btn btn-primary btn-3d-orange"
+                  style={{ cursor: busy ? 'not-allowed' : 'pointer' }}
                 >
                   <Send size={17} /> {busy ? 'Submitting Proposal Request…' : 'Submit Project Inquiry'}
                 </button>
@@ -1329,19 +1270,7 @@ export default function SoftwareDevelopment() {
                 <button
                   type="button"
                   onClick={() => handleWhatsApp('Complete Custom Hardware & Software Project')}
-                  style={{
-                    background: '#25D366',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: 10,
-                    padding: '14px 24px',
-                    fontSize: 15,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                  }}
+                  className="btn btn-3d-whatsapp"
                 >
                   <MessageSquare size={17} /> Instant WhatsApp Consultation
                 </button>
@@ -1369,48 +1298,28 @@ export default function SoftwareDevelopment() {
       </section>
 
       {/* 11. FINAL CALL TO ACTION */}
-      <section style={{ padding: '60px 0', background: '#0a1d37', color: '#ffffff', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <section className="dark" style={{ padding: '72px 0', background: 'linear-gradient(180deg, #07162c 0%, #0a1d37 55%, #0d2649 100%)', color: '#ffffff', borderTop: '2px solid rgba(56, 189, 248, 0.35)' }}>
         <div className="wrap" style={{ textAlign: 'center', maxWidth: 860 }}>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 42px)', color: '#ffffff', fontWeight: 800, marginBottom: 14 }}>
-            Have an Idea? Let's Engineer It.
-          </h2>
-          <p style={{ color: '#b6c6de', fontSize: 17, lineHeight: 1.6, maxWidth: 680, margin: '0 auto 30px' }}>
-            From custom electronic hardware to intelligent software applications, RvmAiTech helps turn your technical requirements into working solutions.
-          </p>
+          <div className="sec-head" style={{ margin: '0 auto 30px' }}>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', color: '#ffffff', fontWeight: 800, marginBottom: 14 }}>
+              Have an Idea? Let&apos;s Engineer It.
+            </h2>
+            <p style={{ color: '#c4d4ea', fontSize: 17.5, lineHeight: 1.65, maxWidth: 680, margin: '0 auto' }}>
+              From custom electronic hardware to intelligent software applications, RvmAiTech helps turn your technical requirements into working solutions.
+            </p>
+          </div>
           <div style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
             <a
               href="mailto:rvmaitech2026@gmail.com"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                color: '#ffffff',
-                textDecoration: 'none',
-                background: 'rgba(255,255,255,0.1)',
-                padding: '10px 20px',
-                borderRadius: 30,
-                fontSize: 15,
-                fontWeight: 600,
-              }}
+              className="cta-contact-pill-3d"
             >
-              <Mail size={16} color="#f47b20" /> rvmaitech2026@gmail.com
+              <Mail size={18} color="#f47b20" /> rvmaitech2026@gmail.com
             </a>
             <a
               href="tel:+917052050656"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                color: '#ffffff',
-                textDecoration: 'none',
-                background: 'rgba(255,255,255,0.1)',
-                padding: '10px 20px',
-                borderRadius: 30,
-                fontSize: 15,
-                fontWeight: 600,
-              }}
+              className="cta-contact-pill-3d"
             >
-              <Phone size={16} color="#38bdf8" /> +91 7052050656
+              <Phone size={18} color="#38bdf8" /> +91 7052050656
             </a>
           </div>
         </div>

@@ -25,7 +25,7 @@ const TILT_SEL = [
   '.intro-text', '.sec-head', '.people-head', '.split-body > div', '.foot-top > div', '.foot-bottom', // 3D tilting headings & footer text (no card box)
   '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',
   '.audit-banner-3d', '.audit-step-3d',
-  '.hero-pill', '.tech-pill', '.cloud-tech-pill',
+  '.hero-pill', '.tech-pill', '.cloud-tech-pill', '.cta-contact-pill-3d',
   '.prod-tab-3d', '.prod-showcase-3d', '.prod-highlight-3d',
   '.faq-item-3d', '.faq-cta-3d',
 ].join(',');
@@ -38,7 +38,7 @@ const TILT_CFG = [
   { sel: '.intro-text, .sec-head, .people-head, .split-body > div', max: 9, lift: -6, glare: false },
   { sel: '.foot-top > div, .foot-bottom', max: 9, lift: -5, glare: false },
   { sel: '.prod-tab-3d', max: 9, lift: -4, glare: true },
-  { sel: '.hero-pill, .tech-pill, .cloud-tech-pill', max: 11, lift: -4, glare: false },
+  { sel: '.hero-pill, .tech-pill, .cloud-tech-pill, .cta-contact-pill-3d', max: 11, lift: -4, glare: false },
   { sel: '.audit-step-3d, .prod-highlight-3d', max: 8, lift: -5, glare: true },
   { sel: '.faq-item-3d', max: 4.5, lift: -4, glare: true },
   { sel: '.audit-banner-3d, .cta-band, .prod-showcase-3d, .faq-cta-3d', max: 3.5, lift: -4, glare: true },
