@@ -1440,3 +1440,277 @@ section[id]{scroll-margin-top:80px}
     transform: translateY(0) scale(1);
   }
 }
+
+/* =====================================================================
+   3D COMPANY AUDIT BANNER, 3D STEP CARDS & 3D AUDIT BUTTONS
+   ===================================================================== */
+
+.btn-3d-orange,
+.btn-3d-cyan,
+.nav-cta-audit-3d {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  border-radius: 14px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.2s ease;
+}
+
+/* 3D Orange Button (Schedule Company Audit) */
+.btn-3d-orange {
+  background: linear-gradient(180deg, #ff9848 0%, #f47b20 55%, #d95d08 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 220, 185, 0.65) !important;
+  padding: 14px 28px;
+  font-size: 15.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 6px 0 #9e3f00,
+    0 14px 28px -4px rgba(244, 123, 32, 0.65),
+    inset 0 2px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+.btn-3d-orange:hover {
+  transform: perspective(700px) translateY(-4px) rotateX(8deg) scale(1.03);
+  box-shadow:
+    0 9px 0 #9e3f00,
+    0 22px 38px -4px rgba(244, 123, 32, 0.85),
+    inset 0 2px 2px rgba(255, 255, 255, 0.7),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25) !important;
+  filter: brightness(1.06);
+}
+
+.btn-3d-orange:active {
+  transform: perspective(700px) translateY(4px) rotateX(0deg) scale(0.99) !important;
+  box-shadow:
+    0 2px 0 #9e3f00,
+    0 6px 14px rgba(244, 123, 32, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* 3D Cyan/Blue Button (Book Company Audit / Vision & QC Audit) */
+.btn-3d-cyan {
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 48%, #0369a1 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(186, 230, 253, 0.75) !important;
+  padding: 14px 26px;
+  font-size: 15.5px;
+  text-shadow: 0 2px 4px rgba(3, 39, 75, 0.45);
+  box-shadow:
+    0 6px 0 #07477a,
+    0 14px 28px -4px rgba(14, 165, 233, 0.6),
+    inset 0 2px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25) !important;
+}
+
+.btn-3d-cyan:hover {
+  transform: perspective(700px) translateY(-4px) rotateX(8deg) scale(1.03);
+  box-shadow:
+    0 9px 0 #07477a,
+    0 22px 38px -4px rgba(56, 189, 248, 0.8),
+    inset 0 2px 2px rgba(255, 255, 255, 0.75),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25) !important;
+  filter: brightness(1.06);
+}
+
+.btn-3d-cyan:active {
+  transform: perspective(700px) translateY(4px) rotateX(0deg) scale(0.99) !important;
+  box-shadow:
+    0 2px 0 #07477a,
+    0 6px 14px rgba(14, 165, 233, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Header 3D Book Audit CTA */
+.nav-cta-audit-3d {
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 50%, #1351b4 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(186, 230, 253, 0.75) !important;
+  border-radius: 11px !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 4px 0 #083968,
+    0 10px 22px -4px rgba(14, 165, 233, 0.65),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.6) !important;
+}
+
+.nav-cta-audit-3d:hover {
+  transform: perspective(600px) translateY(-3px) rotateX(8deg) scale(1.04) !important;
+  box-shadow:
+    0 7px 0 #083968,
+    0 16px 28px -4px rgba(56, 189, 248, 0.85),
+    inset 0 2px 2px rgba(255, 255, 255, 0.75) !important;
+}
+
+.nav-cta-audit-3d:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #083968, 0 4px 10px rgba(14, 165, 233, 0.4) !important;
+}
+
+/* Moving Glossy 3D Light Sweep across Audit Buttons */
+.btn-3d-orange::before,
+.btn-3d-cyan::before,
+.nav-cta-audit-3d::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 65%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.42) 50%,
+    transparent 100%
+  );
+  transform: skewX(-22deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-3d-orange:hover::before,
+.btn-3d-cyan:hover::before,
+.nav-cta-audit-3d:hover::before {
+  left: 140%;
+}
+
+/* 3D Company Audit Showcase Container */
+.audit-banner-3d {
+  position: relative;
+  background: linear-gradient(145deg, #07162c 0%, #0d2649 52%, #12396e 100%);
+  border-radius: 26px;
+  padding: 48px 42px;
+  border: 1.5px solid rgba(56, 189, 248, 0.55);
+  box-shadow:
+    0 12px 0 #051122,
+    0 32px 70px -12px rgba(5, 17, 34, 0.75),
+    0 0 40px -10px rgba(14, 165, 233, 0.35),
+    inset 0 2px 1px rgba(255, 255, 255, 0.22),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 1200px;
+}
+
+/* 3D Perspective Grid Floor inside Audit Banner */
+.audit-banner-3d::before {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  bottom: -28%;
+  height: 75%;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.16) 1px, transparent 1px);
+  background-size: 54px 54px;
+  transform: perspective(650px) rotateX(64deg);
+  transform-origin: 50% 100%;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 60%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 60%);
+  animation: h3dFloor 7s linear infinite;
+  opacity: 0.7;
+}
+
+/* 3D Ambient Glow Orb inside Audit Banner */
+.audit-banner-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 36px;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+/* 3D Step Cards (01, 02, 03) inside Audit Banner */
+.audit-step-3d {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: linear-gradient(145deg, rgba(22, 62, 118, 0.95) 0%, rgba(12, 36, 72, 0.96) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.55);
+  border-radius: 16px;
+  padding: 18px 22px;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  box-shadow:
+    0 7px 0 #06152d,
+    0 18px 36px -8px rgba(0, 0, 0, 0.55),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.audit-step-3d:hover,
+.audit-step-3d.tilting {
+  border-color: #7dd3fc;
+  background: linear-gradient(145deg, rgba(28, 78, 148, 0.98) 0%, rgba(15, 45, 90, 0.98) 100%);
+  box-shadow:
+    0 11px 0 #06152d,
+    0 26px 48px -8px rgba(14, 165, 233, 0.45),
+    0 0 22px rgba(56, 189, 248, 0.3),
+    inset 0 2px 2px rgba(255, 255, 255, 0.38);
+}
+
+/* 3D Extruded Number Cube (01, 02, 03) */
+.audit-step-num {
+  background: linear-gradient(180deg, #ff9d4d 0%, #f47b20 55%, #c85200 100%);
+  color: #ffffff;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 224, 194, 0.65);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 4px 0 #8a3600,
+    0 10px 18px rgba(244, 123, 32, 0.5),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.55);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
+}
+
+.audit-step-body {
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.audit-step-3d:hover .audit-step-num,
+.audit-step-3d.tilting .audit-step-num {
+  transform: translateZ(32px) translateY(-2px) scale(1.08);
+  box-shadow:
+    0 6px 0 #8a3600,
+    0 14px 24px rgba(244, 123, 32, 0.7),
+    inset 0 2px 1px rgba(255, 255, 255, 0.65);
+}
+
+.audit-step-3d:hover .audit-step-body,
+.audit-step-3d.tilting .audit-step-body {
+  transform: translateZ(20px);
+}
+
+@media (max-width: 680px) {
+  .audit-banner-3d {
+    padding: 30px 22px;
+  }
+}

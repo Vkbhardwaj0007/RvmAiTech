@@ -446,8 +446,8 @@ export default function AuditBookingModal({ isOpen: propOpen, onClose: propOnClo
                 <button
                   type="submit"
                   disabled={busy}
-                  className="btn btn-primary"
-                  style={{ flex: 1, minWidth: 220, padding: '13px 18px', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none' }}
+                  className="btn-3d-orange"
+                  style={{ flex: 1, minWidth: 220, padding: '14px 18px', fontSize: 15.5, fontWeight: 800, cursor: 'pointer' }}
                 >
                   {busy ? 'Scheduling Audit…' : 'Book Company Audit Now →'}
                 </button>

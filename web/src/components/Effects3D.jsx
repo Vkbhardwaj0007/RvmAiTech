@@ -22,6 +22,7 @@ const TILT_SEL = [
   '.flow-step', '.stat-b', '.wf-box', '.post-card',
   '.logo', '.nav-cta', '.foot-col',                    // header + footer
   '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',   // intro image, service points/image, leader photo, founder card
+  '.audit-banner-3d', '.audit-step-3d', '.btn-3d-cyan', '.btn-3d-orange',
 ].join(',');
 
 // Per-element tilt settings: max angle (deg), lift (px), glare on/off.
@@ -29,6 +30,9 @@ const TILT_SEL = [
 const TILT_CFG = [
   { sel: '.logo', max: 12, lift: 0, glare: false },
   { sel: '.nav-cta', max: 10, lift: -1, glare: false },
+  { sel: '.btn-3d-cyan, .btn-3d-orange', max: 12, lift: -4, glare: true },
+  { sel: '.audit-step-3d', max: 9, lift: -6, glare: true },
+  { sel: '.audit-banner-3d', max: 3.5, lift: -4, glare: true },
   { sel: '.foot-col', max: 6, lift: -3, glare: false },
   { sel: '.stat-b, .flow-step', max: 8, lift: -6, glare: false },
   { sel: '.intro-media', max: 6, lift: -4, glare: true },
@@ -47,6 +51,7 @@ const REVEAL_SEL = [
   '.lead-card', '.steps > *', '.pd-spec', '.pd-feat-item', '.pd-block', '.cat-intro', '.general-apply',
   '.about-grid > *', '.contact-grid > *', '.quote', '.stat', '.wf-box', '.post-wrap > *', '.member > *',
   '.foot-top > *', '.foot-bottom', '.intro-text', '.intro-media', '.split-body > div', '.split-media', '.people-head', '.people-card', '.founder-card',
+  '.audit-banner-3d', '.audit-step-3d',
 ].join(',');
 
 const reduceMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;

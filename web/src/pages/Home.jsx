@@ -125,14 +125,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => openAuditModal()}
-              className="btn"
-              style={{
-                cursor: 'pointer',
-                background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
-                color: '#fff',
-                border: '1px solid rgba(56, 189, 248, 0.55)',
-                boxShadow: '0 8px 24px rgba(14, 165, 233, 0.35)',
-              }}
+              className="btn btn-3d-cyan"
             >
               Book Company Audit
             </button>
@@ -273,59 +266,39 @@ export default function Home() {
       {/* FAQ SECTION */}
       <FaqSection />
 
-      {/* COMPANY AUTOMATION AUDIT BANNER */}
-      <section style={{ padding: '64px 0 24px' }}>
+      {/* COMPANY AUTOMATION AUDIT BANNER (3D) */}
+      <section style={{ padding: '64px 0 28px' }}>
         <div className="wrap">
-          <div style={{
-            background: 'linear-gradient(135deg, #091a33 0%, #0d2649 60%, #103260 100%)',
-            borderRadius: 24,
-            padding: '44px 40px',
-            border: '1.5px solid rgba(56, 189, 248, 0.45)',
-            boxShadow: '0 24px 60px rgba(9, 26, 51, 0.22)',
-            color: '#fff',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14, 165, 233, 0.25)', border: '1px solid #38bdf8', color: '#e0f2fe', padding: '6px 16px', borderRadius: 20, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 18 }}>
-              <span style={{ color: '#38bdf8' }}>●</span> On-Site &amp; Online Technical Assessment
+          <div className="audit-banner-3d">
+            <div style={{ position: 'relative', zIndex: 2, display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14, 165, 233, 0.25)', border: '1px solid #38bdf8', color: '#e0f2fe', padding: '6px 16px', borderRadius: 20, fontSize: 12.5, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 18, boxShadow: '0 6px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.35)' }}>
+              <span style={{ color: '#38bdf8', textShadow: '0 0 8px #38bdf8' }}>●</span> On-Site &amp; Online Technical Assessment
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 32, alignItems: 'center' }}>
-              <div>
-                <h2 style={{ color: '#ffffff', fontSize: 'clamp(24px, 3.2vw, 34px)', margin: '0 0 14px', lineHeight: 1.22, fontWeight: 800 }}>
+            <div className="audit-banner-grid">
+              <div style={{ transformStyle: 'preserve-3d' }}>
+                <h2 style={{ color: '#ffffff', fontSize: 'clamp(24px, 3.2vw, 34px)', margin: '0 0 14px', lineHeight: 1.22, fontWeight: 800, textShadow: '0 4px 18px rgba(0, 0, 0, 0.45)' }}>
                   Book an Automation &amp; Technical Audit for Your Company
                 </h2>
-                <p style={{ color: '#f1f5f9', fontSize: 16, lineHeight: 1.68, margin: '0 0 26px', maxWidth: 620, fontWeight: 400 }}>
+                <p style={{ color: '#f1f5f9', fontSize: 16, lineHeight: 1.68, margin: '0 0 28px', maxWidth: 620, fontWeight: 400 }}>
                   Want to reduce machine downtime, eliminate manual quality defects, or digitize your plant operations? Our engineering team conducts a complete assessment of your facility and delivers a clear ROI &amp; automation roadmap.
                 </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
                   <button
                     type="button"
                     onClick={() => openAuditModal('Factory / Plant Automation & OEE Audit (MDMS & PLC)')}
-                    className="btn btn-primary"
-                    style={{ cursor: 'pointer', border: 'none', padding: '14px 26px', fontSize: 15, fontWeight: 700 }}
+                    className="btn-3d-orange"
                   >
                     Schedule Company Audit →
                   </button>
                   <button
                     type="button"
                     onClick={() => openAuditModal('Machine Vision & Quality Inspection Audit')}
-                    className="btn"
-                    style={{
-                      cursor: 'pointer',
-                      background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
-                      color: '#ffffff',
-                      border: '1.5px solid #7dd3fc',
-                      padding: '14px 24px',
-                      fontSize: 15,
-                      fontWeight: 700,
-                      boxShadow: '0 8px 22px rgba(14, 165, 233, 0.35)',
-                    }}
+                    className="btn-3d-cyan"
                   >
                     Vision &amp; QC Audit →
                   </button>
                 </div>
               </div>
-              <div style={{ display: 'grid', gap: 14 }}>
+              <div style={{ display: 'grid', gap: 16, transformStyle: 'preserve-3d' }}>
                 {[
                   { step: '01', title: 'Plant & Workflow Inspection', desc: 'On-site visit or virtual walkthrough of your machines, sensors, PLCs, and manual bottlenecks.' },
                   { step: '02', title: 'Gap & OEE Loss Analysis', desc: 'Identify hidden downtime, cycle-time losses, rejection causes, and telemetry gaps.' },
@@ -333,22 +306,14 @@ export default function Home() {
                 ].map((item) => (
                   <div
                     key={item.step}
-                    style={{
-                      display: 'flex',
-                      gap: 16,
-                      alignItems: 'flex-start',
-                      background: 'rgba(19, 54, 105, 0.92)',
-                      border: '1.5px solid rgba(56, 189, 248, 0.45)',
-                      borderRadius: 14,
-                      padding: '16px 20px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-                    }}
+                    className="audit-step-3d"
+                    onClick={() => openAuditModal()}
                   >
-                    <span style={{ background: 'linear-gradient(135deg, #f47b20, #e06610)', color: '#ffffff', fontWeight: 800, fontSize: 13.5, padding: '6px 11px', borderRadius: 8, flexShrink: 0, boxShadow: '0 4px 12px rgba(244, 123, 32, 0.35)' }}>
+                    <span className="audit-step-num">
                       {item.step}
                     </span>
-                    <div>
-                      <h4 style={{ color: '#ffffff', margin: '0 0 5px', fontSize: 16.5, fontWeight: 700 }}>{item.title}</h4>
+                    <div className="audit-step-body">
+                      <h4 style={{ color: '#ffffff', margin: '0 0 5px', fontSize: 16.5, fontWeight: 700, textShadow: '0 2px 6px rgba(0,0,0,0.35)' }}>{item.title}</h4>
                       <p style={{ color: '#e2e8f0', margin: 0, fontSize: 14, lineHeight: 1.55 }}>{item.desc}</p>
                     </div>
                   </div>
@@ -371,13 +336,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => openAuditModal()}
-                className="btn"
-                style={{
-                  cursor: 'pointer',
-                  background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
-                  color: '#fff',
-                  border: '1px solid rgba(56, 189, 248, 0.55)',
-                }}
+                className="btn btn-3d-cyan"
               >
                 Book Company Audit
               </button>

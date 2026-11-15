@@ -74,14 +74,8 @@ export default function Header() {
           <button
             type="button"
             onClick={() => { setOpen(false); openAuditModal(); }}
-            className="nav-cta"
-            style={{
-              background: 'linear-gradient(135deg, #0ea5e9, #1351b4)',
-              border: '1px solid rgba(56, 189, 248, 0.55)',
-              cursor: 'pointer',
-              marginRight: 6,
-              boxShadow: '0 4px 14px rgba(14, 165, 233, 0.25)',
-            }}
+            className="nav-cta nav-cta-audit-3d"
+            style={{ marginRight: 8 }}
           >
             {t('book_audit')}
           </button>
