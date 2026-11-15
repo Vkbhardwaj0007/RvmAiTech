@@ -2760,3 +2760,75 @@ section.dark .sec-head p,
   box-shadow: none !important;
   padding: 20px 0 0 !important;
 }
+
+/* =====================================================================
+   13. PREVENT 3D Z-BUFFER PLANE SLICING / DIAGONAL BUTTON CLIPPING
+   Keeps full 3D card tilt (perspective + rotateX + rotateY) on the parent
+   while preventing the parent's background plane from slicing through
+   nested buttons, icons, or text.
+   ===================================================================== */
+.t3d,
+.faq-cta-3d,
+.faq-item-3d,
+.faq-btn-3d,
+.prod-showcase-3d,
+.prod-side-3d,
+.prod-highlight-3d,
+.audit-banner-3d,
+.audit-banner-grid,
+.audit-step-3d,
+.audit-step-body,
+.cta-band,
+.card,
+.cap,
+.why-card,
+.sol-card,
+.metric-card,
+.quote-card,
+.stat-b,
+.ind,
+.client,
+.cinfo,
+.lead-card,
+.founder-card,
+.pd-spec,
+.pd-feat-item,
+.wf-box,
+.post-card,
+.job,
+.cat-intro,
+.general-apply {
+  transform-style: flat !important;
+}
+
+.t3d::after {
+  transform: none !important;
+}
+
+.btn,
+.btn-primary,
+.btn-ghost,
+.btn-3d-orange,
+.btn-3d-cyan,
+.nav-cta-audit-3d {
+  position: relative;
+  z-index: 6;
+  transform-style: flat !important;
+  backface-visibility: hidden;
+}
+
+.btn-primary:hover,
+.btn-3d-orange:hover,
+.btn-3d-cyan:hover,
+.nav-cta:not(.nav-cta-audit-3d):hover,
+.hero .btn-ghost:hover,
+.cta-band .btn-ghost:hover {
+  transform: translateY(-4px) scale(1.03) !important;
+}
+
+.btn-primary:active,
+.btn-3d-orange:active,
+.btn-3d-cyan:active,
+.nav-cta:not(.nav-cta-audit-3d):active {
+  transform: translateY(2px) scale(0.99) !important;
+}

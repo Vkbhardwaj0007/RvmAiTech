@@ -23,7 +23,7 @@ const TILT_SEL = [
   '.flow-step', '.stat-b', '.wf-box', '.post-card',
   '.logo', '.nav-cta',                                  // header logo + CTA buttons
   '.intro-media', '.split-item', '.split-media', '.people-photo', '.founder-card',
-  '.audit-banner-3d', '.audit-step-3d', '.btn-3d-cyan', '.btn-3d-orange', '.btn-primary',
+  '.audit-banner-3d', '.audit-step-3d',
   '.hero-pill', '.tech-pill', '.cloud-tech-pill',
   '.prod-tab-3d', '.prod-showcase-3d', '.prod-highlight-3d',
   '.faq-item-3d', '.faq-cta-3d',
@@ -34,7 +34,7 @@ const TILT_SEL = [
 const TILT_CFG = [
   { sel: '.logo', max: 12, lift: 0, glare: false },
   { sel: '.nav-cta', max: 10, lift: -2, glare: false },
-  { sel: '.btn-3d-cyan, .btn-3d-orange, .btn-primary, .prod-tab-3d', max: 11, lift: -4, glare: true },
+  { sel: '.prod-tab-3d', max: 9, lift: -4, glare: true },
   { sel: '.hero-pill, .tech-pill, .cloud-tech-pill', max: 11, lift: -4, glare: false },
   { sel: '.audit-step-3d, .prod-highlight-3d', max: 8, lift: -5, glare: true },
   { sel: '.faq-item-3d', max: 4.5, lift: -4, glare: true },
