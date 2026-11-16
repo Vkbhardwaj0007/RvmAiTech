@@ -3231,3 +3231,126 @@ section.dark .sec-head p,
     0 6px 16px rgba(4, 14, 31, 0.98),
     0 12px 30px rgba(244, 123, 32, 0.45) !important;
 }
+
+/* =====================================================================
+   18. UNIFIED 3D CARD ANIMATION FOR HARDWARE & SOFTWARE DEVELOPMENT
+       (.card-dynamic, .hover-blue, .hover-orange, .card-icon-wrap)
+   Removes transition conflicts with Effects3D.jsx and applies full
+   Home-page 3D bevel, 3D tilt, 3D icon lift, and 3D text pop-out.
+   ===================================================================== */
+.card-dynamic.t3d.tilting,
+.hover-blue.t3d.tilting,
+.hover-orange.t3d.tilting,
+.card.t3d.tilting,
+.why-card.t3d.tilting,
+.sol-card.t3d.tilting,
+.metric-card.t3d.tilting,
+.quote-card.t3d.tilting {
+  transition:
+    transform 0s,
+    background 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.28s ease !important;
+}
+
+.card-dynamic,
+.card.hover-blue,
+.card.hover-orange {
+  position: relative;
+  border: 1.5px solid #cfddef !important;
+  box-shadow:
+    0 7px 0 #c1d2e9,
+    0 20px 40px -12px rgba(13, 38, 73, 0.16),
+    inset 0 2px 0 #ffffff !important;
+}
+
+.card-dynamic:hover,
+.card-dynamic.tilting,
+.hover-blue:hover,
+.hover-blue.tilting,
+.hover-orange:hover,
+.hover-orange.tilting {
+  background: linear-gradient(145deg, #123566 0%, #0d2649 60%, #081a35 100%) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 11px 0 #051226,
+    0 30px 60px -12px rgba(8, 26, 53, 0.78),
+    0 0 28px rgba(56, 189, 248, 0.32),
+    inset 0 2px 2px rgba(255, 255, 255, 0.35) !important;
+}
+
+.card-icon-wrap {
+  box-shadow:
+    0 5px 0 rgba(18, 58, 114, 0.22),
+    0 12px 22px -6px rgba(13, 38, 73, 0.25),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.7) !important;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.35s ease !important;
+}
+
+.card:hover .card-icon-wrap,
+.card.tilting .card-icon-wrap,
+.card-dynamic:hover .card-icon-wrap,
+.card-dynamic.tilting .card-icon-wrap,
+.hover-blue:hover .card-icon-wrap,
+.hover-blue.tilting .card-icon-wrap {
+  background: rgba(56, 189, 248, 0.22) !important;
+  border-color: rgba(56, 189, 248, 0.65) !important;
+  color: #38bdf8 !important;
+  transform: translateY(-5px) scale(1.1) !important;
+  box-shadow:
+    0 6px 0 #061b3a,
+    0 16px 28px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(56, 189, 248, 0.45),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.45) !important;
+}
+
+.card:hover .card-icon-wrap svg,
+.card.tilting .card-icon-wrap svg,
+.card-dynamic:hover .card-icon-wrap svg,
+.card-dynamic.tilting .card-icon-wrap svg {
+  color: #38bdf8 !important;
+  stroke: #38bdf8 !important;
+}
+
+.card-dynamic h3,
+.hover-blue h3 {
+  text-shadow:
+    0 1px 0 #ffffff,
+    0 2px 0 #d5e3f5,
+    0 3px 0 #bdcfe7,
+    0 6px 14px rgba(13, 38, 73, 0.18);
+  transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.28s ease, text-shadow 0.28s ease !important;
+}
+
+.card-dynamic:hover h3,
+.card-dynamic.tilting h3,
+.hover-blue:hover h3,
+.hover-blue.tilting h3 {
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  text-shadow:
+    0 1px 0 #071936,
+    0 2px 0 #051329,
+    0 3px 0 #030c1c,
+    0 8px 18px rgba(0, 0, 0, 0.65) !important;
+}
+
+.card-dynamic.tilting p,
+.card-dynamic.tilting li,
+.hover-blue.tilting p,
+.hover-blue.tilting li {
+  color: #e2edf8 !important;
+}
+
+.card-dynamic.tilting .card-action-link,
+.hover-blue.tilting .card-action-link {
+  color: #38bdf8 !important;
+}

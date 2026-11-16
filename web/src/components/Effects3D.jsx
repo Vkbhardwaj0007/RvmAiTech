@@ -39,6 +39,7 @@ const TILT_CFG = [
   { sel: '.hero h1, .hero .lead, .page-hero h1, .page-hero p', max: 8, lift: -4, glare: false },
   { sel: '.intro-text, .sec-head, .people-head, .split-body > div', max: 9, lift: -6, glare: false },
   { sel: '.foot-top > div, .foot-bottom', max: 9, lift: -5, glare: false },
+  { sel: '.card, .cap, .card-dynamic, .why-card, .sol-card, .metric-card, .quote-card', max: 10, lift: -8, glare: true },
   { sel: '.prod-tab-3d', max: 9, lift: -4, glare: true },
   { sel: '.hero-pill, .tech-pill, .cloud-tech-pill, .cta-contact-pill-3d', max: 11, lift: -4, glare: false },
   { sel: '.audit-step-3d, .prod-highlight-3d, .prod-check-3d', max: 8, lift: -5, glare: true },
@@ -58,12 +59,14 @@ const cfgFor = (el, r) => {
 };
 
 const REVEAL_SEL = [
-  '.sec-head', '.grid-3 > *', '.flow-step', '.stat-b', '.ind', '.client', '.cta-band', '.job',
+  '.sec-head', '.card', '.cap', '.card-dynamic', '.grid-3 > *', '.flow-step', '.stat-b', '.ind', '.client', '.cta-band', '.job',
   '.why-card', '.sol-card', '.metric-card', '.quote-card',
   '.lead-card', '.steps > *', '.pd-spec', '.pd-feat-item', '.pd-block', '.cat-intro', '.general-apply',
   '.about-grid > *', '.contact-grid > *', '.quote', '.stat', '.wf-box', '.post-wrap > *', '.member > *',
   '.foot-top > *', '.foot-bottom', '.intro-text', '.intro-media', '.split-body > div', '.split-media', '.people-head', '.people-card', '.founder-card',
-  '.audit-banner-3d', '.audit-step-3d', '.prod-showcase-3d', '.faq-item-3d', '.faq-cta-3d',
+  '.audit-banner-3d', '.audit-step-3d', '.prod-tab-3d', '.prod-showcase-3d', '.prod-check-3d', '.prod-highlight-3d',
+  '.faq-item-3d', '.faq-cta-3d', '.cloud-tech-pill', '.tech-pill', '.cta-contact-pill-3d',
+  '.member-side-3d', '.member-content-3d',
 ].join(',');
 
 const reduceMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
