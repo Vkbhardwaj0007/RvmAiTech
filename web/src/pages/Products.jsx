@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import client from '../api/client';
 import { PageHero } from './_hero.jsx';
+
+const SmartParking3DSimulator = lazy(() => import('../components/SmartParking3DSimulator'));
 const CAT_INTRO = {
   Datalogger: {
     title: 'Datalogger — The Edge of MDMS',
@@ -103,6 +105,15 @@ export default function Products() {
             <button key={c} className={`chip ${category === c ? 'on' : ''}`} onClick={() => setParams(c === 'all' ? {} : { category: c })}>{c}</button>
           ))}
         </div>
+
+        {(category === 'Smart Parking' || category === 'all') && (
+          <div style={{ margin: '28px 0 36px' }}>
+            <Suspense fallback={null}>
+              <SmartParking3DSimulator />
+            </Suspense>
+          </div>
+        )}
+
         <div className="grid-3" style={{ marginTop: 26 }}>
           {items.map((p) => (
             <article className="card" key={p._id} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>

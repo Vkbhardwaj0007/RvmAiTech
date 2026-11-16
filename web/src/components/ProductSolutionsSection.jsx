@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 
 const InteractiveProduct3D = lazy(() => import('./InteractiveProduct3D'));
+const SmartParking3DSimulator = lazy(() => import('./SmartParking3DSimulator'));
 
 export default function ProductSolutionsSection() {
   const [activeTab, setActiveTab] = useState('mdms');
@@ -293,9 +294,9 @@ export default function ProductSolutionsSection() {
         {/* Tab 4: Smart Parking & ERP */}
         {activeTab === 'enterprise' && (
           <div>
-            <div style={{ maxWidth: 520, margin: '0 auto 28px' }}>
+            <div style={{ margin: '0 auto 34px' }}>
               <Suspense fallback={null}>
-                <InteractiveProduct3D mode="enterprise" label="3D Smart Parking & Cloud ERP Core" />
+                <SmartParking3DSimulator />
               </Suspense>
             </div>
             <div

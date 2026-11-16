@@ -27,6 +27,7 @@ import { canRun3D } from '../components/heroScene3DSupport';
  *      or a slow connection downloads nothing at all.
  */
 const HeroScene3D = lazy(() => import('../components/HeroScene3D'));
+const SmartParking3DSimulator = lazy(() => import('../components/SmartParking3DSimulator'));
 
 const FB_STATS = [
   { value: '50+', label: 'Automation projects' },
@@ -224,6 +225,24 @@ export default function Home() {
 
       {/* PRODUCT SOLUTIONS SHOWCASE (MDMS, Datalogger, Home Automation separated) */}
       <ProductSolutionsSection />
+
+      {/* 3D SMART PARKING SYSTEM — LIVE ANPR CAMERA, QR REGISTRATION & EXIT BILLING SIMULATOR */}
+      <section className="dark" id="smart-parking-3d" style={{ padding: '86px 0' }}>
+        <div className="wrap">
+          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 38px', maxWidth: 820 }}>
+            <div className="sec-kicker">Interactive 3D Smart Parking System</div>
+            <h2 style={{ color: '#ffffff' }}>
+              ANPR Camera Scan · QR Customer Registration · Automated Exit Billing
+            </h2>
+            <p style={{ color: '#c4d4ea', maxWidth: 720, margin: '12px auto 0' }}>
+              Experience our complete 3D Smart Parking workflow: Entry ANPR number plate scan, Customer Kiosk QR registration (Name &amp; Phone), live slot timer, and automated Exit QR payment gate control.
+            </p>
+          </div>
+          <Suspense fallback={null}>
+            <SmartParking3DSimulator />
+          </Suspense>
+        </div>
+      </section>
 
       {/* WHY CHOOSE RVMAITECH */}
       <WhyChooseSection />

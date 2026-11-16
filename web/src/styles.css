@@ -3555,3 +3555,287 @@ section.dark .sec-head p,
     0 0 22px rgba(56, 189, 248, 0.45),
     inset 0 2px 2px rgba(255, 255, 255, 0.5) !important;
 }
+
+/* =====================================================================
+   21. 3D SMART PARKING SYSTEM SIMULATOR & CUSTOMER KIOSK
+   ===================================================================== */
+.sp3d-wrapper {
+  background: linear-gradient(145deg, #07162c 0%, #0d2649 55%, #123669 100%);
+  border: 2px solid rgba(56, 189, 248, 0.55);
+  border-radius: 26px;
+  padding: 28px;
+  box-shadow:
+    0 12px 0 #040d1c,
+    0 34px 70px -12px rgba(5, 17, 34, 0.78),
+    inset 0 2px 2px rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.sp3d-stepper {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 980px) {
+  .sp3d-stepper {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .sp3d-stepper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sp3d-wrapper {
+    padding: 18px;
+  }
+}
+
+.sp3d-step-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  background: rgba(13, 38, 73, 0.85);
+  border: 1.5px solid rgba(56, 189, 248, 0.32);
+  color: #cbd5e1;
+  font-family: var(--display);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 4px 0 #040d1c, 0 8px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease, color 0.22s ease;
+}
+
+.sp3d-step-btn:hover {
+  transform: translateY(-2px);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.sp3d-step-btn.active {
+  background: linear-gradient(180deg, #ff9848 0%, #f47b20 58%, #c85200 100%);
+  border-color: #ffd5ad;
+  color: #ffffff;
+  box-shadow: 0 5px 0 #7c3000, 0 12px 22px rgba(244, 123, 32, 0.55);
+}
+
+.sp3d-step-btn.done:not(.active) {
+  background: linear-gradient(180deg, rgba(16, 126, 68, 0.85), rgba(10, 88, 46, 0.9));
+  border-color: #4ade80;
+  color: #ffffff;
+}
+
+.sp3d-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.28);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.sp3d-main-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 0.95fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+@media (max-width: 960px) {
+  .sp3d-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sp3d-stage-box {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(56, 189, 248, 0.2) 0%, rgba(6, 19, 38, 0.96) 75%),
+    linear-gradient(180deg, #051122 0%, #091d3a 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.5);
+  box-shadow:
+    0 8px 0 #040d1c,
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 410px;
+}
+
+.sp3d-hud-top {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  right: 14px;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sp3d-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(7, 22, 44, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 800;
+  color: #e0f2fe;
+  letter-spacing: 0.04em;
+}
+
+.sp3d-ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #1e5bbf 0%, #0d2649 100%);
+  border: 1px solid rgba(125, 211, 252, 0.6);
+  color: #ffffff;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #040d1c;
+}
+
+.sp3d-ctrl-btn:hover {
+  border-color: #ffffff;
+  filter: brightness(1.1);
+}
+
+.sp3d-canvas-host {
+  width: 100%;
+  height: 330px;
+  cursor: grab;
+}
+
+.sp3d-canvas-host:active {
+  cursor: grabbing;
+}
+
+.sp3d-canvas-host canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.sp3d-stage-caption {
+  padding: 14px 18px;
+  background: rgba(5, 16, 34, 0.92);
+  border-top: 1px solid rgba(56, 189, 248, 0.32);
+}
+
+.sp3d-kiosk-card {
+  background: linear-gradient(160deg, #0b2244 0%, #07162c 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.55);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 8px 0 #040d1c,
+    0 22px 44px rgba(0, 0, 0, 0.52),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.22);
+}
+
+.sp3d-kiosk-header {
+  padding: 14px 18px;
+  background: linear-gradient(90deg, #0f2e5c 0%, #153e7a 100%);
+  border-bottom: 1.5px solid rgba(56, 189, 248, 0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #e0f2fe;
+}
+
+.sp3d-plate-badge {
+  background: #facc15;
+  color: #0f172a;
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 2px 0 #854d0e;
+}
+
+.sp3d-kiosk-body {
+  padding: 20px 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sp3d-cam-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(14, 165, 233, 0.14);
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  margin-bottom: 14px;
+}
+
+.sp3d-plate-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  color: #0f172a;
+  border: 3px solid #1e293b;
+  border-radius: 12px;
+  padding: 12px 18px;
+  box-shadow: 0 6px 0 #040d1c, 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+.sp3d-plate-display .ind-flag {
+  background: #1d4ed8;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.sp3d-plate-display b {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.sp3d-timer-box {
+  background: linear-gradient(145deg, rgba(15, 42, 82, 0.95), rgba(8, 24, 48, 0.98));
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 5px 0 #040d1c;
+}
