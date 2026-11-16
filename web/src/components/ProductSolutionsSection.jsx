@@ -292,13 +292,19 @@ export default function ProductSolutionsSection() {
 
         {/* Tab 4: Smart Parking & ERP */}
         {activeTab === 'enterprise' && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
-              gap: 24,
-            }}
-          >
+          <div>
+            <div style={{ maxWidth: 520, margin: '0 auto 28px' }}>
+              <Suspense fallback={null}>
+                <InteractiveProduct3D mode="enterprise" label="3D Smart Parking & Cloud ERP Core" />
+              </Suspense>
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+                gap: 24,
+              }}
+            >
             {/* Smart Parking */}
             <div className="sol-card card link card-dynamic hover-blue" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
@@ -363,6 +369,7 @@ export default function ProductSolutionsSection() {
                 <Link to="/software-development/hotel-erp" className="card-link card-action-link" style={{ flex: 1, fontSize: 14 }}>Details →</Link>
                 <Link to="/contact?subject=Hotel%20PMS%20Enquiry" className="btn btn-primary" style={{ padding: '6px 14px', fontSize: 13 }}>Enquire</Link>
               </div>
+            </div>
             </div>
           </div>
         )}

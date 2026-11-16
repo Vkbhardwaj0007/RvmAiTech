@@ -1,7 +1,10 @@
 import { PageHero } from './_hero.jsx';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
+
+const HeroScene3D = lazy(() => import('../components/HeroScene3D'));
+const InteractiveProduct3D = lazy(() => import('../components/InteractiveProduct3D'));
 import {
   Code,
   Monitor,
@@ -459,6 +462,9 @@ export default function SoftwareDevelopment() {
           overflow: 'hidden',
         }}
       >
+        <Suspense fallback={null}>
+          <HeroScene3D />
+        </Suspense>
         <div className="wrap" style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: 960 }}>
           <div className="sec-head" style={{ margin: '0 auto 36px', maxWidth: 880 }}>
             <div
@@ -571,6 +577,12 @@ export default function SoftwareDevelopment() {
             >
               RvmAiTech designs and develops custom electronic hardware, embedded systems, firmware, and software applications. We combine electronics engineering with modern software technologies to build reliable, scalable, and application-specific solutions.
             </p>
+          </div>
+
+          <div style={{ maxWidth: 560, margin: '0 auto 36px' }}>
+            <Suspense fallback={null}>
+              <InteractiveProduct3D mode="datalogger" label="360° Interactive Custom PCB & Embedded Hardware" />
+            </Suspense>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>

@@ -99,6 +99,7 @@ export default function AiAssistant() {
       >
         <button
           type="button"
+          className="ai-float-3d"
           onClick={() => setOpen(!open)}
           aria-label="Open AI Assistant"
           style={{
@@ -107,23 +108,11 @@ export default function AiAssistant() {
             gap: 10,
             padding: '9px 18px',
             borderRadius: 30,
-            background: 'linear-gradient(135deg, #0d2649 0%, #1a4a8f 100%)',
             color: '#ffffff',
-            border: '1.5px solid #f47b20',
-            boxShadow: '0 10px 26px -6px rgba(13, 38, 73, 0.65), 0 0 14px rgba(244, 123, 32, 0.35)',
             cursor: 'pointer',
             fontFamily: 'inherit',
             fontSize: 14,
             fontWeight: 700,
-            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 14px 30px -6px rgba(244, 123, 32, 0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1) translateY(0)';
-            e.currentTarget.style.boxShadow = '0 10px 26px -6px rgba(13, 38, 73, 0.65), 0 0 14px rgba(244, 123, 32, 0.35)';
           }}
         >
           <img

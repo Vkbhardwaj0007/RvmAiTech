@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import { SiteProvider } from './api/SiteContext';
 import { LangProvider } from './api/Lang';
 import Header from './components/Header';
@@ -48,11 +48,12 @@ import Admins from './admin/Admins';
 import Applications from './admin/Applications';
 
 function Layout() {
+  const { pathname } = useLocation();
   return (
     <>
       <ScrollTop />
       <Header />
-      <main><Outlet /><BottomIntro /></main>
+      <main key={pathname} className="page-transition-3d"><Outlet /><BottomIntro /></main>
       <Footer />
       <WhatsAppFloat />
       <AiAssistant />
