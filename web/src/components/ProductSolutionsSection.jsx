@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Activity, Cpu, Home as HomeIcon, Car, GraduationCap, Hotel,
   CheckCircle2, ArrowRight, ShieldCheck, Zap, Database, BarChart3, Clock,
 } from 'lucide-react';
+
+const InteractiveProduct3D = lazy(() => import('./InteractiveProduct3D'));
 
 export default function ProductSolutionsSection() {
   const [activeTab, setActiveTab] = useState('mdms');
@@ -108,9 +110,12 @@ export default function ProductSolutionsSection() {
                 </div>
               </div>
 
-              {/* MDMS Value Box (3D) */}
+              {/* MDMS Value Box (3D + Interactive 360° 3D Machine Digital Twin) */}
               <div className="prod-side-3d">
-                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Suspense fallback={null}>
+                  <InteractiveProduct3D mode="mdms" label="3D MDMS Machine Digital Twin" />
+                </Suspense>
+                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '16px 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <BarChart3 size={20} color="#38bdf8" /> Quantifiable Business ROI
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -187,9 +192,12 @@ export default function ProductSolutionsSection() {
                 </div>
               </div>
 
-              {/* Datalogger Specs Box (3D) */}
+              {/* Datalogger Specs Box (3D + Interactive 360° 3D Edge Gateway Model) */}
               <div className="prod-side-3d">
-                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Suspense fallback={null}>
+                  <InteractiveProduct3D mode="datalogger" label="3D Edge IoT Datalogger PCB" />
+                </Suspense>
+                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '16px 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Database size={20} color="#f47b20" /> Hardware Highlights
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -255,9 +263,12 @@ export default function ProductSolutionsSection() {
                 </div>
               </div>
 
-              {/* Home Packages Box (3D) */}
+              {/* Home Packages Box (3D + Interactive 360° 3D Smart Switchboard) */}
               <div className="prod-side-3d">
-                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '0 0 18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Suspense fallback={null}>
+                  <InteractiveProduct3D mode="home" label="3D Smart Touch Panel & IoT Hub" />
+                </Suspense>
+                <h4 style={{ color: '#ffffff', fontSize: 19, margin: '16px 0 14px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Zap size={20} color="#38bdf8" /> Package Options
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

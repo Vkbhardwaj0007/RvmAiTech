@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 /**
  * Site-wide 3D layer. Mount it ONCE inside the public <Layout />.
@@ -292,8 +292,58 @@ function useReveal() {
 }
 
 export default function Effects3D() {
+  const barRef = useRef(null);
+  const auraRef = useRef(null);
+
   useTilt();
   useHeroParallax();
   useReveal();
-  return null;
+
+  useEffect(() => {
+    const updateScroll = () => {
+      if (!barRef.current) return;
+      const doc = document.documentElement;
+      const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+      const pct = Math.min(100, Math.max(0, (window.scrollY / max) * 100));
+      barRef.current.style.width = `${pct.toFixed(1)}%`;
+    };
+    updateScroll();
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    window.addEventListener('resize', updateScroll, { passive: true });
+
+    let raf = 0;
+    let cx = -500;
+    let cy = -500;
+    const onMove = (e) => {
+      cx = e.clientX;
+      cy = e.clientY;
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          if (auraRef.current) {
+            auraRef.current.style.transform = `translate3d(${cx - 190}px, ${cy - 190}px, 0)`;
+          }
+        });
+      }
+    };
+    if (finePointer() && !reduceMotion()) {
+      window.addEventListener('mousemove', onMove, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updateScroll);
+      window.removeEventListener('resize', updateScroll);
+      window.removeEventListener('mousemove', onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <>
+      <div className="scroll-progress-track-3d" aria-hidden="true">
+        <div ref={barRef} className="scroll-progress-bar-3d" />
+      </div>
+      <div ref={auraRef} className="cursor-aura-3d" aria-hidden="true" />
+    </>
+  );
 }
