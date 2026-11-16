@@ -40,7 +40,7 @@ export const NAV_HI = {
 
 const LangCtx = createContext({ lang: 'en', t: (k) => k, setLang: () => {} });
 export function LangProvider({ children }) {
-  const [lang, setLangState] = useState(localStorage.getItem('rv_lang') || 'en');
+  const [lang, setLangState] = useState('en');
   useEffect(() => { localStorage.setItem('rv_lang', lang); document.documentElement.lang = lang; }, [lang]);
   const t = (k) => (STR[lang] && STR[lang][k]) || STR.en[k] || k;
   const navLabel = (en) => lang === 'hi' ? (NAV_HI[en] || en) : en;

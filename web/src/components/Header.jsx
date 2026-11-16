@@ -68,9 +68,6 @@ export default function Header() {
               )}
             </div>
           ))}
-          <button className="lang-toggle" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} title="Language">
-            {lang === 'en' ? 'हिंदी' : 'ENG'}
-          </button>
           <button
             type="button"
             onClick={() => { setOpen(false); openAuditModal(); }}
