@@ -57,7 +57,38 @@ export default function Apply() {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (!form.position) fd.set('position', 'General application');
       fd.append('resume', resume);
-      await client.post('/applications', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const res = await client.post('/applications', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+      // Fallback direct sync to Business Suite HRMS if backend didn't confirm sync
+      if (!res?.data?.hrmsSynced) {
+        try {
+          const salNums = (String(form.expectedSalary || '').replace(/,/g, '').match(/\d+/g) || []).map(Number).filter(Number.isFinite);
+          await fetch('https://erp-rvmaitech.onrender.com/api/careers/apply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: form.name.trim(),
+              email: form.email.trim(),
+              phone: form.phone.trim(),
+              role: form.position || 'General application',
+              dept: 'R&D / Engineering',
+              experience: form.experienceYears ? `${form.experienceYears} Years` : 'Fresher / Not specified',
+              expectedSalary: salNums.length ? Math.max(...salNums) : 0,
+              source: 'Website Careers Page',
+              address: form.location || 'Not specified',
+              notes: [
+                form.qualification ? `Qualification: ${form.qualification}` : null,
+                form.currentCompany ? `Current: ${form.currentCompany}` : null,
+                form.noticePeriod ? `Notice: ${form.noticePeriod}` : null,
+                form.coverNote || null,
+              ].filter(Boolean).join(' | '),
+            }),
+          });
+        } catch {
+          // Non-blocking fallback
+        }
+      }
+
       setSent(true);
       setForm(EMPTY); setResume(null); if (fileRef.current) fileRef.current.value = '';
     } catch (ex) {

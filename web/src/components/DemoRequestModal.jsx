@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Calendar, Video, Building, Phone, Mail, User, CheckCircle2, MessageSquare } from 'lucide-react';
 import client from '../api/client';
 import { useSite } from '../api/SiteContext';
@@ -70,7 +71,7 @@ export default function DemoRequestModal({ isOpen, onClose, initialProduct = '' 
     window.open(`https://wa.me/${waNumber}?text=${text}`, '_blank');
   };
 
-  return (
+  return createPortal(
     <div
       style={{
         position: 'fixed',
@@ -341,7 +342,8 @@ export default function DemoRequestModal({ isOpen, onClose, initialProduct = '' 
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

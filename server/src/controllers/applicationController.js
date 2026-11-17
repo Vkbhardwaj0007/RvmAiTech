@@ -49,7 +49,60 @@ async function submit(req, res) {
     ].join('\n')
   ).catch(() => {});
 
-  res.status(201).json({ ok: true, id: doc._id });
+  // Real-time Webhook forward to RvmAiTech HRMS / Business Suite (https://erp-rvmaitech.onrender.com/api/careers/apply)
+  const hrmsCareersUrl =
+    process.env.HRMS_CAREERS_URL ||
+    'https://erp-rvmaitech.onrender.com/api/careers/apply';
+
+  const parseSalaryNumber = (val) => {
+    if (typeof val === 'number' && Number.isFinite(val)) return val;
+    if (!val) return 0;
+    const nums = (String(val).replace(/,/g, '').match(/\d+/g) || [])
+      .map(Number)
+      .filter((n) => Number.isFinite(n));
+    return nums.length ? Math.max(...nums) : 0;
+  };
+
+  const expStr = doc.experienceYears
+    ? `${doc.experienceYears} Years`
+    : 'Fresher / Not specified';
+
+  const hrmsNotes = [
+    doc.qualification ? `Qualification: ${doc.qualification}` : null,
+    doc.currentCompany ? `Current: ${doc.currentCompany}${doc.currentDesignation ? ` (${doc.currentDesignation})` : ''}` : null,
+    doc.currentSalary ? `Current CTC: ${doc.currentSalary}` : null,
+    doc.noticePeriod ? `Notice: ${doc.noticePeriod}` : null,
+    doc.linkedin ? `LinkedIn: ${doc.linkedin}` : null,
+    resumeUrl ? `Resume: ${resumeUrl}` : null,
+    doc.coverNote || null,
+  ]
+    .filter(Boolean)
+    .join(' | ');
+
+  let hrmsSynced = false;
+  try {
+    const hrmsRes = await fetch(hrmsCareersUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: doc.name,
+        email: doc.email,
+        phone: doc.phone,
+        role: doc.position || 'General application',
+        dept: b.dept || 'R&D / Engineering',
+        experience: expStr,
+        expectedSalary: parseSalaryNumber(doc.expectedSalary),
+        source: 'Website Careers Page',
+        address: doc.location || 'Not specified',
+        notes: hrmsNotes,
+      }),
+    });
+    hrmsSynced = !!(hrmsRes && hrmsRes.ok);
+  } catch (err) {
+    console.warn('HRMS careers webhook error:', err?.message || err);
+  }
+
+  res.status(201).json({ ok: true, id: doc._id, hrmsSynced });
 }
 
 async function list(req, res) {
