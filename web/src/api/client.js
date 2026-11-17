@@ -96,8 +96,53 @@ function toLogin(reason) {
   return null;
 }
 
+export const ERP_CRM_INQUIRIES_URL = 'https://erp-rvmaitech.onrender.com/api/inquiries';
+
+function parseBudgetToNumber(val) {
+  if (typeof val === 'number' && Number.isFinite(val)) return val;
+  if (!val) return 0;
+  const nums = (String(val).replace(/,/g, '').match(/\d+/g) || [])
+    .map(Number)
+    .filter((n) => Number.isFinite(n));
+  return nums.length ? Math.max(...nums) : 0;
+}
+
+/**
+ * Direct 1-step fetch to RvmAiTech ERP/CRM Dashboard on Render.
+ */
+export async function syncLeadToCrm(raw = {}) {
+  try {
+    const payload = {
+      name: raw.name || 'Customer',
+      phone: raw.phone || 'Not provided',
+      email: raw.email || 'client@rvmaitech.com',
+      company: raw.company || 'Website Lead',
+      service: raw.service || raw.subject || raw.projectCategory || 'Industrial Automation & Vision',
+      message: raw.message || raw.requirements || 'Enquiry from RvmAiTech Website',
+      budget: parseBudgetToNumber(raw.budget),
+      source: raw.source || 'Website Landing Page',
+    };
+
+    await fetch(ERP_CRM_INQUIRIES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    // Non-blocking fallback
+  }
+}
+
 client.interceptors.response.use(
   (r) => {
+    if (r?.config?.url && /\/contact\/?$/.test(r.config.url) && !r?.data?.crmSynced) {
+      try {
+        const sentBody = typeof r.config.data === 'string' ? JSON.parse(r.config.data) : r.config.data;
+        if (sentBody) syncLeadToCrm(sentBody);
+      } catch {
+        // ignore parse errors
+      }
+    }
     if (r?.data) {
       const isString = typeof r.data === 'string';
       const text = isString ? r.data : JSON.stringify(r.data);

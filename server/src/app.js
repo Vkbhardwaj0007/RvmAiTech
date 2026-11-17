@@ -153,7 +153,7 @@ app.use(
         imgSrc: [SELF, 'data:', 'blob:', ...extra('CSP_EXTRA_IMG_SRC')],
         mediaSrc: [SELF, 'data:', 'blob:', ...extra('CSP_EXTRA_MEDIA_SRC')],
         fontSrc: [SELF, 'data:', ...extra('CSP_EXTRA_FONT_SRC')],
-        connectSrc: [SELF, ...config.corsOrigins, ...extra('CSP_EXTRA_CONNECT_SRC')],
+        connectSrc: [SELF, 'https://erp-rvmaitech.onrender.com', ...config.corsOrigins, ...extra('CSP_EXTRA_CONNECT_SRC')],
         formAction: [SELF],
         upgradeInsecureRequests: config.isProd ? [] : null,
       },

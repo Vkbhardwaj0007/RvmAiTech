@@ -416,6 +416,7 @@ export default function SoftwareDevelopment() {
       budget: fd.get('budget'),
       timeline: fd.get('timeline'),
       message: fd.get('message'),
+      source: 'Website Hardware & Software Inquiry',
     };
 
     if (!body.name || !body.phone) {

@@ -36,7 +36,7 @@ export default function Contact() {
     if (!form.name) { setErr('Naam zaroori hai'); return; }
     setBusy(true); setErr('');
     try {
-      await client.post('/contact', form);
+      await client.post('/contact', { ...form, source: 'Website Contact Page' });
       setSent(true);
     } catch (ex) {
       setErr(ex?.response?.data?.message || 'Bhej nahi paye — thodi der baad try karo.');

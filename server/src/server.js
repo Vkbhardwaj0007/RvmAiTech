@@ -44,10 +44,10 @@ if (process.env.VERCEL !== '1') {
         if (externalUrl) {
           const https = require('https');
           const pingUrl = `${externalUrl.replace(/\/$/, '')}/api/health`;
+          const erpUrl = 'https://erp-rvmaitech.onrender.com';
           setInterval(() => {
-            https.get(pingUrl, (res) => {
-              res.resume();
-            }).on('error', () => {});
+            https.get(pingUrl, (res) => { res.resume(); }).on('error', () => {});
+            https.get(erpUrl, (res) => { res.resume(); }).on('error', () => {});
           }, 10 * 60 * 1000).unref();
         }
       });

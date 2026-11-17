@@ -103,6 +103,7 @@ export default function AuditBookingModal({ isOpen: propOpen, onClose: propOnClo
         email: form.email.trim() || '',
         phone: form.phone.trim(),
         subject: `[COMPANY AUDIT] ${form.auditType} — ${form.company.trim()}`,
+        source: `Website Audit Booking (${form.auditType})`,
         message: [
           `COMPANY AUDIT BOOKING DETAILS:`,
           `- Company / Plant: ${form.company.trim()}`,

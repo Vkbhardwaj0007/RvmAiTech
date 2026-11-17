@@ -48,9 +48,11 @@ export default function DemoRequestModal({ isOpen, onClose, initialProduct = '' 
     try {
       await client.post('/contact', {
         name: form.name,
+        company: form.company || 'Machine Demo Lead',
         email: form.email || 'not-provided@client.com',
         phone: form.phone,
         subject: `[DEMO REQUEST] ${form.product} (${form.demoType})`,
+        source: `Website Demo Booking (${form.product})`,
         message: `DEMO REQUEST DETAILS:\n- Product: ${form.product}\n- Mode: ${form.demoType}\n- Company: ${form.company || 'N/A'}\n- Preferred Date: ${form.date || 'Earliest available'}\n- Notes: ${form.message || 'None'}`,
       });
       setSuccess(true);
