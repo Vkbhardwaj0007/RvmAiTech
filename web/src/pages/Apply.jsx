@@ -59,10 +59,15 @@ export default function Apply() {
       fd.append('resume', resume);
       const res = await client.post('/applications', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
 
-      // Fallback direct sync to Business Suite HRMS if backend didn't confirm sync
+      // Fallback direct sync with base64 Resume to Business Suite HRMS if backend didn't confirm sync
       if (!res?.data?.hrmsSynced) {
         try {
-          const salNums = (String(form.expectedSalary || '').replace(/,/g, '').match(/\d+/g) || []).map(Number).filter(Number.isFinite);
+          const resumeData = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(resume);
+          });
           await fetch('https://erp-rvmaitech.onrender.com/api/careers/apply', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -70,18 +75,21 @@ export default function Apply() {
               name: form.name.trim(),
               email: form.email.trim(),
               phone: form.phone.trim(),
+              address: form.location || 'Not specified',
               role: form.position || 'General application',
               dept: 'R&D / Engineering',
-              experience: form.experienceYears ? `${form.experienceYears} Years` : 'Fresher / Not specified',
-              expectedSalary: salNums.length ? Math.max(...salNums) : 0,
+              qualification: form.qualification || '',
+              experience: form.experienceYears ? `${form.experienceYears} Years` : 'Fresher',
+              linkedin: form.linkedin || '',
+              currentCompany: form.currentCompany || '',
+              currentDesignation: form.currentDesignation || '',
+              currentCtc: form.currentSalary || '',
+              expectedCtc: form.expectedSalary || '',
+              noticePeriod: form.noticePeriod || '',
+              whyHire: form.coverNote || '',
+              resumeName: resume.name || 'Resume.pdf',
+              resumeData,
               source: 'Website Careers Page',
-              address: form.location || 'Not specified',
-              notes: [
-                form.qualification ? `Qualification: ${form.qualification}` : null,
-                form.currentCompany ? `Current: ${form.currentCompany}` : null,
-                form.noticePeriod ? `Notice: ${form.noticePeriod}` : null,
-                form.coverNote || null,
-              ].filter(Boolean).join(' | '),
             }),
           });
         } catch {

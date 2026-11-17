@@ -54,30 +54,20 @@ async function submit(req, res) {
     process.env.HRMS_CAREERS_URL ||
     'https://erp-rvmaitech.onrender.com/api/careers/apply';
 
-  const parseSalaryNumber = (val) => {
-    if (typeof val === 'number' && Number.isFinite(val)) return val;
-    if (!val) return 0;
-    const nums = (String(val).replace(/,/g, '').match(/\d+/g) || [])
-      .map(Number)
-      .filter((n) => Number.isFinite(n));
-    return nums.length ? Math.max(...nums) : 0;
-  };
-
   const expStr = doc.experienceYears
     ? `${doc.experienceYears} Years`
-    : 'Fresher / Not specified';
+    : 'Fresher';
 
-  const hrmsNotes = [
-    doc.qualification ? `Qualification: ${doc.qualification}` : null,
-    doc.currentCompany ? `Current: ${doc.currentCompany}${doc.currentDesignation ? ` (${doc.currentDesignation})` : ''}` : null,
-    doc.currentSalary ? `Current CTC: ${doc.currentSalary}` : null,
-    doc.noticePeriod ? `Notice: ${doc.noticePeriod}` : null,
-    doc.linkedin ? `LinkedIn: ${doc.linkedin}` : null,
-    resumeUrl ? `Resume: ${resumeUrl}` : null,
-    doc.coverNote || null,
-  ]
-    .filter(Boolean)
-    .join(' | ');
+  let resumeData = '';
+  try {
+    if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+      const mime = req.file.mimetype || 'application/pdf';
+      const b64 = fs.readFileSync(req.file.path).toString('base64');
+      resumeData = `data:${mime};base64,${b64}`;
+    }
+  } catch (err) {
+    console.warn('Resume base64 encode warning:', err?.message || err);
+  }
 
   let hrmsSynced = false;
   try {
@@ -88,13 +78,21 @@ async function submit(req, res) {
         name: doc.name,
         email: doc.email,
         phone: doc.phone,
+        address: doc.location || 'Not specified',
         role: doc.position || 'General application',
         dept: b.dept || 'R&D / Engineering',
+        qualification: doc.qualification || '',
         experience: expStr,
-        expectedSalary: parseSalaryNumber(doc.expectedSalary),
+        linkedin: doc.linkedin || '',
+        currentCompany: doc.currentCompany || '',
+        currentDesignation: doc.currentDesignation || '',
+        currentCtc: doc.currentSalary || '',
+        expectedCtc: doc.expectedSalary || '',
+        noticePeriod: doc.noticePeriod || '',
+        whyHire: doc.coverNote || '',
+        resumeName: req.file.originalname || 'Resume.pdf',
+        resumeData,
         source: 'Website Careers Page',
-        address: doc.location || 'Not specified',
-        notes: hrmsNotes,
       }),
     });
     hrmsSynced = !!(hrmsRes && hrmsRes.ok);
