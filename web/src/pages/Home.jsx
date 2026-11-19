@@ -28,6 +28,7 @@ import { canRun3D } from '../components/heroScene3DSupport';
  */
 const HeroScene3D = lazy(() => import('../components/HeroScene3D'));
 const SmartParking3DSimulator = lazy(() => import('../components/SmartParking3DSimulator'));
+const MdmsFactory3D = lazy(() => import('../components/MdmsFactory3D'));
 
 const FB_STATS = [
   { value: '50+', label: 'Automation projects' },
@@ -225,6 +226,24 @@ export default function Home() {
 
       {/* PRODUCT SOLUTIONS SHOWCASE (MDMS, Datalogger, Home Automation separated) */}
       <ProductSolutionsSection />
+
+      {/* 3D INTERACTIVE MDMS FACTORY FLOOR */}
+      <section id="mdms-3d-floor" style={{ padding: '86px 0', background: 'linear-gradient(180deg, #ffffff 0%, #f1f6fd 100%)' }}>
+        <div className="wrap">
+          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 38px', maxWidth: 820 }}>
+            <div className="sec-kicker">Interactive 3D Factory Digital Twin</div>
+            <h2>
+              3D Live MDMS Shop-Floor &amp; Machine Telemetry
+            </h2>
+            <p style={{ maxWidth: 720, margin: '12px auto 0' }}>
+              Click any 3D machine on the shop floor (CNC, Hydraulic Press, Injection Molding, or Assembly Line) to inspect live OEE %, RPM, power draw, and simulate Run/Idle/Fault states in real time.
+            </p>
+          </div>
+          <Suspense fallback={null}>
+            <MdmsFactory3D onBookDemo={() => { setDemoProduct('MDMS (Machine Data Monitoring)'); setDemoOpen(true); }} />
+          </Suspense>
+        </div>
+      </section>
 
       {/* 3D SMART PARKING SYSTEM — LIVE ANPR CAMERA, QR REGISTRATION & EXIT BILLING SIMULATOR */}
       <section className="dark" id="smart-parking-3d" style={{ padding: '86px 0' }}>

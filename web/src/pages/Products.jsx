@@ -4,6 +4,7 @@ import client from '../api/client';
 import { PageHero } from './_hero.jsx';
 
 const SmartParking3DSimulator = lazy(() => import('../components/SmartParking3DSimulator'));
+const MdmsFactory3D = lazy(() => import('../components/MdmsFactory3D'));
 const CAT_INTRO = {
   Datalogger: {
     title: 'Datalogger — The Edge of MDMS',
@@ -105,6 +106,14 @@ export default function Products() {
             <button key={c} className={`chip ${category === c ? 'on' : ''}`} onClick={() => setParams(c === 'all' ? {} : { category: c })}>{c}</button>
           ))}
         </div>
+
+        {category === 'MDMS' && (
+          <div style={{ margin: '28px 0 36px' }}>
+            <Suspense fallback={null}>
+              <MdmsFactory3D />
+            </Suspense>
+          </div>
+        )}
 
         {(category === 'Smart Parking' || category === 'all') && (
           <div style={{ margin: '28px 0 36px' }}>
