@@ -1907,6 +1907,9 @@ export default function SmartConveyor3D({ onBookDemo }) {
           }
         }
       }
+
+      // Render the scene to the canvas
+      renderer.render(scene, camera);
     };
 
     animId = requestAnimationFrame(animate);
