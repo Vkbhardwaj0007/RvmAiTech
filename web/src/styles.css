@@ -3900,3 +3900,676 @@ section.dark .sec-head p,
 .mdms3d-state-btn:hover {
   transform: translateY(-2px);
 }
+
+
+/* =====================================================================
+   23. 3D SMART CONVEYOR BELT & AI VISION INSPECTION MACHINE SYSTEM
+   ===================================================================== */
+.smart-conveyor-wrapper {
+  background: linear-gradient(145deg, #07162c 0%, #0d2649 55%, #123669 100%);
+  border: 2px solid rgba(56, 189, 248, 0.55);
+  border-radius: 26px;
+  padding: 26px;
+  box-shadow:
+    0 12px 0 #040d1c,
+    0 34px 70px -12px rgba(5, 17, 34, 0.78),
+    inset 0 2px 2px rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  margin-top: 18px;
+}
+
+@media (max-width: 640px) {
+  .smart-conveyor-wrapper {
+    padding: 16px;
+    border-radius: 18px;
+  }
+}
+
+.sc-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.22);
+}
+
+@media (max-width: 860px) {
+  .sc-header-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.sc-header-left {
+  flex: 1;
+}
+
+.sc-pulse-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  font-family: var(--display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #7dd3fc;
+  margin-bottom: 8px;
+}
+
+.sc-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.sc-dot-active {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: scPulse 1.6s infinite ease-in-out;
+}
+
+.sc-dot-paused {
+  background: #facc15;
+  box-shadow: 0 0 10px #facc15;
+}
+
+@keyframes scPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.25); }
+}
+
+.sc-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
+.sc-subtitle {
+  margin: 6px 0 0;
+  color: #b8cde8;
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-width: 780px;
+}
+
+.sc-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.sc-btn:hover {
+  transform: translateY(-2px);
+}
+
+.sc-btn-play {
+  background: linear-gradient(180deg, #ff9848 0%, #f47b20 58%, #c85200 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 0 #7c3000, 0 10px 18px rgba(244, 123, 32, 0.45);
+}
+
+.sc-btn-secondary {
+  background: rgba(15, 23, 42, 0.85);
+  color: #cbd5e1;
+  border: 1.5px solid rgba(56, 189, 248, 0.32);
+  box-shadow: 0 3px 0 #040d1c;
+}
+
+.sc-btn-secondary:hover {
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+/* Main Grid Layout: Canvas (3D) + HMI Screen */
+.sc-main-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 22px;
+  align-items: stretch;
+}
+
+@media (max-width: 1040px) {
+  .sc-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 3D WebGL Canvas Container */
+.sc-canvas-container {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #0a1424;
+  border: 1.5px solid rgba(56, 189, 248, 0.4);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
+  min-height: 480px;
+  display: flex;
+}
+
+.sc-three-canvas {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+.sc-three-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  outline: none;
+  cursor: grab;
+}
+
+.sc-three-canvas canvas:active {
+  cursor: grabbing;
+}
+
+.sc-canvas-hud-top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.sc-hud-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(10, 20, 36, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  backdrop-filter: blur(8px);
+  color: #e0f2fe;
+  font-size: 11px;
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.sc-canvas-hud-bottom {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sc-hud-tip {
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(10, 20, 36, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  font-size: 11.5px;
+  color: #cbd5e1;
+}
+
+/* Right Side: Factory HMI Touch Screen Dashboard */
+.sc-hmi-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(8, 20, 38, 0.92);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.12);
+}
+
+.sc-hmi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+  padding-bottom: 12px;
+}
+
+.sc-hmi-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.06em;
+}
+
+.sc-icon-accent {
+  color: #f47b20;
+}
+
+.sc-hmi-station {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+  font-family: var(--display);
+}
+
+/* KPI Cards Grid */
+.sc-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .sc-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.sc-kpi-card {
+  background: rgba(15, 29, 52, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sc-kpi-ok {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.sc-kpi-ng {
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.sc-kpi-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.06em;
+  font-family: var(--display);
+}
+
+.sc-kpi-val {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.15;
+  margin: 3px 0 2px;
+}
+
+.sc-kpi-sub {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Live Camera Viewfinder Card */
+.sc-viewfinder-card {
+  background: #030814;
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.sc-viewfinder-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-family: var(--display);
+  font-size: 11px;
+}
+
+.sc-vf-live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #38bdf8;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.sc-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  display: inline-block;
+  animation: scPulse 1.2s infinite;
+}
+
+.sc-badge-verdict {
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.sc-badge-pass {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid #22c55e;
+  color: #4ade80;
+}
+
+.sc-badge-fail {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #f87171;
+}
+
+.sc-viewfinder-box {
+  position: relative;
+  background: linear-gradient(180deg, rgba(14, 165, 233, 0.06) 0%, rgba(3, 8, 20, 0.85) 100%);
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  border-radius: 10px;
+  padding: 16px 14px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sc-vf-crosshair-tl, .sc-vf-crosshair-tr, .sc-vf-crosshair-bl, .sc-vf-crosshair-br {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: #38bdf8;
+  pointer-events: none;
+}
+
+.sc-vf-crosshair-tl {
+  top: 6px;
+  left: 6px;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+
+.sc-vf-crosshair-tr {
+  top: 6px;
+  right: 6px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+}
+
+.sc-vf-crosshair-bl {
+  bottom: 6px;
+  left: 6px;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+}
+
+.sc-vf-crosshair-br {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+}
+
+.sc-vf-center-info {
+  text-align: center;
+}
+
+.sc-vf-item-id {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+}
+
+.sc-vf-metric {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.sc-vf-defect-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.25);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--display);
+}
+
+.sc-vf-ok-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.22);
+  border: 1px solid #22c55e;
+  color: #86efac;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--display);
+}
+
+/* Interactive Controls Box */
+.sc-controls-box {
+  background: rgba(15, 29, 52, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.sc-ctrl-title {
+  display: block;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 800;
+  color: #7dd3fc;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.sc-ctrl-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sc-btn-force {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: var(--display);
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+}
+
+.sc-btn-force-ng {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+.sc-btn-force-ng:hover, .sc-btn-force-ng.active {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+}
+
+.sc-btn-force-ok {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.5);
+  color: #86efac;
+}
+
+.sc-btn-force-ok:hover, .sc-btn-force-ok.active {
+  background: #22c55e;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.6);
+}
+
+.sc-speed-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sc-speed-label {
+  font-size: 11.5px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.sc-speed-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(10, 20, 36, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-family: var(--display);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sc-speed-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+/* Rolling Audit Log Table */
+.sc-log-card {
+  background: rgba(10, 20, 36, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.sc-log-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.sc-log-count {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.sc-log-table-wrapper {
+  overflow-x: auto;
+}
+
+.sc-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.sc-log-table th {
+  text-align: left;
+  padding: 4px 6px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sc-log-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+}
+
+.sc-table-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  display: inline-block;
+}
+
+.sc-table-badge.pass {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.sc-table-badge.fail {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.sc-table-dest {
+  color: #93c5fd;
+  font-size: 10.5px;
+}
+
+/* Call to Action Button */
+.sc-cta-wrap {
+  margin-top: 4px;
+}
+
+.sc-cta-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 18px;
+  font-size: 14.5px;
+  border-radius: 12px;
+}

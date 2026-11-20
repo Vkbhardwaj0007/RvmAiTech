@@ -29,6 +29,7 @@ import { canRun3D } from '../components/heroScene3DSupport';
 const HeroScene3D = lazy(() => import('../components/HeroScene3D'));
 const SmartParking3DSimulator = lazy(() => import('../components/SmartParking3DSimulator'));
 const MdmsFactory3D = lazy(() => import('../components/MdmsFactory3D'));
+const SmartConveyor3D = lazy(() => import('../components/SmartConveyor3D'));
 
 const FB_STATS = [
   { value: '50+', label: 'Automation projects' },
@@ -241,6 +242,24 @@ export default function Home() {
           </div>
           <Suspense fallback={null}>
             <MdmsFactory3D onBookDemo={() => { setDemoProduct('MDMS (Machine Data Monitoring)'); setDemoOpen(true); }} />
+          </Suspense>
+        </div>
+      </section>
+
+      {/* 3D SMART CONVEYOR & AI MACHINE VISION INSPECTION DEMO */}
+      <section id="smart-conveyor-3d" style={{ padding: '86px 0', background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
+        <div className="wrap">
+          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 38px', maxWidth: 840 }}>
+            <div className="sec-kicker">Interactive 3D Industrial Machine Demo</div>
+            <h2>
+              Smart Conveyor Belt · AI Vision QC &amp; Automated OK / NG Sorting
+            </h2>
+            <p style={{ maxWidth: 740, margin: '12px auto 0' }}>
+              Real-world industrial automation in action: Aluminum extrusion roller conveyor with AC drive motor, Siemens PLC cabinet, overhead CMOS vision camera scanning packages, high-speed pneumatic reject pusher for NG defects, and live factory SCADA HMI telemetry.
+            </p>
+          </div>
+          <Suspense fallback={null}>
+            <SmartConveyor3D onBookDemo={() => { setDemoProduct('Smart Conveyor & AI Vision Inspection System'); setDemoOpen(true); }} />
           </Suspense>
         </div>
       </section>

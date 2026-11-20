@@ -21,6 +21,7 @@ const FALLBACK = [
     { label: 'MDMS', path: '/products?category=MDMS' },
     { label: 'Datalogger', path: '/products?category=Datalogger' },
     { label: 'Smart Parking', path: '/products?category=Smart%20Parking' },
+    { label: 'Smart Conveyor & Vision QC', path: '/#smart-conveyor-3d' },
     { label: 'Smart Home Automation', path: '/products?category=Smart%20Home%20Automation' },
   ]},
   { label: 'Projects', path: '/projects' },
