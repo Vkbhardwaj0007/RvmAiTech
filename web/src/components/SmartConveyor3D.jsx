@@ -144,8 +144,8 @@ export default function SmartConveyor3D({ onBookDemo }) {
 
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 80);
     // Angled view showing the Left PLC Panel, Conveyor, Checkweigher, Camera & Reject Chute
-    camera.position.set(-0.8, 3.8, 6.2);
-    camera.lookAt(-0.5, 0.85, 0);
+    camera.position.set(-1.0, 3.8, 6.5);
+    camera.lookAt(-0.8, 0.85, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
@@ -172,15 +172,15 @@ export default function SmartConveyor3D({ onBookDemo }) {
     fillLight.position.set(-3.5, 3.5, 2.5);
     scene.add(fillLight);
 
-    // Tower Light Beacon Point Light
+    // Tower Light Beacon Point Light (Mounted on top of left cabinet)
     const beaconLight = new THREE.PointLight(0x22c55e, 2.6, 6);
-    beaconLight.position.set(-3.1, 2.7, -0.9);
+    beaconLight.position.set(-3.9, 2.7, -1.35);
     scene.add(beaconLight);
     simRef.current.beaconLight = beaconLight;
 
-    // Interior Cabinet Inspection Light
+    // Interior Cabinet Inspection Light (turns on when door opens)
     const cabinetLight = new THREE.PointLight(0xffffff, 0, 4.5);
-    cabinetLight.position.set(-3.4, 1.3, -0.7);
+    cabinetLight.position.set(-4.2, 1.3, -1.1);
     scene.add(cabinetLight);
     simRef.current.cabinetLight = cabinetLight;
 
@@ -502,16 +502,18 @@ export default function SmartConveyor3D({ onBookDemo }) {
     monitorStation.add(kbTray);
 
     // ----------------------------------------------------
-    // 11. REAL INDUSTRIAL PLC CONTROL PANEL (MOVED TO LEFT SIDE: X = -3.4m)
-    // (Requested: "PENAL KO SIZE BADA KARO SAHI SE DIKHA NAHI RAHA HAI PENAL KON ACCHE FIT KARO LEFT SIDE ME KARO AUR WO REAL NAHI LAG RAHA HAI USKO REAL PENAL BANA HAI PEANL KA DORE BHI OPEN HOGA")
+    // 11. REAL INDUSTRIAL PLC CONTROL PANEL (POSITIONED ON LEFT SIDE OF CONVEYOR)
+    // Placed at x = -4.2m, z = -1.35m with ample walkway clearance behind the conveyor.
+    // When the door swings open to the left, it opens into completely open floor space
+    // with ZERO overlap or collision with the conveyor belt!
     // ----------------------------------------------------
     const cabinetGroup = new THREE.Group();
-    cabinetGroup.position.set(-3.4, 0, -1.05); // Fitted cleanly on the Left Side
+    cabinetGroup.position.set(-4.2, 0, -1.35); // Left-side placement with full clearance
     scene.add(cabinetGroup);
 
-    const cabWidth = 1.35;
+    const cabWidth = 1.18;
     const cabHeight = 1.85;
-    const cabDepth = 0.5;
+    const cabDepth = 0.46;
 
     // Steel Plinth Base
     const plinthGeo = new THREE.BoxGeometry(cabWidth + 0.04, 0.12, cabDepth + 0.04);
@@ -1076,10 +1078,10 @@ export default function SmartConveyor3D({ onBookDemo }) {
     const updateCameraFromSpherical = () => {
       spherical.phi = Math.max(0.35, Math.min(Math.PI / 2 - 0.05, spherical.phi));
       spherical.radius = Math.max(3.8, Math.min(11.0, spherical.radius));
-      camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta) - 0.5;
+      camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta) - 0.8;
       camera.position.y = spherical.radius * Math.cos(spherical.phi) + 0.6;
       camera.position.z = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
-      camera.lookAt(-0.5, 0.9, 0);
+      camera.lookAt(-0.8, 0.9, 0);
     };
     updateCameraFromSpherical();
 
