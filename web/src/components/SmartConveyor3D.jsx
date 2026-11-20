@@ -3,31 +3,38 @@ import * as THREE from 'three';
 import {
   Play, Pause, RotateCcw, CheckCircle2, AlertTriangle,
   Camera, Cpu, Activity, ShieldCheck, Sparkles, ArrowRight,
-  Octagon, DoorOpen, DoorClosed, Monitor, Zap
+  Octagon, DoorOpen, DoorClosed, Monitor, Scale, Gauge
 } from 'lucide-react';
 import { openAuditModal } from './AuditBookingModal';
 
 /**
- * 3D Smart Conveyor Belt & AI Vision Inspection Machine
- * Real Factory Setup with:
- *  - Large Industrial PLC Control Cabinet with swing-open front door
- *  - Detailed Panel Interior matching real electrical schematics:
- *      * Siemens SIMATIC S7-1200 PLC (CPU 1214C + I/O Expansion Cards)
- *      * 24V DC SMPS Power Supply, 3-Phase MCBs, Safety Relay, Terminal Blocks, Wire Ducts
- *  - Large 15" Widescreen HMI Touch-Panel on Door
- *  - Dedicated Industrial Vision Operator Monitor on Articulated Pedestal Arm
- *  - 3 Physical Hardware Buttons on Door (START, STOP, EMERGENCY STOP)
- *  - Tricolor Tower Light (Green: Run, Yellow: Idle, Red: E-Stop / Defect)
- *  - Smooth cylindrical roller rotation forward without wobble
- *  - High-Speed Overhead AI Vision Camera & Pneumatic Reject Sorting Diverter
+ * 3D Smart Conveyor Belt & Real Industrial Inspection Line
+ * Real Factory Machine Upgrades:
+ *  1. Realistic Floor-Standing PLC Control Panel on LEFT SIDE (x = -3.4m) with openable door
+ *  2. Real Panel Interior:
+ *     - Siemens SIMATIC S7-1200 PLC (CPU 1214C + I/O Expansion Modules + Green RUN LED)
+ *     - 24V DC SMPS Industrial Power Supply, 3-Phase MCB Breakers, Safety Relay, Wiring Ducts, Terminal Strips
+ *     - Warning Decals ("DANGER 415V"), Cooling Louvers, Door Lock Latches
+ *  3. REAL LIVE HMI SCREEN:
+ *     - Rendered via high-res CanvasTexture with live WinCC telemetry: Live Weight, OEE %, Line Speed, State
+ *  4. DYNAMIC IN-LINE CHECKWEIGHER / WEIGHT SENSOR:
+ *     - Load cell sensor platform measuring package weight in real time
+ *     - Target 500g (Tolerance ±15g). Underweight/Overweight triggers NG reject!
+ *  5. DEDICATED 24" VISION OPERATOR MONITOR on articulating arm showing live camera viewfinder
+ *  6. 3 Physical Control Buttons: START (Green), STOP (Yellow), EMERGENCY STOP (Red Mushroom)
+ *  7. Tricolor Industrial Tower Light (Green: Run, Yellow: Idle, Red: E-Stop / Defect)
+ *  8. High-Speed Pneumatic Reject Pusher sorting Visual/Weight NG defects to side bin
  */
 
+const TARGET_WEIGHT = 500.0; // grams
+const WEIGHT_TOLERANCE = 15.0; // ±15g
+
 const DEFECT_TYPES = [
+  'Underweight (Missing Content)',
+  'Overweight (Overfilled)',
   'Surface Dent / Crack',
-  'Barcode Unreadable / Scratched',
-  'Label Misaligned (>3mm)',
-  'Seal Tampered / Open',
-  'Dimensional Tolerance Error',
+  'Barcode Scratched / Unreadable',
+  'Seal Open / Tampered',
 ];
 
 export default function SmartConveyor3D({ onBookDemo }) {
@@ -36,15 +43,17 @@ export default function SmartConveyor3D({ onBookDemo }) {
   // Machine Operational State: 'RUNNING' | 'IDLE' | 'ESTOP'
   const [machineState, setMachineState] = useState('RUNNING');
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
-  const [forceNextType, setForceNextType] = useState(null); // null | 'ok' | 'ng'
-  const [isDoorOpen, setIsDoorOpen] = useState(false); // Toggle PLC Cabinet Door
+  const [forceNextType, setForceNextType] = useState(null); // null | 'ok' | 'ng-weight' | 'ng-vision'
+  const [isDoorOpen, setIsDoorOpen] = useState(false); // PLC Cabinet Door Open/Close
 
   // Production Metrics
   const [metrics, setMetrics] = useState({
-    total: 148,
-    ok: 141,
-    ng: 7,
-    cycleTimeMs: 36,
+    total: 156,
+    ok: 148,
+    ng: 8,
+    cycleTimeMs: 34,
+    currentWeight: 501.2,
+    weightStatus: 'OK (501.2g)',
     airPressureBar: 6.2,
   });
 
@@ -53,18 +62,19 @@ export default function SmartConveyor3D({ onBookDemo }) {
     id: 'LOT-9824',
     status: 'OK',
     confidence: 99.4,
+    weight: 501.2,
     defect: null,
     scanTime: 'Just now',
-    barcode: 'RVM-8849-OK',
+    barcode: 'RVM-8849-PASS',
   });
 
   // Rolling Production Inspection Log
   const [inspectionLog, setInspectionLog] = useState([
-    { id: 'LOT-9824', time: '12:44:18', status: 'OK', defect: 'Passed All Criteria', dest: 'Main Line (OK)' },
-    { id: 'LOT-9823', time: '12:44:14', status: 'OK', defect: 'Passed All Criteria', dest: 'Main Line (OK)' },
-    { id: 'LOT-9822', time: '12:44:09', status: 'NG', defect: 'Surface Dent / Crack', dest: 'Reject Chute (NG)' },
-    { id: 'LOT-9821', time: '12:44:05', status: 'OK', defect: 'Passed All Criteria', dest: 'Main Line (OK)' },
-    { id: 'LOT-9820', time: '12:44:01', status: 'OK', defect: 'Passed All Criteria', dest: 'Main Line (OK)' },
+    { id: 'LOT-9824', time: '12:44:18', weight: '501.2g', status: 'OK', defect: 'All Specs In Range', dest: 'Main Line (OK)' },
+    { id: 'LOT-9823', time: '12:44:14', weight: '498.6g', status: 'OK', defect: 'All Specs In Range', dest: 'Main Line (OK)' },
+    { id: 'LOT-9822', time: '12:44:09', weight: '438.0g', status: 'NG', defect: 'Underweight (-62g Defect)', dest: 'Reject Chute (NG)' },
+    { id: 'LOT-9821', time: '12:44:05', weight: '502.8g', status: 'OK', defect: 'All Specs In Range', dest: 'Main Line (OK)' },
+    { id: 'LOT-9820', time: '12:44:01', weight: '500.4g', status: 'OK', defect: 'All Specs In Range', dest: 'Main Line (OK)' },
   ]);
 
   // Three.js internal shared references
@@ -79,6 +89,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
     boxes: [],
     rollers: [],
     pusherArm: null,
+    scalePlatform: null,
     stackGreenMat: null,
     stackYellowMat: null,
     stackRedMat: null,
@@ -86,9 +97,16 @@ export default function SmartConveyor3D({ onBookDemo }) {
     scanLaserPlane: null,
     scanSpotLight: null,
     sensorRayMat: null,
+    hmiTexture: null,
+    hmiCanvas: null,
+    hmiCtx: null,
+    monitorTexture: null,
+    monitorCanvas: null,
+    monitorCtx: null,
     nextBoxId: 9825,
     lastSpawnTime: 0,
     ngBlinkTimer: 0,
+    lastWeight: 501.2,
     raycaster: new THREE.Raycaster(),
     mouse: new THREE.Vector2(),
     clickableButtons: [],
@@ -122,11 +140,12 @@ export default function SmartConveyor3D({ onBookDemo }) {
     // 1. Scene & Camera Setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a1424);
-    scene.fog = new THREE.FogExp2(0x0a1424, 0.038);
+    scene.fog = new THREE.FogExp2(0x0a1424, 0.035);
 
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 80);
-    camera.position.set(-0.3, 3.8, 6.4);
-    camera.lookAt(-0.2, 0.85, 0);
+    // Angled view showing the Left PLC Panel, Conveyor, Checkweigher, Camera & Reject Chute
+    camera.position.set(-0.8, 3.8, 6.2);
+    camera.lookAt(-0.5, 0.85, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
@@ -134,39 +153,39 @@ export default function SmartConveyor3D({ onBookDemo }) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.3;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
     // 2. Industrial Lighting
-    const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x0f172a, 0.95);
+    const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x0f172a, 1.0);
     scene.add(hemiLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.45);
-    dirLight.position.set(4, 9, 5);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    dirLight.position.set(3, 10, 5);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 1024;
     dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
 
-    const fillLight = new THREE.PointLight(0x38bdf8, 1.3, 14);
-    fillLight.position.set(-3, 3, 2.5);
+    const fillLight = new THREE.PointLight(0x38bdf8, 1.4, 14);
+    fillLight.position.set(-3.5, 3.5, 2.5);
     scene.add(fillLight);
 
-    // Beacon Stack Light glow in 3D space
-    const beaconLight = new THREE.PointLight(0x22c55e, 2.5, 6);
-    beaconLight.position.set(-1.4, 2.65, -0.9);
+    // Tower Light Beacon Point Light
+    const beaconLight = new THREE.PointLight(0x22c55e, 2.6, 6);
+    beaconLight.position.set(-3.1, 2.7, -0.9);
     scene.add(beaconLight);
     simRef.current.beaconLight = beaconLight;
 
-    // Cabinet interior LED illumination (turns on when door opens)
-    const cabinetLight = new THREE.PointLight(0xffffff, 0, 4);
-    cabinetLight.position.set(-1.8, 1.2, -0.85);
+    // Interior Cabinet Inspection Light
+    const cabinetLight = new THREE.PointLight(0xffffff, 0, 4.5);
+    cabinetLight.position.set(-3.4, 1.3, -0.7);
     scene.add(cabinetLight);
     simRef.current.cabinetLight = cabinetLight;
 
     // 3. Factory Epoxy Floor & Grid
-    const floorGeo = new THREE.PlaneGeometry(26, 20);
+    const floorGeo = new THREE.PlaneGeometry(28, 20);
     const floorMat = new THREE.MeshStandardMaterial({
       color: 0x111e33,
       roughness: 0.65,
@@ -177,36 +196,28 @@ export default function SmartConveyor3D({ onBookDemo }) {
     floor.receiveShadow = true;
     scene.add(floor);
 
-    const grid = new THREE.GridHelper(24, 24, 0x1e3a5f, 0x132742);
+    const grid = new THREE.GridHelper(26, 26, 0x1e3a5f, 0x132742);
     grid.position.y = 0.005;
     scene.add(grid);
 
-    // Safety Hazard Yellow / Black border line under conveyor
-    const hazardGeo = new THREE.PlaneGeometry(10.2, 3.8);
-    const hazardMat = new THREE.MeshBasicMaterial({ color: 0x1a293d });
+    // Hazard zone outline
+    const hazardGeo = new THREE.PlaneGeometry(10.8, 4.2);
+    const hazardMat = new THREE.MeshBasicMaterial({ color: 0x18283d });
     const hazardZone = new THREE.Mesh(hazardGeo, hazardMat);
     hazardZone.rotation.x = -Math.PI / 2;
     hazardZone.position.set(0, 0.01, 0.1);
     scene.add(hazardZone);
 
-    // 4. Heavy-Duty Conveyor Assembly (Aluminum 8020 Extrusions)
+    // 4. Aluminum Conveyor Frame Assembly
     const conveyorGroup = new THREE.Group();
     scene.add(conveyorGroup);
 
-    const aluMat = new THREE.MeshStandardMaterial({
-      color: 0x94a3b8,
-      metalness: 0.88,
-      roughness: 0.28,
-    });
-    const darkAluMat = new THREE.MeshStandardMaterial({
-      color: 0x334155,
-      metalness: 0.9,
-      roughness: 0.35,
-    });
+    const aluMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.88, roughness: 0.28 });
+    const darkAluMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.9, roughness: 0.35 });
 
     const railLength = 8.8;
 
-    // Front & Back Side Structural Rails
+    // Main Aluminum Side Rails
     const railGeo = new THREE.BoxGeometry(railLength, 0.14, 0.06);
     const railFront = new THREE.Mesh(railGeo, aluMat);
     railFront.position.set(0, 0.95, 0.45);
@@ -228,7 +239,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
     guideBack.position.set(0, 1.07, -0.44);
     conveyorGroup.add(guideBack);
 
-    // Support Legs & Feet (4 pairs)
+    // Support Legs & Feet
     const legXPositions = [-3.8, -1.3, 1.3, 3.8];
     const legGeo = new THREE.BoxGeometry(0.08, 0.95, 0.08);
     const footGeo = new THREE.CylinderGeometry(0.08, 0.09, 0.04, 12);
@@ -258,19 +269,14 @@ export default function SmartConveyor3D({ onBookDemo }) {
       conveyorGroup.add(cross);
     });
 
-    // 5. Cylindrical Rollers (Power Roller Bed)
-    // Oriented with rotation.x = Math.PI / 2 and rotated on local Y axis for authentic round rolling
+    // 5. Cylindrical Rollers with Rubber Traction Rings (Smooth round-and-round spin)
     const rollerCount = 28;
     const rollerLength = 0.84;
     const rollerRadius = 0.042;
     const rollerGeo = new THREE.CylinderGeometry(rollerRadius, rollerRadius, rollerLength, 18);
     const ringGeo = new THREE.CylinderGeometry(rollerRadius + 0.003, rollerRadius + 0.003, 0.04, 18);
 
-    const rollerMat = new THREE.MeshStandardMaterial({
-      color: 0x94a3b8,
-      metalness: 0.92,
-      roughness: 0.22,
-    });
+    const rollerMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.92, roughness: 0.22 });
     const ringMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.9 });
 
     const rollers = [];
@@ -301,17 +307,59 @@ export default function SmartConveyor3D({ onBookDemo }) {
 
     // Moving Conveyor Belt Top Bed
     const beltGeo = new THREE.BoxGeometry(8.5, 0.015, 0.8);
-    const beltMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.92,
-      metalness: 0.05,
-    });
+    const beltMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.92, metalness: 0.05 });
     const belt = new THREE.Mesh(beltGeo, beltMat);
     belt.position.set(0, 0.995, 0);
     belt.receiveShadow = true;
     conveyorGroup.add(belt);
 
-    // 6. AC Electric Drive Motor & Gearbox
+    // ----------------------------------------------------
+    // 6. DYNAMIC CHECKWEIGHER / IN-LINE WEIGHT SENSOR PLATFORM
+    // (Requested: "ISME WIGHT SENSOR HAI JO IS BOX KI WIGHT KAREGA AUR GAR WIGHT SAHI HAI OK AUR NG DITECT KAREGA")
+    // Located at X = -1.8m (before camera inspection)
+    // ----------------------------------------------------
+    const scaleGroup = new THREE.Group();
+    scaleGroup.position.set(-1.8, 0.98, 0);
+    conveyorGroup.add(scaleGroup);
+
+    // Stainless Steel Weighing Bed (Separate weighing deck)
+    const scaleBedGeo = new THREE.BoxGeometry(0.72, 0.03, 0.78);
+    const scaleBedMat = new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      metalness: 0.8,
+      roughness: 0.25,
+      transparent: true,
+      opacity: 0.85,
+    });
+    const scalePlatform = new THREE.Mesh(scaleBedGeo, scaleBedMat);
+    scalePlatform.position.set(0, 0.02, 0);
+    scaleGroup.add(scalePlatform);
+    simRef.current.scalePlatform = scalePlatform;
+
+    // 4 Corner Load Cell Strain Gauge Blocks
+    const loadCellGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.04, 12);
+    const loadCellMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.9 });
+    [[-0.3, -0.32], [0.3, -0.32], [-0.3, 0.32], [0.3, 0.32]].forEach(([cx, cz]) => {
+      const lc = new THREE.Mesh(loadCellGeo, loadCellMat);
+      lc.position.set(cx, -0.02, cz);
+      scaleGroup.add(lc);
+    });
+
+    // Checkweigher Digital Weight Readout Terminal Box on side of conveyor
+    const weightTerminalGeo = new THREE.BoxGeometry(0.24, 0.16, 0.08);
+    const weightTermMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
+    const weightTerminal = new THREE.Mesh(weightTerminalGeo, weightTermMat);
+    weightTerminal.position.set(0, 0.22, 0.52);
+    scaleGroup.add(weightTerminal);
+
+    // Glowing Green Digital LED Display for Live Weight
+    const weightScreenGeo = new THREE.BoxGeometry(0.18, 0.08, 0.01);
+    const weightScreenMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+    const weightScreen = new THREE.Mesh(weightScreenGeo, weightScreenMat);
+    weightScreen.position.set(0, 0.22, 0.565);
+    scaleGroup.add(weightScreen);
+
+    // 7. AC Electric Drive Motor & Gearbox
     const motorGroup = new THREE.Group();
     motorGroup.position.set(-4.2, 0.65, 0.6);
     conveyorGroup.add(motorGroup);
@@ -327,9 +375,9 @@ export default function SmartConveyor3D({ onBookDemo }) {
     gearBox.position.set(0.18, 0, 0);
     motorGroup.add(gearBox);
 
-    // 7. Overhead Machine Vision Camera Gantry
+    // 8. Overhead Machine Vision Camera Gantry
     const visionGantry = new THREE.Group();
-    visionGantry.position.set(-0.5, 0, 0);
+    visionGantry.position.set(-0.4, 0, 0);
     conveyorGroup.add(visionGantry);
 
     const archLegGeo = new THREE.BoxGeometry(0.08, 1.6, 0.08);
@@ -384,31 +432,29 @@ export default function SmartConveyor3D({ onBookDemo }) {
     visionGantry.add(scanSpotLight);
     simRef.current.scanSpotLight = scanSpotLight;
 
-    // 8. Photo-Eye Retroreflective Optical Sensor
+    // 9. Photo-Eye Optical Sensor Trigger
     const sensorBodyGeo = new THREE.BoxGeometry(0.06, 0.1, 0.06);
     const sensorBodyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
     const sensor1 = new THREE.Mesh(sensorBodyGeo, sensorBodyMat);
-    sensor1.position.set(-1.5, 1.12, 0.46);
+    sensor1.position.set(-1.1, 1.12, 0.46);
     conveyorGroup.add(sensor1);
 
     const laserRayGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.88, 6);
     laserRayGeo.rotateX(Math.PI / 2);
     const sensorRayMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.85 });
     const sensor1Ray = new THREE.Mesh(laserRayGeo, sensorRayMat);
-    sensor1Ray.position.set(-1.5, 1.12, 0);
+    sensor1Ray.position.set(-1.1, 1.12, 0);
     conveyorGroup.add(sensor1Ray);
     simRef.current.sensorRayMat = sensorRayMat;
 
     // ----------------------------------------------------
-    // 9. DEDICATED INDUSTRIAL VISION OPERATOR MONITOR SCREEN
+    // 10. DEDICATED 24" VISION OPERATOR MONITOR (WITH DYNAMIC CANVAS TEXTURE)
     // (Requested: "ISME EK MONITOR SCREEN HOGA")
-    // Mounted on articulating pedestal arm right next to conveyor
     // ----------------------------------------------------
     const monitorStation = new THREE.Group();
-    monitorStation.position.set(-0.5, 0, 0.95);
+    monitorStation.position.set(-0.4, 0, 1.05);
     scene.add(monitorStation);
 
-    // Heavy floor pedestal stand
     const standPostGeo = new THREE.CylinderGeometry(0.035, 0.045, 1.45, 16);
     const standPost = new THREE.Mesh(standPostGeo, darkAluMat);
     standPost.position.set(0, 0.725, 0);
@@ -420,84 +466,92 @@ export default function SmartConveyor3D({ onBookDemo }) {
     standBase.position.set(0, 0.02, 0);
     monitorStation.add(standBase);
 
-    // Articulated Swivel Arm
     const armGeo = new THREE.BoxGeometry(0.04, 0.05, 0.35);
     const armMesh = new THREE.Mesh(armGeo, aluMat);
     armMesh.position.set(0, 1.45, -0.12);
     monitorStation.add(armMesh);
 
-    // 24" Widescreen Vision Monitor Housing
-    const monitorBoxGeo = new THREE.BoxGeometry(0.68, 0.44, 0.04);
+    const monitorBoxGeo = new THREE.BoxGeometry(0.72, 0.46, 0.04);
     const monitorBoxMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
     const monitorHousing = new THREE.Mesh(monitorBoxGeo, monitorBoxMat);
     monitorHousing.position.set(0, 1.55, -0.3);
-    monitorHousing.rotation.x = -0.15; // Tilted towards operator
+    monitorHousing.rotation.x = -0.15;
     monitorStation.add(monitorHousing);
 
-    // Active Screen Display (Simulated Camera Vision Live Feed)
-    const monitorScreenGeo = new THREE.BoxGeometry(0.62, 0.38, 0.01);
-    const monitorScreenMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
+    // Dynamic 2D Canvas for Live Vision Monitor Feed
+    const monitorCanvas = document.createElement('canvas');
+    monitorCanvas.width = 512;
+    monitorCanvas.height = 320;
+    const monitorCtx = monitorCanvas.getContext('2d');
+    const monitorTexture = new THREE.CanvasTexture(monitorCanvas);
+    monitorTexture.minFilter = THREE.LinearFilter;
+    simRef.current.monitorTexture = monitorTexture;
+    simRef.current.monitorCanvas = monitorCanvas;
+    simRef.current.monitorCtx = monitorCtx;
+
+    const monitorScreenGeo = new THREE.BoxGeometry(0.66, 0.4, 0.01);
+    const monitorScreenMat = new THREE.MeshBasicMaterial({ map: monitorTexture });
     const monitorScreen = new THREE.Mesh(monitorScreenGeo, monitorScreenMat);
     monitorScreen.position.set(0, 1.55, -0.278);
     monitorScreen.rotation.x = -0.15;
     monitorStation.add(monitorScreen);
 
-    // Industrial Keyboard & Trackball Tray
     const kbTrayGeo = new THREE.BoxGeometry(0.55, 0.02, 0.22);
     const kbTray = new THREE.Mesh(kbTrayGeo, darkAluMat);
     kbTray.position.set(0, 1.15, -0.22);
     monitorStation.add(kbTray);
 
     // ----------------------------------------------------
-    // 10. LARGE REAL INDUSTRIAL PLC CONTROL CABINET (ENLARGED)
-    // (Requested: "PENAL KO SIZE BADA KARO SAHI SE DIKHA NAHI RAHA HAI PENAL KO OPEN BHI KAREGE KON SI PLC LAGA HAI HMI BHI BADI HO")
+    // 11. REAL INDUSTRIAL PLC CONTROL PANEL (MOVED TO LEFT SIDE: X = -3.4m)
+    // (Requested: "PENAL KO SIZE BADA KARO SAHI SE DIKHA NAHI RAHA HAI PENAL KON ACCHE FIT KARO LEFT SIDE ME KARO AUR WO REAL NAHI LAG RAHA HAI USKO REAL PENAL BANA HAI PEANL KA DORE BHI OPEN HOGA")
     // ----------------------------------------------------
     const cabinetGroup = new THREE.Group();
-    cabinetGroup.position.set(-1.8, 0, -1.15);
+    cabinetGroup.position.set(-3.4, 0, -1.05); // Fitted cleanly on the Left Side
     scene.add(cabinetGroup);
 
-    // Large Cabinet Dimensions: Width = 1.35m, Height = 1.85m, Depth = 0.5m
     const cabWidth = 1.35;
     const cabHeight = 1.85;
-    const cabDepth = 0.48;
+    const cabDepth = 0.5;
 
-    // Cabinet Plinth (Black Steel Base)
+    // Steel Plinth Base
     const plinthGeo = new THREE.BoxGeometry(cabWidth + 0.04, 0.12, cabDepth + 0.04);
     const plinth = new THREE.Mesh(plinthGeo, darkAluMat);
     plinth.position.set(0, 0.06, 0);
     cabinetGroup.add(plinth);
 
-    // Cabinet Enclosure Body (Walls & Roof - Rittal light gray)
     const rittalGrayMat = new THREE.MeshStandardMaterial({
       color: 0xc8d1d9,
       metalness: 0.45,
       roughness: 0.38,
     });
 
-    // Back wall
+    // Enclosure walls
     const backWallGeo = new THREE.BoxGeometry(cabWidth, cabHeight, 0.03);
     const backWall = new THREE.Mesh(backWallGeo, rittalGrayMat);
     backWall.position.set(0, cabHeight / 2 + 0.12, -cabDepth / 2 + 0.015);
     cabinetGroup.add(backWall);
 
-    // Left wall
     const sideWallGeo = new THREE.BoxGeometry(0.03, cabHeight, cabDepth);
     const leftWall = new THREE.Mesh(sideWallGeo, rittalGrayMat);
     leftWall.position.set(-cabWidth / 2 + 0.015, cabHeight / 2 + 0.12, 0);
     cabinetGroup.add(leftWall);
 
-    // Right wall
     const rightWall = new THREE.Mesh(sideWallGeo, rittalGrayMat);
     rightWall.position.set(cabWidth / 2 - 0.015, cabHeight / 2 + 0.12, 0);
     cabinetGroup.add(rightWall);
 
-    // Top roof
+    // Cooling Louvers on Right Wall
+    const louverGeo = new THREE.BoxGeometry(0.01, 0.28, 0.22);
+    const louverMat = new THREE.MeshStandardMaterial({ color: 0x475569 });
+    const louver = new THREE.Mesh(louverGeo, louverMat);
+    louver.position.set(cabWidth / 2 - 0.01, cabHeight / 2 + 0.35, 0);
+    cabinetGroup.add(louver);
+
     const roofGeo = new THREE.BoxGeometry(cabWidth, 0.04, cabDepth);
     const roof = new THREE.Mesh(roofGeo, rittalGrayMat);
     roof.position.set(0, cabHeight + 0.12, 0);
     cabinetGroup.add(roof);
 
-    // Bottom floor plate
     const bottomPlate = new THREE.Mesh(roofGeo, rittalGrayMat);
     bottomPlate.position.set(0, 0.14, 0);
     cabinetGroup.add(bottomPlate);
@@ -506,49 +560,40 @@ export default function SmartConveyor3D({ onBookDemo }) {
     // REAL PLC PANEL INTERIOR (MATCHING USER'S PHOTO)
     // ----------------------------------------------------
     const interiorGroup = new THREE.Group();
-    interiorGroup.position.set(0, 0, 0);
     cabinetGroup.add(interiorGroup);
 
-    // 1. Galvanized Zinc-plated Steel Mounting Backplate
+    // Galvanized Backplate
     const backplateGeo = new THREE.BoxGeometry(cabWidth - 0.08, cabHeight - 0.15, 0.015);
-    const zincMat = new THREE.MeshStandardMaterial({
-      color: 0xe2e8f0,
-      metalness: 0.9,
-      roughness: 0.28,
-    });
+    const zincMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.9, roughness: 0.28 });
     const backplate = new THREE.Mesh(backplateGeo, zincMat);
     backplate.position.set(0, cabHeight / 2 + 0.12, -cabDepth / 2 + 0.04);
     interiorGroup.add(backplate);
 
-    // 2. Horizontal Slotted Cable Ducts / Wire Trunking (Gray with wire slots)
+    // Slotted Cable Trunking
     const ductMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.6 });
     const ductGeo = new THREE.BoxGeometry(cabWidth - 0.12, 0.07, 0.05);
-
     [-0.55, -0.15, 0.28, 0.68].forEach((dy) => {
       const duct = new THREE.Mesh(ductGeo, ductMat);
       duct.position.set(0, cabHeight / 2 + 0.12 + dy, -cabDepth / 2 + 0.07);
       interiorGroup.add(duct);
     });
 
-    // 3. Steel DIN Rails (35mm Top Hat)
+    // Steel DIN Rails
     const dinRailMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, metalness: 0.95, roughness: 0.15 });
     const dinRailGeo = new THREE.BoxGeometry(cabWidth - 0.18, 0.035, 0.01);
-
     [-0.35, 0.07, 0.48].forEach((ry) => {
       const dinRail = new THREE.Mesh(dinRailGeo, dinRailMat);
       dinRail.position.set(0, cabHeight / 2 + 0.12 + ry, -cabDepth / 2 + 0.06);
       interiorGroup.add(dinRail);
     });
 
-    // 4. TOP DIN RAIL COMPONENTS (Row 1):
-    // 3-Phase Main MCB Breaker (Black & Red switch levers)
+    // ROW 1: Circuit Breakers & 24V DC SMPS Power Supply
     const mcb3Geo = new THREE.BoxGeometry(0.12, 0.1, 0.07);
     const mcbMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.4 });
     const mcb3 = new THREE.Mesh(mcb3Geo, mcbMat);
     mcb3.position.set(-0.46, cabHeight / 2 + 0.12 + 0.48, -cabDepth / 2 + 0.1);
     interiorGroup.add(mcb3);
 
-    // Single-phase circuit breakers (4 breakers)
     const mcb1Geo = new THREE.BoxGeometry(0.04, 0.09, 0.065);
     for (let b = 0; b < 4; b++) {
       const mcb1 = new THREE.Mesh(mcb1Geo, mcbMat);
@@ -556,83 +601,61 @@ export default function SmartConveyor3D({ onBookDemo }) {
       interiorGroup.add(mcb1);
     }
 
-    // 24V DC SMPS Power Supply (Perforated metal cage)
     const smpsGeo = new THREE.BoxGeometry(0.18, 0.12, 0.08);
     const smpsMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.85, roughness: 0.3 });
     const smps = new THREE.Mesh(smpsGeo, smpsMat);
     smps.position.set(-0.04, cabHeight / 2 + 0.12 + 0.48, -cabDepth / 2 + 0.11);
     interiorGroup.add(smps);
 
-    // Industrial Main Contactor & Overload
     const contactorGeo = new THREE.BoxGeometry(0.11, 0.11, 0.08);
     const contactor = new THREE.Mesh(contactorGeo, darkAluMat);
     contactor.position.set(0.15, cabHeight / 2 + 0.12 + 0.48, -cabDepth / 2 + 0.11);
     interiorGroup.add(contactor);
 
-    // Top Terminal strip
-    const termStripTopGeo = new THREE.BoxGeometry(0.24, 0.06, 0.05);
-    const termBlueMat = new THREE.MeshStandardMaterial({ color: 0x0284c7 });
-    const termStripTop = new THREE.Mesh(termStripTopGeo, termBlueMat);
-    termStripTop.position.set(0.38, cabHeight / 2 + 0.12 + 0.48, -cabDepth / 2 + 0.09);
-    interiorGroup.add(termStripTop);
-
-    // 5. MIDDLE DIN RAIL COMPONENTS (Row 2 - MAIN PLC SYSTEM):
-    // SIEMENS SIMATIC S7-1200 / S7-1500 MODULAR PLC
-    // CPU 1214C Module (Siemens Dark Slate Gray + Siemens Cyan Stripe)
+    // ROW 2: SIEMENS SIMATIC S7-1200 PLC SYSTEM (CPU 1214C + I/O Expansion Cards)
     const plcCpuGeo = new THREE.BoxGeometry(0.18, 0.14, 0.085);
     const plcCpuMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4 });
     const plcCpu = new THREE.Mesh(plcCpuGeo, plcCpuMat);
     plcCpu.position.set(-0.42, cabHeight / 2 + 0.12 + 0.07, -cabDepth / 2 + 0.11);
     interiorGroup.add(plcCpu);
 
-    // Siemens Cyan Brand Accent Bar & LEDs on CPU
+    // Siemens signature cyan branding stripe
     const plcStripeGeo = new THREE.BoxGeometry(0.18, 0.015, 0.005);
-    const plcStripeMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9 }); // Siemens Cyan
+    const plcStripeMat = new THREE.MeshBasicMaterial({ color: 0x0ea5e9 });
     const plcStripe = new THREE.Mesh(plcStripeGeo, plcStripeMat);
     plcStripe.position.set(0, 0.045, 0.043);
     plcCpu.add(plcStripe);
 
-    // CPU RUN LED (Glowing Green)
+    // PLC RUN LED (Bright Green Glowing)
     const ledGeo = new THREE.BoxGeometry(0.01, 0.01, 0.005);
     const runLedMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
     const runLed = new THREE.Mesh(ledGeo, runLedMat);
     runLed.position.set(-0.06, 0.015, 0.043);
     plcCpu.add(runLed);
 
-    // Expansion I/O Modules (Digital Input DI, Digital Output DQ, Analog AI)
+    // Expansion I/O Modules (DI, DQ, AI)
     const plcModuleGeo = new THREE.BoxGeometry(0.065, 0.14, 0.085);
     const plcModuleMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.45 });
-
     for (let m = 0; m < 4; m++) {
       const ioMod = new THREE.Mesh(plcModuleGeo, plcModuleMat);
       ioMod.position.set(-0.29 + m * 0.068, cabHeight / 2 + 0.12 + 0.07, -cabDepth / 2 + 0.11);
       interiorGroup.add(ioMod);
     }
 
-    // Safety Relay (Pilz style Yellow Module)
+    // Yellow Safety Relay Module
     const safetyRelayGeo = new THREE.BoxGeometry(0.065, 0.11, 0.08);
     const safetyRelayMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
     const safetyRelay = new THREE.Mesh(safetyRelayGeo, safetyRelayMat);
     safetyRelay.position.set(0.08, cabHeight / 2 + 0.12 + 0.07, -cabDepth / 2 + 0.1);
     interiorGroup.add(safetyRelay);
 
-    // Auxiliary Miniature Relays (Clear plastic cube relays)
-    const relayCubeGeo = new THREE.BoxGeometry(0.035, 0.06, 0.05);
-    const relayCubeMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.75 });
-    for (let r = 0; r < 4; r++) {
-      const relay = new THREE.Mesh(relayCubeGeo, relayCubeMat);
-      relay.position.set(0.18 + r * 0.042, cabHeight / 2 + 0.12 + 0.07, -cabDepth / 2 + 0.09);
-      interiorGroup.add(relay);
-    }
-
-    // 6. BOTTOM DIN RAIL (Row 3 - FIELD I/O TERMINAL BLOCK ARRAY):
+    // ROW 3: Field I/O Terminal Strips
     const termStripMainGeo = new THREE.BoxGeometry(0.85, 0.07, 0.05);
     const termGrayMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8 });
     const termStripMain = new THREE.Mesh(termStripMainGeo, termGrayMat);
     termStripMain.position.set(-0.06, cabHeight / 2 + 0.12 - 0.35, -cabDepth / 2 + 0.09);
     interiorGroup.add(termStripMain);
 
-    // Earth PE Terminals (Green / Yellow stripes)
     const earthTermGeo = new THREE.BoxGeometry(0.12, 0.07, 0.05);
     const earthMat = new THREE.MeshStandardMaterial({ color: 0x84cc16 });
     const earthTerm = new THREE.Mesh(earthTermGeo, earthMat);
@@ -640,8 +663,8 @@ export default function SmartConveyor3D({ onBookDemo }) {
     interiorGroup.add(earthTerm);
 
     // ----------------------------------------------------
-    // 11. HINGED CABINET FRONT DOOR (OPENS & CLOSES)
-    // Pivot located at left edge: x = -cabWidth/2, z = cabDepth/2
+    // 12. HINGED CABINET DOOR WITH REAL DYNAMIC HMI SCREEN
+    // (Requested: "HMI PE KUCHH SHOW HI NAHI HO RAHA HAI AUR HMI BHI BADI HO")
     // ----------------------------------------------------
     const doorPivot = new THREE.Group();
     doorPivot.position.set(-cabWidth / 2, 0, cabDepth / 2);
@@ -652,12 +675,11 @@ export default function SmartConveyor3D({ onBookDemo }) {
     doorGroup.position.set(cabWidth / 2, cabHeight / 2 + 0.12, 0);
     doorPivot.add(doorGroup);
 
-    // Front Door Panel Slab
     const doorPanelGeo = new THREE.BoxGeometry(cabWidth, cabHeight, 0.025);
     const doorPanel = new THREE.Mesh(doorPanelGeo, rittalGrayMat);
     doorGroup.add(doorPanel);
 
-    // Chrome Hinges (Top & Bottom)
+    // Door Hinges & Handle
     const hingeGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.08, 14);
     const hingeTop = new THREE.Mesh(hingeGeo, darkAluMat);
     hingeTop.position.set(-cabWidth / 2 + 0.02, 0.65, 0.015);
@@ -667,110 +689,96 @@ export default function SmartConveyor3D({ onBookDemo }) {
     hingeBot.position.set(-cabWidth / 2 + 0.02, -0.65, 0.015);
     doorGroup.add(hingeBot);
 
-    // Industrial Door Handle / Latch (Right Edge)
     const handleGeo = new THREE.BoxGeometry(0.035, 0.22, 0.04);
     const handle = new THREE.Mesh(handleGeo, darkAluMat);
     handle.position.set(cabWidth / 2 - 0.05, 0, 0.03);
     doorGroup.add(handle);
 
-    // ----------------------------------------------------
-    // LARGE 15" WIDESCREEN HMI TOUCHSCREEN ON DOOR
-    // (Requested: "HMI BHI BADI HO")
-    // ----------------------------------------------------
-    const hmiFrameGeo = new THREE.BoxGeometry(0.58, 0.42, 0.03);
+    // Warning Lightning Triangle Decal on Door
+    const warningDecalGeo = new THREE.PlaneGeometry(0.12, 0.12);
+    const warningDecalMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide });
+    const warningDecal = new THREE.Mesh(warningDecalGeo, warningDecalMat);
+    warningDecal.position.set(cabWidth / 2 - 0.16, 0.72, 0.016);
+    doorGroup.add(warningDecal);
+
+    // LARGE 15" HMI FRAME
+    const hmiFrameGeo = new THREE.BoxGeometry(0.68, 0.48, 0.03);
     const hmiFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3 });
     const hmiFrame = new THREE.Mesh(hmiFrameGeo, hmiFrameMat);
-    hmiFrame.position.set(0, 0.36, 0.022);
+    hmiFrame.position.set(0, 0.32, 0.022);
     doorGroup.add(hmiFrame);
 
-    // HMI Active Screen Display
-    const hmiGlassGeo = new THREE.BoxGeometry(0.52, 0.34, 0.01);
-    const hmiGlassMat = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
+    // REAL DYNAMIC 2D CANVAS TEXTURE FOR HMI SCREEN (Siemens WinCC GUI)
+    const hmiCanvas = document.createElement('canvas');
+    hmiCanvas.width = 1024;
+    hmiCanvas.height = 680;
+    const hmiCtx = hmiCanvas.getContext('2d');
+    const hmiTexture = new THREE.CanvasTexture(hmiCanvas);
+    hmiTexture.minFilter = THREE.LinearFilter;
+    simRef.current.hmiTexture = hmiTexture;
+    simRef.current.hmiCanvas = hmiCanvas;
+    simRef.current.hmiCtx = hmiCtx;
+
+    const hmiGlassGeo = new THREE.BoxGeometry(0.62, 0.42, 0.01);
+    const hmiGlassMat = new THREE.MeshBasicMaterial({ map: hmiTexture });
     const hmiGlass = new THREE.Mesh(hmiGlassGeo, hmiGlassMat);
-    hmiGlass.position.set(0, 0.36, 0.038);
+    hmiGlass.position.set(0, 0.32, 0.038);
     doorGroup.add(hmiGlass);
 
-    // ----------------------------------------------------
-    // 3 PHYSICAL HARDWARE CONTROL BUTTONS ON DOOR
-    // (START, STOP, EMERGENCY STOP)
-    // ----------------------------------------------------
+    // 3 PHYSICAL BUTTONS ON DOOR
     const clickableButtons = [];
     const btnBaseGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.02, 18);
     btnBaseGeo.rotateX(Math.PI / 2);
     const bezelMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 });
 
-    // 1. START Push-Button (Green)
+    // START (Green)
     const startBase = new THREE.Mesh(btnBaseGeo, bezelMat);
-    startBase.position.set(-0.25, -0.15, 0.02);
+    startBase.position.set(-0.25, -0.18, 0.02);
     doorGroup.add(startBase);
 
     const startCapGeo = new THREE.CylinderGeometry(0.028, 0.028, 0.03, 18);
     startCapGeo.rotateX(Math.PI / 2);
-    const startMat = new THREE.MeshStandardMaterial({
-      color: 0x22c55e,
-      roughness: 0.3,
-      emissive: 0x15803d,
-      emissiveIntensity: 0.4,
-    });
+    const startMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x15803d, emissiveIntensity: 0.4 });
     const startBtnMesh = new THREE.Mesh(startCapGeo, startMat);
-    startBtnMesh.position.set(-0.25, -0.15, 0.036);
+    startBtnMesh.position.set(-0.25, -0.18, 0.036);
     startBtnMesh.userData = { action: 'START' };
     doorGroup.add(startBtnMesh);
     clickableButtons.push(startBtnMesh);
 
-    // 2. STOP Push-Button (Red/Black)
+    // STOP (Yellow/Red)
     const stopBase = new THREE.Mesh(btnBaseGeo, bezelMat);
-    stopBase.position.set(0, -0.15, 0.02);
+    stopBase.position.set(0, -0.18, 0.02);
     doorGroup.add(stopBase);
 
     const stopCapGeo = new THREE.CylinderGeometry(0.028, 0.028, 0.03, 18);
     stopCapGeo.rotateX(Math.PI / 2);
-    const stopMat = new THREE.MeshStandardMaterial({
-      color: 0xef4444,
-      roughness: 0.3,
-      emissive: 0x991b1b,
-      emissiveIntensity: 0.3,
-    });
+    const stopMat = new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0x991b1b, emissiveIntensity: 0.3 });
     const stopBtnMesh = new THREE.Mesh(stopCapGeo, stopMat);
-    stopBtnMesh.position.set(0, -0.15, 0.036);
+    stopBtnMesh.position.set(0, -0.18, 0.036);
     stopBtnMesh.userData = { action: 'STOP' };
     doorGroup.add(stopBtnMesh);
     clickableButtons.push(stopBtnMesh);
 
-    // 3. EMERGENCY STOP (Big Red Mushroom Head on Yellow Ring)
+    // EMERGENCY STOP (Big Red Mushroom Head on Yellow Ring)
     const estopBaseGeo = new THREE.CylinderGeometry(0.052, 0.052, 0.025, 18);
     estopBaseGeo.rotateX(Math.PI / 2);
     const estopYellowMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
     const estopBase = new THREE.Mesh(estopBaseGeo, estopYellowMat);
-    estopBase.position.set(0.25, -0.15, 0.02);
+    estopBase.position.set(0.25, -0.18, 0.02);
     doorGroup.add(estopBase);
 
     const estopMushroomGeo = new THREE.CylinderGeometry(0.048, 0.035, 0.045, 20);
     estopMushroomGeo.rotateX(Math.PI / 2);
-    const estopMushroomMat = new THREE.MeshStandardMaterial({
-      color: 0xdc2626,
-      roughness: 0.25,
-      emissive: 0x7f1d1d,
-      emissiveIntensity: 0.5,
-    });
+    const estopMushroomMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, emissive: 0x7f1d1d, emissiveIntensity: 0.5 });
     const estopBtnMesh = new THREE.Mesh(estopMushroomGeo, estopMushroomMat);
-    estopBtnMesh.position.set(0.25, -0.15, 0.048);
+    estopBtnMesh.position.set(0.25, -0.18, 0.048);
     estopBtnMesh.userData = { action: 'ESTOP' };
     doorGroup.add(estopBtnMesh);
     clickableButtons.push(estopBtnMesh);
 
-    // Main Rotary Power Isolator Switch (Door interlock handle)
-    const isolatorGeo = new THREE.CylinderGeometry(0.038, 0.038, 0.03, 16);
-    isolatorGeo.rotateX(Math.PI / 2);
-    const isolator = new THREE.Mesh(isolatorGeo, darkAluMat);
-    isolator.position.set(0.25, 0.36, 0.03);
-    doorGroup.add(isolator);
-
     simRef.current.clickableButtons = clickableButtons;
 
-    // ----------------------------------------------------
-    // 12. TRICOLOR INDUSTRIAL TOWER LIGHT (STACK BEACON ON CABINET ROOF)
-    // ----------------------------------------------------
+    // 13. TRICOLOR TOWER LIGHT (ON CABINET ROOF)
     const stackPoleGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.55, 14);
     const stackPole = new THREE.Mesh(stackPoleGeo, aluMat);
     stackPole.position.set(0.4, cabHeight + 0.12 + 0.275, 0);
@@ -778,44 +786,25 @@ export default function SmartConveyor3D({ onBookDemo }) {
 
     const stackLensGeo = new THREE.CylinderGeometry(0.048, 0.048, 0.09, 18);
 
-    // Top: RED
-    const stackRedMat = new THREE.MeshStandardMaterial({
-      color: 0x450a0a,
-      emissive: 0x000000,
-      roughness: 0.2,
-      metalness: 0.1,
-    });
+    const stackRedMat = new THREE.MeshStandardMaterial({ color: 0x450a0a, emissive: 0x000000 });
     const stackRed = new THREE.Mesh(stackLensGeo, stackRedMat);
     stackRed.position.set(0.4, cabHeight + 0.12 + 0.55 + 0.18, 0);
     cabinetGroup.add(stackRed);
     simRef.current.stackRedMat = stackRedMat;
 
-    // Middle: YELLOW / AMBER
-    const stackYellowMat = new THREE.MeshStandardMaterial({
-      color: 0x451a03,
-      emissive: 0x000000,
-      roughness: 0.2,
-      metalness: 0.1,
-    });
+    const stackYellowMat = new THREE.MeshStandardMaterial({ color: 0x451a03, emissive: 0x000000 });
     const stackYellow = new THREE.Mesh(stackLensGeo, stackYellowMat);
     stackYellow.position.set(0.4, cabHeight + 0.12 + 0.55 + 0.09, 0);
     cabinetGroup.add(stackYellow);
     simRef.current.stackYellowMat = stackYellowMat;
 
-    // Bottom: GREEN (Default ON when running)
-    const stackGreenMat = new THREE.MeshStandardMaterial({
-      color: 0x22c55e,
-      emissive: 0x22c55e,
-      emissiveIntensity: 0.95,
-      roughness: 0.2,
-      metalness: 0.1,
-    });
+    const stackGreenMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x22c55e, emissiveIntensity: 0.95 });
     const stackGreen = new THREE.Mesh(stackLensGeo, stackGreenMat);
     stackGreen.position.set(0.4, cabHeight + 0.12 + 0.55, 0);
     cabinetGroup.add(stackGreen);
     simRef.current.stackGreenMat = stackGreenMat;
 
-    // 13. Automated Pneumatic Diverter / Pusher (at X = 1.3)
+    // 14. Automated Pneumatic Reject Pusher (at X = 1.3)
     const sortingStation = new THREE.Group();
     sortingStation.position.set(1.3, 0, 0);
     conveyorGroup.add(sortingStation);
@@ -845,7 +834,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
     paddle.position.set(0, 0, 0.18);
     pusherArm.add(paddle);
 
-    // 14. NG Reject Chute & Bin
+    // 15. NG Reject Chute & Bin
     const ngBinGroup = new THREE.Group();
     ngBinGroup.position.set(1.3, 0, 1.05);
     conveyorGroup.add(ngBinGroup);
@@ -864,27 +853,36 @@ export default function SmartConveyor3D({ onBookDemo }) {
     bin.castShadow = true;
     ngBinGroup.add(bin);
 
-    // 15. Finished Goods OK Primary Output Table
+    // 16. Finished Goods OK Primary Output Table
     const okTableGeo = new THREE.BoxGeometry(0.7, 0.95, 0.8);
     const okTableMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.6 });
     const okTable = new THREE.Mesh(okTableGeo, okTableMat);
     okTable.position.set(4.6, 0.475, 0);
     conveyorGroup.add(okTable);
 
-    // 16. Box Creation & Spawning
+    // 17. Box Creation & Spawning with Weight Attribution
     const boxGeo = new THREE.BoxGeometry(0.38, 0.26, 0.32);
-    const okBoxMat = new THREE.MeshStandardMaterial({
-      color: 0xd97706,
-      roughness: 0.85,
-      metalness: 0.05,
-    });
-    const ngBoxMat = new THREE.MeshStandardMaterial({
-      color: 0xef4444,
-      roughness: 0.65,
-      metalness: 0.1,
-    });
+    const okBoxMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.85, metalness: 0.05 });
+    const ngBoxMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.65, metalness: 0.1 });
 
-    const createBox = (isNg, idNum) => {
+    const createBox = (isNg, idNum, forcedWeight) => {
+      let weight = TARGET_WEIGHT + (Math.random() * 8 - 4); // normal e.g. 496 - 504g
+      let defectReason = null;
+
+      if (isNg) {
+        if (forcedWeight === 'under') {
+          weight = 435.0 + Math.random() * 15; // underweight
+          defectReason = `Underweight (${weight.toFixed(1)}g < 485g)`;
+        } else if (forcedWeight === 'over') {
+          weight = 575.0 + Math.random() * 20; // overweight
+          defectReason = `Overweight (${weight.toFixed(1)}g > 515g)`;
+        } else {
+          defectReason = DEFECT_TYPES[Math.floor(Math.random() * DEFECT_TYPES.length)];
+          if (defectReason.includes('Underweight')) weight = 438.0;
+          if (defectReason.includes('Overweight')) weight = 572.0;
+        }
+      }
+
       const boxMesh = new THREE.Mesh(boxGeo, isNg ? ngBoxMat.clone() : okBoxMat.clone());
       boxMesh.position.set(-4.0, 1.13, 0);
       boxMesh.castShadow = true;
@@ -902,25 +900,170 @@ export default function SmartConveyor3D({ onBookDemo }) {
         mesh: boxMesh,
         id: `LOT-${idNum}`,
         isNg,
+        weight: parseFloat(weight.toFixed(1)),
         inspected: false,
+        weighed: false,
         rejected: false,
-        defect: isNg ? DEFECT_TYPES[Math.floor(Math.random() * DEFECT_TYPES.length)] : null,
+        defect: defectReason,
       };
     };
 
     const initialBoxes = [
       createBox(false, 9822),
-      createBox(true, 9823),
+      createBox(true, 9823, 'under'),
       createBox(false, 9824),
     ];
     initialBoxes[0].mesh.position.x = 2.4;
     initialBoxes[0].inspected = true;
     initialBoxes[1].mesh.position.x = 0.5;
     initialBoxes[1].inspected = true;
-    initialBoxes[2].mesh.position.x = -1.8;
+    initialBoxes[2].mesh.position.x = -1.5;
     simRef.current.boxes = initialBoxes;
 
-    // 17. Mouse / Touch Orbit Controls & Button Raycasting
+    // 18. Helper function to render Real Siemens HMI CanvasTexture
+    const drawHmiCanvas = (ctx, st, scan, wt) => {
+      ctx.fillStyle = '#061325';
+      ctx.fillRect(0, 0, 1024, 680);
+
+      // Top Header Bar
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(0, 0, 1024, 64);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText('SIEMENS SIMATIC HMI — RVMAITECH SMART PACKAGING LINE', 28, 42);
+
+      ctx.fillStyle = st === 'RUNNING' ? '#22c55e' : st === 'IDLE' ? '#facc15' : '#ef4444';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText(`STATUS: ${st}`, 800, 42);
+
+      // 4 Main Telemetry Cards
+      // 1. Weight Sensor Card (Checkweigher)
+      ctx.fillStyle = '#0b213f';
+      ctx.fillRect(30, 90, 460, 240);
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(30, 90, 460, 240);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText('DYNAMIC CHECKWEIGHER (LOAD CELL)', 50, 126);
+
+      ctx.fillStyle = wt >= 485 && wt <= 515 ? '#22c55e' : '#ef4444';
+      ctx.font = 'bold 64px monospace';
+      ctx.fillText(`${wt.toFixed(1)} g`, 50, 205);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '18px sans-serif';
+      ctx.fillText(`Target: ${TARGET_WEIGHT}g  |  Tolerance: ±${WEIGHT_TOLERANCE}g`, 50, 250);
+      ctx.fillStyle = wt >= 485 && wt <= 515 ? '#4ade80' : '#f87171';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText(wt >= 485 && wt <= 515 ? '✓ WEIGHT PASS (IN SPEC)' : '✕ WEIGHT OUT OF SPEC (NG REJECT)', 50, 295);
+
+      // 2. Vision QC Inspection Card
+      ctx.fillStyle = '#0b213f';
+      ctx.fillRect(530, 90, 460, 240);
+      ctx.strokeRect(530, 90, 460, 240);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText('AI VISION INSPECTION CAMERA', 550, 126);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 36px monospace';
+      ctx.fillText(scan.id, 550, 185);
+
+      ctx.fillStyle = scan.status === 'OK' ? '#22c55e' : '#ef4444';
+      ctx.font = 'bold 28px sans-serif';
+      ctx.fillText(scan.status === 'OK' ? '✓ INSPECTION: PASS' : `✕ REJECT: ${scan.defect || 'DEFECT'}`, 550, 235);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '18px sans-serif';
+      ctx.fillText(`Confidence: ${scan.confidence}%  |  Barcode: ${scan.barcode}`, 550, 290);
+
+      // Bottom Row: Production Yield & Diagnostics
+      ctx.fillStyle = '#0f294d';
+      ctx.fillRect(30, 360, 960, 280);
+      ctx.strokeRect(30, 360, 960, 280);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('LINE SPEED & PRODUCTION STATS', 50, 400);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '20px sans-serif';
+      ctx.fillText('PLC: Siemens S7-1200 (PROFINET Active)', 50, 450);
+      ctx.fillText('Conveyor Speed: 24.0 m/min  |  Pneumatics: 6.2 Bar OK', 50, 490);
+      ctx.fillText('Photo-Eye Sensor: Aligned  |  Reject Diverter: Armed', 50, 530);
+
+      // Virtual Buttons on HMI Screen
+      ctx.fillStyle = '#15803d';
+      ctx.fillRect(50, 570, 180, 50);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText('▶ RUN AUTO', 80, 602);
+
+      ctx.fillStyle = '#b45309';
+      ctx.fillRect(260, 570, 180, 50);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('⏸ STANDBY', 290, 602);
+
+      ctx.fillStyle = '#b91c1c';
+      ctx.fillRect(470, 570, 180, 50);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('🛑 E-STOP', 510, 602);
+    };
+
+    // 19. Helper function to render Live Vision Operator Monitor Feed
+    const drawMonitorCanvas = (ctx, scan) => {
+      ctx.fillStyle = '#050c18';
+      ctx.fillRect(0, 0, 512, 320);
+
+      // Top title
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(0, 0, 512, 36);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('RVMAITECH AI VISION QC — LIVE CAM 01', 14, 24);
+
+      // Reticle Crosshairs & Bounding Box
+      ctx.strokeStyle = scan.status === 'OK' ? '#22c55e' : '#ef4444';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(90, 65, 332, 190);
+
+      ctx.beginPath();
+      ctx.moveTo(256, 45); ctx.lineTo(256, 65);
+      ctx.moveTo(256, 255); ctx.lineTo(256, 275);
+      ctx.moveTo(70, 160); ctx.lineTo(90, 160);
+      ctx.moveTo(422, 160); ctx.lineTo(442, 160);
+      ctx.stroke();
+
+      // Info text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 16px monospace';
+      ctx.fillText(`TARGET: ${scan.id}`, 105, 100);
+
+      ctx.fillStyle = scan.status === 'OK' ? '#4ade80' : '#f87171';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText(scan.status === 'OK' ? 'PASS (100% OK)' : 'FAIL: REJECT', 105, 145);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '14px sans-serif';
+      ctx.fillText(`AI Score: ${scan.confidence}%`, 105, 185);
+      ctx.fillText(`Weight: ${scan.weight || 501.2}g`, 105, 215);
+
+      if (scan.defect) {
+        ctx.fillStyle = '#ef4444';
+        ctx.fillText(`Error: ${scan.defect}`, 105, 242);
+      }
+    };
+
+    // Initial draw
+    drawHmiCanvas(hmiCtx, machineState, currentScan, 501.2);
+    hmiTexture.needsUpdate = true;
+    drawMonitorCanvas(monitorCtx, currentScan);
+    monitorTexture.needsUpdate = true;
+
+    // 20. Orbit Controls & Raycasting for 3D Buttons & Door
     let isDragging = false;
     let prevMouseX = 0;
     let prevMouseY = 0;
@@ -933,10 +1076,10 @@ export default function SmartConveyor3D({ onBookDemo }) {
     const updateCameraFromSpherical = () => {
       spherical.phi = Math.max(0.35, Math.min(Math.PI / 2 - 0.05, spherical.phi));
       spherical.radius = Math.max(3.8, Math.min(11.0, spherical.radius));
-      camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta) - 0.2;
+      camera.position.x = spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta) - 0.5;
       camera.position.y = spherical.radius * Math.cos(spherical.phi) + 0.6;
       camera.position.z = spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
-      camera.lookAt(-0.2, 0.9, 0);
+      camera.lookAt(-0.5, 0.9, 0);
     };
     updateCameraFromSpherical();
 
@@ -993,11 +1136,12 @@ export default function SmartConveyor3D({ onBookDemo }) {
     window.addEventListener('pointerup', onPointerUp);
     dom.addEventListener('wheel', onWheel, { passive: false });
 
-    // 18. Real-Time Animation Loop
+    // 21. Real-Time Animation Loop
     let animId;
     let lastClock = performance.now();
     let pusherProgress = 0;
     let isPushing = false;
+    let lastHmiDraw = 0;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -1010,16 +1154,24 @@ export default function SmartConveyor3D({ onBookDemo }) {
       const state = sim.machineState;
 
       // Smooth Door Swing Open / Close Animation
-      const targetDoorAngle = sim.isDoorOpen ? -Math.PI * 0.6 : 0; // ~108 degrees open
+      const targetDoorAngle = sim.isDoorOpen ? -Math.PI * 0.6 : 0;
       sim.doorAngle += (targetDoorAngle - sim.doorAngle) * 0.1;
       if (sim.doorPivot) {
         sim.doorPivot.rotation.y = sim.doorAngle;
       }
 
-      // Interior Light Intensity follows door opening
       if (sim.cabinetLight) {
         const openFactor = Math.abs(sim.doorAngle) / (Math.PI * 0.6);
-        sim.cabinetLight.intensity = openFactor * 2.2;
+        sim.cabinetLight.intensity = openFactor * 2.4;
+      }
+
+      // Periodically refresh the HMI & Monitor CanvasTexture
+      if (now - lastHmiDraw > 150) {
+        lastHmiDraw = now;
+        drawHmiCanvas(sim.hmiCtx, state, currentScan, sim.lastWeight);
+        sim.hmiTexture.needsUpdate = true;
+        drawMonitorCanvas(sim.monitorCtx, currentScan);
+        sim.monitorTexture.needsUpdate = true;
       }
 
       // TOWER LIGHT & BEACON BEHAVIOR:
@@ -1033,7 +1185,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
           sim.stackRedMat.emissive.setHex(0xef4444);
           sim.stackRedMat.emissiveIntensity = 1.0;
           sim.beaconLight.color.setHex(0xef4444);
-          sim.beaconLight.intensity = 3.0;
+          sim.beaconLight.intensity = 3.2;
         } else {
           sim.stackRedMat.color.setHex(0x450a0a);
           sim.stackRedMat.emissive.setHex(0x000000);
@@ -1048,7 +1200,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
         sim.stackYellowMat.emissive.setHex(0xfacc15);
         sim.stackYellowMat.emissiveIntensity = 0.9;
         sim.beaconLight.color.setHex(0xfacc15);
-        sim.beaconLight.intensity = 2.2;
+        sim.beaconLight.intensity = 2.4;
 
         sim.stackGreenMat.color.setHex(0x064e3b);
         sim.stackGreenMat.emissive.setHex(0x000000);
@@ -1061,7 +1213,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
           sim.stackRedMat.emissive.setHex(0xef4444);
           sim.stackRedMat.emissiveIntensity = 1.0;
           sim.beaconLight.color.setHex(0xef4444);
-          sim.beaconLight.intensity = 3.0;
+          sim.beaconLight.intensity = 3.2;
 
           sim.stackGreenMat.color.setHex(0x064e3b);
           sim.stackGreenMat.emissive.setHex(0x000000);
@@ -1070,7 +1222,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
           sim.stackGreenMat.emissive.setHex(0x22c55e);
           sim.stackGreenMat.emissiveIntensity = 0.95;
           sim.beaconLight.color.setHex(0x22c55e);
-          sim.beaconLight.intensity = 2.4;
+          sim.beaconLight.intensity = 2.5;
 
           sim.stackRedMat.color.setHex(0x450a0a);
           sim.stackRedMat.emissive.setHex(0x000000);
@@ -1094,8 +1246,15 @@ export default function SmartConveyor3D({ onBookDemo }) {
           const leftmostBox = sim.boxes.reduce((min, b) => Math.min(min, b.mesh.position.x), 999);
           if (leftmostBox > -3.2 || sim.boxes.length === 0) {
             let nextIsNg = Math.random() < 0.16;
-            if (sim.forceNext === 'ng') {
+            let forcedWt = null;
+            if (sim.forceNext === 'ng-weight') {
               nextIsNg = true;
+              forcedWt = 'under';
+              sim.forceNext = null;
+              setForceNextType(null);
+            } else if (sim.forceNext === 'ng-vision') {
+              nextIsNg = true;
+              forcedWt = 'vision';
               sim.forceNext = null;
               setForceNextType(null);
             } else if (sim.forceNext === 'ok') {
@@ -1104,7 +1263,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
               setForceNextType(null);
             }
 
-            const newBox = createBox(nextIsNg, sim.nextBoxId++);
+            const newBox = createBox(nextIsNg, sim.nextBoxId++, forcedWt);
             sim.boxes.push(newBox);
             sim.lastSpawnTime = now;
           }
@@ -1128,18 +1287,42 @@ export default function SmartConveyor3D({ onBookDemo }) {
 
           box.mesh.position.x += moveDist;
 
-          // Photo-eye Trigger Check
-          if (box.mesh.position.x >= -1.55 && box.mesh.position.x <= -1.45) {
+          // 1. Dynamic Checkweigher (at X = -1.8)
+          if (!box.weighed && box.mesh.position.x >= -1.95 && box.mesh.position.x <= -1.65) {
+            box.weighed = true;
+            sim.lastWeight = box.weight;
+
+            const isWeightOk = box.weight >= TARGET_WEIGHT - WEIGHT_TOLERANCE && box.weight <= TARGET_WEIGHT + WEIGHT_TOLERANCE;
+            setMetrics((prev) => ({
+              ...prev,
+              currentWeight: box.weight,
+              weightStatus: isWeightOk ? `OK (${box.weight}g)` : `NG (${box.weight}g OUT OF SPEC)`,
+            }));
+
+            // Weighing platform slight depression bounce
+            if (sim.scalePlatform) {
+              sim.scalePlatform.position.y = 0.012;
+              setTimeout(() => {
+                if (sim.scalePlatform) sim.scalePlatform.position.y = 0.02;
+              }, 120);
+            }
+          }
+
+          // 2. Optical Sensor Trigger (at X = -1.1)
+          if (box.mesh.position.x >= -1.15 && box.mesh.position.x <= -1.05) {
             sim.sensorRayMat.color.setHex(0xfacc15);
-          } else if (sim.boxes.every((b) => Math.abs(b.mesh.position.x - -1.5) > 0.2)) {
+          } else if (sim.boxes.every((b) => Math.abs(b.mesh.position.x - -1.1) > 0.2)) {
             sim.sensorRayMat.color.setHex(0xef4444);
           }
 
-          // Camera Inspection Station
-          if (!box.inspected && box.mesh.position.x >= -0.65 && box.mesh.position.x <= -0.35) {
+          // 3. Vision Camera Inspection (at X = -0.4)
+          if (!box.inspected && box.mesh.position.x >= -0.55 && box.mesh.position.x <= -0.25) {
             box.inspected = true;
 
-            if (box.isNg) {
+            const isWeightFail = box.weight < TARGET_WEIGHT - WEIGHT_TOLERANCE || box.weight > TARGET_WEIGHT + WEIGHT_TOLERANCE;
+            const isReject = box.isNg || isWeightFail;
+
+            if (isReject) {
               sim.scanLaserPlane.material.color.setHex(0xef4444);
               sim.scanSpotLight.color.setHex(0xef4444);
               sim.ngBlinkTimer = now + 1800;
@@ -1149,25 +1332,27 @@ export default function SmartConveyor3D({ onBookDemo }) {
             }
 
             const timeStr = new Date().toLocaleTimeString('en-IN', { hour12: false });
-            setCurrentScan({
+            const itemScan = {
               id: box.id,
-              status: box.isNg ? 'NG' : 'OK',
-              confidence: box.isNg ? 97.8 : 99.6,
-              defect: box.defect,
+              status: isReject ? 'NG' : 'OK',
+              confidence: isReject ? 97.6 : 99.7,
+              weight: box.weight,
+              defect: box.defect || (isWeightFail ? `Weight Error (${box.weight}g)` : null),
               scanTime: timeStr,
-              barcode: `RVM-${box.id}-${box.isNg ? 'REJECT' : 'PASS'}`,
-            });
+              barcode: `RVM-${box.id}-${isReject ? 'REJECT' : 'PASS'}`,
+            };
+            setCurrentScan(itemScan);
 
             setMetrics((prev) => {
               const newTotal = prev.total + 1;
-              const newOk = box.isNg ? prev.ok : prev.ok + 1;
-              const newNg = box.isNg ? prev.ng + 1 : prev.ng;
+              const newOk = isReject ? prev.ok : prev.ok + 1;
+              const newNg = isReject ? prev.ng + 1 : prev.ng;
               return {
                 ...prev,
                 total: newTotal,
                 ok: newOk,
                 ng: newNg,
-                cycleTimeMs: Math.floor(32 + Math.random() * 12),
+                cycleTimeMs: Math.floor(32 + Math.random() * 10),
               };
             });
 
@@ -1175,27 +1360,29 @@ export default function SmartConveyor3D({ onBookDemo }) {
               {
                 id: box.id,
                 time: timeStr,
-                status: box.isNg ? 'NG' : 'OK',
-                defect: box.isNg ? box.defect : 'Passed All Criteria',
-                dest: box.isNg ? 'Reject Chute (NG)' : 'Main Line (OK)',
+                weight: `${box.weight}g`,
+                status: isReject ? 'NG' : 'OK',
+                defect: itemScan.defect || 'All Specs In Range',
+                dest: isReject ? 'Reject Chute (NG)' : 'Main Line (OK)',
               },
               ...prev.slice(0, 5),
             ]);
           }
 
-          if (box.mesh.position.x > -0.2 && box.mesh.position.x < 0.0) {
+          if (box.mesh.position.x > -0.1 && box.mesh.position.x < 0.1) {
             sim.scanLaserPlane.material.color.setHex(0x38bdf8);
             sim.scanSpotLight.color.setHex(0x38bdf8);
           }
 
-          // Pneumatic Reject Diverter
-          if (box.isNg && !box.rejected && box.mesh.position.x >= 1.15 && box.mesh.position.x <= 1.45) {
+          // 4. Pneumatic Diverter (at X = 1.3)
+          const isWeightFail = box.weight < TARGET_WEIGHT - WEIGHT_TOLERANCE || box.weight > TARGET_WEIGHT + WEIGHT_TOLERANCE;
+          if ((box.isNg || isWeightFail) && !box.rejected && box.mesh.position.x >= 1.15 && box.mesh.position.x <= 1.45) {
             box.rejected = true;
             isPushing = true;
             pusherProgress = 0;
           }
 
-          // Finish Line (OK Output)
+          // 5. Finish Line (OK Output)
           if (box.mesh.position.x > 4.6) {
             conveyorGroup.remove(box.mesh);
             sim.boxes.splice(i, 1);
@@ -1280,11 +1467,11 @@ export default function SmartConveyor3D({ onBookDemo }) {
             </span>
           </div>
           <h3 className="sc-title">
-            Smart Conveyor Belt · Real PLC Cabinet (Siemens S7) &amp; Vision Inspection Machine
+            Smart Conveyor Belt · In-Line Checkweigher &amp; Real Siemens PLC Vision System
           </h3>
           <p className="sc-subtitle">
-            Enlarged industrial electrical panel with interactive openable door. Inspect internal Siemens S7-1200 PLC,
-            DIN breakers, safety relays, large 15&quot; door HMI, articulated vision monitor, and pneumatic sorting.
+            Real industrial setup on Left Side: Openable electrical panel with internal Siemens S7-1200 PLC,
+            live 15&quot; HMI touchscreen, in-line load cell weight sensor (500g ±15g), 24&quot; vision monitor, and pneumatic sorting.
           </p>
         </div>
 
@@ -1297,7 +1484,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
             onClick={() => setIsDoorOpen(!isDoorOpen)}
             title="Open or Close PLC Cabinet Front Door"
           >
-            {isDoorOpen ? <><DoorOpen size={16} /> Close Panel</> : <><DoorClosed size={16} /> Open Panel (Inspect PLC)</>}
+            {isDoorOpen ? <><DoorOpen size={16} /> Close Panel</> : <><DoorClosed size={16} /> Open Panel (Inspect Siemens PLC)</>}
           </button>
 
           {/* START BUTTON (Green) */}
@@ -1344,20 +1531,20 @@ export default function SmartConveyor3D({ onBookDemo }) {
       {/* Main Grid: 3D Canvas (Left) + Factory SCADA HMI Screen (Right) */}
       <div className="sc-main-grid">
         {/* Left: 3D WebGL Canvas */}
-        <div className="sc-canvas-container" style={{ height: 580 }}>
+        <div className="sc-canvas-container" style={{ height: 600 }}>
           <div ref={mountRef} className="sc-three-canvas" />
 
           {/* Interactive 3D Canvas HUD overlays */}
           <div className="sc-canvas-hud-top">
-            <span className="sc-hud-tag"><Cpu size={13} /> PLC: Siemens S7-1200 (CPU 1214C)</span>
-            <span className="sc-hud-tag"><Monitor size={13} /> 24&quot; Vision Station Monitor</span>
-            <span className="sc-hud-tag"><Zap size={13} /> 24V DC SMPS &amp; Safety Relay</span>
+            <span className="sc-hud-tag"><Scale size={13} /> Load Cell: {metrics.currentWeight}g ({metrics.weightStatus})</span>
+            <span className="sc-hud-tag"><Cpu size={13} /> Siemens S7-1200 CPU 1214C</span>
+            <span className="sc-hud-tag"><Monitor size={13} /> 24&quot; Vision Screen</span>
             <span className="sc-hud-tag"><Activity size={13} /> 6.2 Bar Air</span>
           </div>
 
           <div className="sc-canvas-hud-bottom">
             <span className="sc-hud-tip">
-              🚪 Click <strong>&quot;Open Panel&quot;</strong> to inspect the Siemens PLC inside · <strong>Drag 360°</strong> to orbit
+              🚪 Click <strong>&quot;Open Panel&quot;</strong> to inspect the Siemens PLC inside · <strong>Drag 360°</strong> to orbit around machine
             </span>
           </div>
         </div>
@@ -1395,20 +1582,20 @@ export default function SmartConveyor3D({ onBookDemo }) {
             </div>
 
             <div className="sc-kpi-card">
-              <span className="sc-kpi-label">CYCLE TIME</span>
-              <span className="sc-kpi-val">{metrics.cycleTimeMs}</span>
-              <span className="sc-kpi-sub">Milliseconds</span>
+              <span className="sc-kpi-label">LAST WEIGHT</span>
+              <span className="sc-kpi-val" style={{ fontSize: 18, color: '#38bdf8' }}>{metrics.currentWeight}g</span>
+              <span className="sc-kpi-sub">Target: 500g ±15g</span>
             </div>
           </div>
 
-          {/* Live Camera Viewfinder Card */}
+          {/* Live Camera Viewfinder Card with Dual Vision + Weight readout */}
           <div className="sc-viewfinder-card">
             <div className="sc-viewfinder-head">
               <div className="sc-vf-live">
-                <span className="sc-rec-dot" /> LIVE VISION CAMERA FEED
+                <span className="sc-rec-dot" /> LIVE VISION &amp; WEIGHT CHECK
               </div>
               <span className={`sc-badge-verdict ${currentScan.status === 'OK' ? 'sc-badge-pass' : 'sc-badge-fail'}`}>
-                {currentScan.status === 'OK' ? '✓ PASS: OK PRODUCT' : '✕ REJECT: DEFECT DETECTED'}
+                {currentScan.status === 'OK' ? '✓ PASS: ALL SPECS OK' : '✕ REJECT: DEFECT / WEIGHT OUT'}
               </span>
             </div>
 
@@ -1420,38 +1607,50 @@ export default function SmartConveyor3D({ onBookDemo }) {
 
               <div className="sc-vf-center-info">
                 <div className="sc-vf-item-id">LOT ID: {currentScan.id}</div>
-                <div className="sc-vf-metric">AI Confidence: {currentScan.confidence}%</div>
-                <div className="sc-vf-metric">Barcode: {currentScan.barcode}</div>
+                <div className="sc-vf-metric">
+                  Measured Weight: <strong style={{ color: currentScan.weight >= 485 && currentScan.weight <= 515 ? '#4ade80' : '#f87171' }}>{currentScan.weight} g</strong> (Target: 500g)
+                </div>
+                <div className="sc-vf-metric">AI Confidence: {currentScan.confidence}% | {currentScan.barcode}</div>
                 {currentScan.defect ? (
                   <div className="sc-vf-defect-alert">
                     <AlertTriangle size={14} /> DEFECT: {currentScan.defect}
                   </div>
                 ) : (
                   <div className="sc-vf-ok-check">
-                    <CheckCircle2 size={14} /> Dimensions, Seal &amp; Label 100% OK
+                    <CheckCircle2 size={14} /> Weight, Seal, Label &amp; Barcode 100% OK
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Interactive Simulation Controls */}
+          {/* Interactive Simulation Controls: Test Weight & Visual Defects */}
           <div className="sc-controls-box">
-            <span className="sc-ctrl-title">TEST DEFECT &amp; SORTING:</span>
-            <div className="sc-ctrl-buttons">
+            <span className="sc-ctrl-title">TEST DEFECT &amp; CHECKWEIGHER REJECT:</span>
+            <div className="sc-ctrl-buttons" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
               <button
                 type="button"
-                className={`sc-btn-force sc-btn-force-ng ${forceNextType === 'ng' ? 'active' : ''}`}
-                onClick={() => setForceNextType('ng')}
+                className={`sc-btn-force sc-btn-force-ng ${forceNextType === 'ng-weight' ? 'active' : ''}`}
+                onClick={() => setForceNextType('ng-weight')}
+                title="Force Underweight box (e.g. 438g) to test checkweigher reject"
               >
-                <AlertTriangle size={15} /> Force Next as NG (Defect)
+                <Scale size={14} /> Test Weight NG
+              </button>
+              <button
+                type="button"
+                className={`sc-btn-force sc-btn-force-ng ${forceNextType === 'ng-vision' ? 'active' : ''}`}
+                onClick={() => setForceNextType('ng-vision')}
+                title="Force Visual Defect box to test camera reject"
+              >
+                <Camera size={14} /> Test Vision NG
               </button>
               <button
                 type="button"
                 className={`sc-btn-force sc-btn-force-ok ${forceNextType === 'ok' ? 'active' : ''}`}
                 onClick={() => setForceNextType('ok')}
+                title="Force 100% Perfect Box"
               >
-                <CheckCircle2 size={15} /> Force Next as OK
+                <CheckCircle2 size={14} /> Force OK
               </button>
             </div>
 
@@ -1473,7 +1672,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
           {/* Live Rolling Audit Log Table */}
           <div className="sc-log-card">
             <div className="sc-log-head">
-              <span>LIVE INSPECTION &amp; SORTING LOG</span>
+              <span>LIVE INSPECTION &amp; CHECKWEIGHER LOG</span>
               <span className="sc-log-count">{inspectionLog.length} recent</span>
             </div>
             <div className="sc-log-table-wrapper">
@@ -1482,6 +1681,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
                   <tr>
                     <th>Time</th>
                     <th>Lot ID</th>
+                    <th>Weight</th>
                     <th>Result</th>
                     <th>Action</th>
                   </tr>
@@ -1491,6 +1691,7 @@ export default function SmartConveyor3D({ onBookDemo }) {
                     <tr key={`${log.id}-${idx}`}>
                       <td>{log.time}</td>
                       <td><strong>{log.id}</strong></td>
+                      <td><span style={{ color: '#38bdf8' }}>{log.weight}</span></td>
                       <td>
                         <span className={`sc-table-badge ${log.status === 'OK' ? 'pass' : 'fail'}`}>
                           {log.status}
@@ -1513,11 +1714,11 @@ export default function SmartConveyor3D({ onBookDemo }) {
                 if (onBookDemo) {
                   onBookDemo();
                 } else {
-                  openAuditModal('Smart Conveyor & AI Vision Inspection System');
+                  openAuditModal('Smart Conveyor & In-Line Checkweigher Vision System');
                 }
               }}
             >
-              <ShieldCheck size={18} /> Book Machine Vision &amp; Conveyor Audit <ArrowRight size={16} />
+              <ShieldCheck size={18} /> Book Checkweigher &amp; Vision Audit <ArrowRight size={16} />
             </button>
           </div>
         </div>
