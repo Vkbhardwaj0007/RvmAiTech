@@ -3,21 +3,22 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
   Activity, Cpu, Gauge, Thermometer, Zap, Play, Pause, AlertTriangle, RotateCcw,
-  Wifi, Radio, ArrowRight, ShieldCheck, CheckCircle2, Sliders, Eye, Box, Info
+  Wifi, Radio, ArrowRight, ShieldCheck, CheckCircle2, Sliders, Eye, Box, Info,
+  TrendingUp, BarChart3, Monitor, Layers, Clock
 } from 'lucide-react';
 
 /**
  * 3D Live MDMS Shop-Floor & Machine Telemetry
- * Featuring the actual Rvmaitech MDMS Edge Data Logger:
- * Hardware Model: Waveshare ESP32-S3-ETH-8DI-8RO-C (8CH Digital Inputs + 8CH Relays + Ethernet + CAN + Wi-Fi)
+ * Featuring the RvmAiTech MDMS Edge Data Logger:
+ * Hardware Model: RvmAiTech MDMS-8DI-8RO-PRO (8CH Digital Inputs + 8CH Relays + Ethernet + CAN + Wi-Fi)
  * Connected directly to an Industrial 5-Axis CNC Milling Center (VMC).
  *
- * Demonstrates:
- * 1. Physical Signal Acquisition from CNC Machine (Spindle Run, In-Cycle, Part Counter, Error Alarm)
- * 2. High-speed signal processing on ESP32-S3 Edge Gateway
- * 3. Animated data pulses along wiring harness into DI1-DI8 terminals
- * 4. Ethernet / Wi-Fi telemetry transmission to MDMS Cloud Platform
- * 5. Real-time OEE, Spindle RPM, Power Load, Motor Temp, and Parts Counter
+ * Real Machine & Real Telemetry Architecture:
+ * 1. Open-Cabin Industrial CNC Machining Center with sliding safety door (opens on Stop, closes on Run)
+ * 2. High-speed spindle carriage that feeds down and spins at 6,500 RPM with cutting sparks & coolant spray
+ * 3. RvmAiTech branded IoT Edge Data Logger with green screw terminals, Ethernet, gold antenna, and blinking LEDs
+ * 4. Exact Client MDMS Dashboard (from Image 4) rendered live on the 3D Operator Console & Monitor Screen
+ * 5. Animated electrical pulses flowing from CNC spindle & relays into the RvmAiTech Data Logger
  */
 
 export default function MdmsFactory3D({ onBookDemo }) {
@@ -27,128 +28,117 @@ export default function MdmsFactory3D({ onBookDemo }) {
   const [machineState, setMachineState] = useState('running');
   const [activeCamPreset, setActiveCamPreset] = useState('cell'); // 'cell' | 'logger' | 'spindle' | 'console'
 
-  // Live Machine Telemetry Data
-  const [telemetry, setTelemetry] = useState({
-    oee: 89.6,
-    availability: 95.2,
-    performance: 96.1,
-    quality: 98.2,
+  // Live Client MDMS Dashboard Metrics (Matching Image 4)
+  const [dashboardData, setDashboardData] = useState({
+    group: 'Group 1 · Shift B (Night)',
+    groupAvailability: 58,
+    groupProducedMtr: 20809,
+    groupRunTime: '6h 15m',
+    groupIdleTime: '4h 37m',
+    groupStoppedTime: '0m',
+    // Machine 1: CNC / CBR-01
+    cbrStatus: 'Running',
+    cbrAvail: 59,
+    cbrProducedMtr: 7368,
+    cbrSpeed: 60, // m/min
+    cbrRunTime: '2h 07m',
+    cbrIdleTime: '1h 29m',
+    cbrDowntime: '1h 29m',
+    // Machine 2: Mercerizer-01
+    mercStatus: 'Idle',
+    mercAvail: 37,
+    mercProducedMtr: 3692,
+    mercSpeed: 0,
+    mercRunTime: '1h 20m',
+    mercIdleTime: '2h 17m',
+    mercDowntime: '2h 17m',
+    // Live Engineering Telemetry
     rpm: 6250,
-    power: 12.8,
-    temp: 48,
-    parts: 342,
-    cycleTime: 42,
-    feedRate: 1450,
-    activeTool: 'T04 (Ø12mm Carbide Endmill)',
+    powerKw: 12.8,
+    tempC: 48,
+    partsCompleted: 342,
     gCode: 'N140 G01 X-120.4 Y45.8 Z-8.5 F1450 S6250',
-    loggerStatus: {
-      powerOk: true,
-      di1_spindle: true,
-      di2_inCycle: true,
-      di3_partCounter: false,
-      di4_alarm: false,
-      di5_doorClosed: true,
-      ethConnected: true,
-      mqttPacketsPerSec: 18,
-    },
   });
 
-  // Shared simulation refs
+  // Shared simulation refs for Three.js animation
   const simRef = useRef({
     machineState: 'running',
     camera: null,
     controls: null,
-    targetCamPos: new THREE.Vector3(0, 3.2, 5.8),
+    targetCamPos: new THREE.Vector3(0, 3.0, 5.4),
     targetLookAt: new THREE.Vector3(0, 1.4, 0),
+    slidingDoor: null,
+    doorOffset: 0,
+    spindleGroup: null,
     spindleHead: null,
     cutterMesh: null,
     chipsParticles: null,
-    coolantMesh: null,
+    workpiece: null,
     dataPulses: [],
     ledPwr: null,
     ledRx: null,
     ledTx: null,
-    ledDI: [],
     towerGreenMat: null,
     towerYellowMat: null,
     towerRedMat: null,
-    cncScreenTexture: null,
-    cncScreenCtx: null,
-    cncScreenCanvas: null,
-    loggerLabelTex: null,
+    consoleTexture: null,
+    consoleCtx: null,
+    consoleCanvas: null,
+    dashTexture: null,
+    dashCtx: null,
+    dashCanvas: null,
+    lastDashDraw: 0,
   });
 
-  // Sync machineState to simRef
+  // Sync state to simRef
   useEffect(() => {
     simRef.current.machineState = machineState;
   }, [machineState]);
 
-  // Live telemetry ticker
+  // Live telemetry ticker that updates metrics based on machineState
   useEffect(() => {
     const timer = setInterval(() => {
-      setTelemetry((prev) => {
+      setDashboardData((prev) => {
         if (machineState === 'running') {
-          const rpmJitter = Math.floor(6200 + Math.random() * 120);
-          const powerJitter = parseFloat((12.5 + Math.random() * 0.8).toFixed(1));
-          const tempJitter = Math.floor(47 + Math.random() * 3);
-          const oeeJitter = parseFloat((89.4 + Math.random() * 0.5).toFixed(1));
-          const cycleNext = prev.cycleTime >= 45 ? 1 : prev.cycleTime + 1;
-          const partInc = cycleNext === 1 ? 1 : 0;
+          const incMtr = Math.floor(1 + Math.random() * 3);
+          const rpmJitter = Math.floor(6200 + Math.random() * 140);
+          const pwrJitter = parseFloat((12.4 + Math.random() * 0.8).toFixed(1));
+          const tempJitter = Math.floor(48 + Math.random() * 2);
 
           return {
             ...prev,
-            oee: oeeJitter,
+            cbrStatus: 'Running',
+            cbrSpeed: 60,
+            cbrProducedMtr: prev.cbrProducedMtr + incMtr,
+            groupProducedMtr: prev.groupProducedMtr + incMtr,
+            groupAvailability: 59,
             rpm: rpmJitter,
-            power: powerJitter,
-            temp: tempJitter,
-            cycleTime: cycleNext,
-            parts: prev.parts + partInc,
-            gCode: `N${Math.floor(120 + Math.random() * 40)} G01 X${(Math.random() * -150).toFixed(1)} Y${(Math.random() * 80).toFixed(1)} Z-8.5 F1450 S${rpmJitter}`,
-            loggerStatus: {
-              ...prev.loggerStatus,
-              di1_spindle: true,
-              di2_inCycle: true,
-              di3_partCounter: cycleNext === 1,
-              di4_alarm: false,
-              di5_doorClosed: true,
-              mqttPacketsPerSec: Math.floor(16 + Math.random() * 5),
-            },
+            powerKw: pwrJitter,
+            tempC: tempJitter,
+            partsCompleted: prev.partsCompleted + (Math.random() > 0.7 ? 1 : 0),
+            gCode: `N${Math.floor(140 + Math.random() * 20)} G01 X${(Math.random() * -140).toFixed(1)} Y${(Math.random() * 70).toFixed(1)} Z-8.5 F1450 S${rpmJitter}`,
           };
         } else if (machineState === 'idle') {
           return {
             ...prev,
+            cbrStatus: 'Idle',
+            cbrSpeed: 0,
+            groupAvailability: 46,
             rpm: 0,
-            power: 2.1,
-            temp: Math.max(36, prev.temp - 0.2),
-            oee: parseFloat(Math.max(68, prev.oee - 0.05).toFixed(1)),
-            gCode: 'FEED HOLD / OPERATOR SETUP MODE (M00)',
-            loggerStatus: {
-              ...prev.loggerStatus,
-              di1_spindle: false,
-              di2_inCycle: false,
-              di3_partCounter: false,
-              di4_alarm: false,
-              di5_doorClosed: false,
-              mqttPacketsPerSec: 4,
-            },
+            powerKw: 1.8,
+            tempC: Math.max(36, prev.tempC - 0.4),
+            gCode: 'M00 FEED HOLD / OPERATOR INSPECTION',
           };
         } else {
           // fault
           return {
             ...prev,
+            cbrStatus: 'Downtime Alert',
+            cbrSpeed: 0,
+            groupAvailability: 38,
             rpm: 0,
-            power: 0.6,
-            oee: parseFloat(Math.max(55, prev.oee - 0.1).toFixed(1)),
-            gCode: 'ALARM 1024: SPINDLE OVERLOAD / E-STOP TRIGGERED',
-            loggerStatus: {
-              ...prev.loggerStatus,
-              di1_spindle: false,
-              di2_inCycle: false,
-              di3_partCounter: false,
-              di4_alarm: true,
-              di5_doorClosed: true,
-              mqttPacketsPerSec: 2,
-            },
+            powerKw: 0.5,
+            gCode: 'ALARM 1024: TOOL BREAKAGE / EMERGENCY STOP',
           };
         }
       });
@@ -157,27 +147,27 @@ export default function MdmsFactory3D({ onBookDemo }) {
     return () => clearInterval(timer);
   }, [machineState]);
 
-  // Camera preset handler
+  // Camera presets
   const setCamView = (preset) => {
     setActiveCamPreset(preset);
     const sim = simRef.current;
     if (!sim.camera || !sim.controls) return;
 
     if (preset === 'cell') {
-      sim.targetCamPos.set(0, 3.2, 5.8);
+      sim.targetCamPos.set(0, 3.0, 5.4);
       sim.targetLookAt.set(0, 1.4, 0);
     } else if (preset === 'logger') {
-      // Zoom into the Waveshare ESP32-S3 MDMS Logger on the right side
-      sim.targetCamPos.set(2.0, 1.9, 1.7);
+      // Zoom into RvmAiTech MDMS Data Logger on the right
+      sim.targetCamPos.set(1.9, 1.8, 1.6);
       sim.targetLookAt.set(1.85, 1.5, 0.4);
     } else if (preset === 'spindle') {
-      // Zoom into the CNC cutting chamber
-      sim.targetCamPos.set(-0.25, 1.9, 2.2);
-      sim.targetLookAt.set(-0.3, 1.55, 0);
+      // Zoom into the CNC interior machining chamber
+      sim.targetCamPos.set(-0.35, 1.7, 1.9);
+      sim.targetLookAt.set(-0.35, 1.45, 0);
     } else if (preset === 'console') {
-      // Zoom into the CNC control console
-      sim.targetCamPos.set(1.2, 2.1, 2.6);
-      sim.targetLookAt.set(0.95, 1.8, 1.0);
+      // Zoom into the CNC operator screen & HMI dashboard
+      sim.targetCamPos.set(1.15, 1.95, 2.4);
+      sim.targetLookAt.set(0.9, 1.75, 0.9);
     }
   };
 
@@ -187,15 +177,15 @@ export default function MdmsFactory3D({ onBookDemo }) {
     if (!host) return;
 
     const w = host.clientWidth || 800;
-    const h = host.clientHeight || 560;
+    const h = host.clientHeight || 580;
 
     // 1. Scene & Camera
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdce5ef); // Bright industrial plant ambiance
-    scene.fog = new THREE.FogExp2(0xdce5ef, 0.026);
+    scene.background = new THREE.Color(0xdde6f0); // Crisp industrial plant daylight
+    scene.fog = new THREE.FogExp2(0xdde6f0, 0.024);
 
-    const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 60);
-    camera.position.set(0, 3.2, 5.8);
+    const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 70);
+    camera.position.set(0, 3.0, 5.4);
     camera.lookAt(0, 1.4, 0);
     simRef.current.camera = camera;
 
@@ -214,8 +204,8 @@ export default function MdmsFactory3D({ onBookDemo }) {
     controls.dampingFactor = 0.05;
     controls.target.set(0, 1.4, 0);
     controls.maxPolarAngle = Math.PI / 2 - 0.04;
-    controls.minDistance = 1.4;
-    controls.maxDistance = 11.0;
+    controls.minDistance = 1.3;
+    controls.maxDistance = 12.0;
     simRef.current.controls = controls;
 
     // 2. High-Bay Factory Lighting
@@ -223,34 +213,41 @@ export default function MdmsFactory3D({ onBookDemo }) {
     scene.add(hemiLight);
 
     const sun = new THREE.DirectionalLight(0xfffbeb, 1.8);
-    sun.position.set(5.5, 10, 5.5);
+    sun.position.set(6, 12, 6);
     sun.castShadow = true;
     sun.shadow.mapSize.width = 2048;
     sun.shadow.mapSize.height = 2048;
     sun.shadow.bias = -0.0004;
     scene.add(sun);
 
-    const fill = new THREE.DirectionalLight(0xcfd8dc, 0.9);
+    const fill = new THREE.DirectionalLight(0xcfd8dc, 0.85);
     fill.position.set(-6, 8, -4);
     scene.add(fill);
 
-    const spotCnc = new THREE.PointLight(0xffffff, 1.4, 6);
-    spotCnc.position.set(-0.3, 2.4, 0.6);
-    scene.add(spotCnc);
+    // Bright interior CNC chamber worklights (illuminates inside so it never looks like a black box)
+    const chamberLight = new THREE.PointLight(0xffffff, 2.5, 5.0);
+    chamberLight.position.set(-0.35, 2.3, 0.2);
+    scene.add(chamberLight);
+
+    const chamberSpot = new THREE.SpotLight(0xffffff, 3.0, 4.5, Math.PI / 4, 0.3);
+    chamberSpot.position.set(-0.35, 2.4, 0.6);
+    chamberSpot.target.position.set(-0.35, 1.1, 0);
+    scene.add(chamberSpot);
+    scene.add(chamberSpot.target);
 
     // 3. Polished Factory Epoxy Floor with OSHA Safety Markings
-    const floorGeo = new THREE.PlaneGeometry(28, 20);
+    const floorGeo = new THREE.PlaneGeometry(32, 22);
     const floorMat = new THREE.MeshStandardMaterial({ color: 0xc8d3de, roughness: 0.35, metalness: 0.15 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    const floorGrid = new THREE.GridHelper(26, 14, 0x94a3b8, 0xb0bec5);
+    const floorGrid = new THREE.GridHelper(30, 16, 0x94a3b8, 0xb0bec5);
     floorGrid.position.y = 0.002;
     scene.add(floorGrid);
 
-    // Yellow 5S perimeter zone around the CNC work cell
+    // Yellow 5S Safety Boundary Line around cell
     const yellowZoneMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
     const makeStripe = (x, z, sx, sz) => {
       const s = new THREE.Mesh(new THREE.PlaneGeometry(sx, sz), yellowZoneMat);
@@ -264,186 +261,217 @@ export default function MdmsFactory3D({ onBookDemo }) {
     makeStripe(3.2, 0, 0.08, 4.8);
 
     // ----------------------------------------------------
-    // 4. INDUSTRIAL 5-AXIS CNC MILLING CENTER (Matching Photo 2)
+    // 4. REAL OPEN-CABIN INDUSTRIAL CNC MILLING CENTER (VMC)
+    // Modeled as a real machine with openable front sliding door & bright interior!
     // ----------------------------------------------------
     const cncGroup = new THREE.Group();
-    cncGroup.position.set(-0.4, 0, 0);
+    cncGroup.position.set(-0.35, 0, 0);
     scene.add(cncGroup);
 
     // Materials
-    const matDarkBase = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.7 });
-    const matLightEnclosure = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.35, metalness: 0.3 });
-    const matAccentDark = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.45, metalness: 0.6 });
+    const matDarkBase = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.45, metalness: 0.7 });
+    const matLightCabin = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.35, metalness: 0.35 });
+    const matAccentDark = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4, metalness: 0.6 });
     const matChrome = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.1, metalness: 0.98 });
-    const matGlass = new THREE.MeshPhysicalMaterial({
+    const matWayCover = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.25, metalness: 0.9 });
+    const matClearGlass = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.32,
-      roughness: 0.08,
-      metalness: 0.1,
-      transmission: 0.85,
+      opacity: 0.28,
+      roughness: 0.05,
+      metalness: 0.05,
+      transmission: 0.9,
     });
 
-    // Heavy Cast Base
-    const baseCasting = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.55, 2.4), matDarkBase);
+    // 4A. Heavy Machine Base Bed Casting (Dark Charcoal Anthracite)
+    const baseCasting = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.55, 2.3), matDarkBase);
     baseCasting.position.y = 0.275;
     baseCasting.castShadow = true;
     baseCasting.receiveShadow = true;
     cncGroup.add(baseCasting);
 
-    // Main Machine Enclosure (Light Grey Cabin)
-    const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.7, 2.1, 2.3), matLightEnclosure);
-    cabin.position.y = 1.6;
-    cabin.castShadow = true;
-    cncGroup.add(cabin);
+    // Leveling feet
+    [[-1.1, -0.9], [1.1, -0.9], [-1.1, 0.9], [1.1, 0.9]].forEach(([fx, fz]) => {
+      const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.06, 14), matDarkBase);
+      foot.position.set(fx, 0.03, fz);
+      cncGroup.add(foot);
+    });
 
-    // Front Machine Door Frame (Dark Charcoal Accent)
-    const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.8, 0.08), matAccentDark);
-    doorFrame.position.set(0, 1.6, 1.16);
-    cncGroup.add(doorFrame);
+    // 4B. Open Cabin Walls (NOT a solid box! Enclosure with back, left, right, and top canopy)
+    const cabinHeight = 1.95;
+    const cabinDepth = 2.1;
+    const cabinWidth = 2.5;
 
-    // Polycarbonate Safety Inspection Window
-    const glassWindow = new THREE.Mesh(new THREE.BoxGeometry(1.35, 1.5, 0.02), matGlass);
-    glassWindow.position.set(0, 1.6, 1.17);
-    cncGroup.add(glassWindow);
+    // Back Wall
+    const backWall = new THREE.Mesh(new THREE.BoxGeometry(cabinWidth, cabinHeight, 0.08), matLightCabin);
+    backWall.position.set(0, 0.55 + cabinHeight / 2, -cabinDepth / 2 + 0.04);
+    cncGroup.add(backWall);
 
-    // Stainless Door Handle Bar
-    const doorHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.9, 12), matChrome);
-    doorHandle.position.set(0.68, 1.6, 1.22);
-    cncGroup.add(doorHandle);
+    // Left Wall with small side window
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.08, cabinHeight, cabinDepth), matLightCabin);
+    leftWall.position.set(-cabinWidth / 2 + 0.04, 0.55 + cabinHeight / 2, 0);
+    cncGroup.add(leftWall);
+
+    // Right Wall (adjacent to console)
+    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.08, cabinHeight, cabinDepth), matLightCabin);
+    rightWall.position.set(cabinWidth / 2 - 0.04, 0.55 + cabinHeight / 2, 0);
+    cncGroup.add(rightWall);
+
+    // Upper Roof Canopy with Mist Extraction Duct
+    const roofCanopy = new THREE.Mesh(new THREE.BoxGeometry(cabinWidth, 0.12, cabinDepth), matLightCabin);
+    roofCanopy.position.set(0, 0.55 + cabinHeight + 0.06, 0);
+    cncGroup.add(roofCanopy);
+
+    // Oil Mist / Fume Collector on Roof
+    const mistCollector = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.45, 18), matAccentDark);
+    mistCollector.position.set(0.65, 0.55 + cabinHeight + 0.35, -0.4);
+    cncGroup.add(mistCollector);
+
+    // Front Upper Fascia Header Panel
+    const frontHeader = new THREE.Mesh(new THREE.BoxGeometry(cabinWidth, 0.35, 0.12), matLightCabin);
+    frontHeader.position.set(0, 0.55 + cabinHeight - 0.175, cabinDepth / 2 - 0.06);
+    cncGroup.add(frontHeader);
+
+    // Front Lower Splash Guard Kickplate
+    const frontKickplate = new THREE.Mesh(new THREE.BoxGeometry(cabinWidth, 0.3, 0.12), matDarkBase);
+    frontKickplate.position.set(0, 0.55 + 0.15, cabinDepth / 2 - 0.06);
+    cncGroup.add(frontKickplate);
+
+    // 4C. Real Front Sliding Door Assembly
+    // Smoothly opens when IDLE / STOPPED, and closes when RUNNING!
+    const doorFrameGroup = new THREE.Group();
+    doorFrameGroup.position.set(0, 1.5, cabinDepth / 2 - 0.02);
+    cncGroup.add(doorFrameGroup);
+    simRef.current.slidingDoor = doorFrameGroup;
+
+    // Door Frame Surround (Charcoal with orange safety handle)
+    const doorWidth = 1.35;
+    const doorHeight = 1.35;
+
+    // Top door rail
+    const dRailTop = new THREE.Mesh(new THREE.BoxGeometry(doorWidth, 0.06, 0.04), matAccentDark);
+    dRailTop.position.set(0, doorHeight / 2 - 0.03, 0);
+    doorFrameGroup.add(dRailTop);
+
+    // Bottom door rail
+    const dRailBot = new THREE.Mesh(new THREE.BoxGeometry(doorWidth, 0.06, 0.04), matAccentDark);
+    dRailBot.position.set(0, -doorHeight / 2 + 0.03, 0);
+    doorFrameGroup.add(dRailBot);
+
+    // Left door stile
+    const dStileL = new THREE.Mesh(new THREE.BoxGeometry(0.06, doorHeight, 0.04), matAccentDark);
+    dStileL.position.set(-doorWidth / 2 + 0.03, 0, 0);
+    doorFrameGroup.add(dStileL);
+
+    // Right door stile with door handle
+    const dStileR = new THREE.Mesh(new THREE.BoxGeometry(0.06, doorHeight, 0.04), matAccentDark);
+    dStileR.position.set(doorWidth / 2 - 0.03, 0, 0);
+    doorFrameGroup.add(dStileR);
+
+    // Crystal-Clear Viewing Glass Panel
+    const doorGlass = new THREE.Mesh(new THREE.BoxGeometry(doorWidth - 0.12, doorHeight - 0.12, 0.015), matClearGlass);
+    doorFrameGroup.add(doorGlass);
+
+    // Stainless Steel Vertical Grab Handle
+    const doorHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.85, 12), matChrome);
+    doorHandle.position.set(doorWidth / 2 - 0.08, 0, 0.04);
+    doorFrameGroup.add(doorHandle);
 
     // ----------------------------------------------------
-    // CNC MACHINING CHAMBER INTERIOR (Visible through window)
+    // 4D. HIGH-DETAIL INTERIOR MACHINING CHAMBER
+    // Clearly visible from outside through the open door and crystal glass!
     // ----------------------------------------------------
-    // Slotted T-Slot Worktable (XYZ axis table)
-    const tableBed = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.14, 0.95), matDarkBase);
-    tableBed.position.set(0, 0.78, 0.1);
+    // Telescopic Slideway Way Covers (Stainless Accordion Bellows)
+    const wayCoverBack = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.8, 0.35), matWayCover);
+    wayCoverBack.position.set(0, 1.25, -0.65);
+    cncGroup.add(wayCoverBack);
+
+    // Precision Slotted T-Slot Table (Cast Iron XYZ Machining Bed)
+    const tableBed = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.12, 0.85), matDarkBase);
+    tableBed.position.set(0, 0.78, 0);
+    tableBed.receiveShadow = true;
     cncGroup.add(tableBed);
 
-    // Heavy Machine Vise
-    const vise = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.12, 0.4), matAccentDark);
-    vise.position.set(0, 0.91, 0.1);
+    // Machine Vise (Heavy Hydraulic Milling Vise)
+    const vise = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 0.42), matAccentDark);
+    vise.position.set(0, 0.91, 0);
+    vise.castShadow = true;
     cncGroup.add(vise);
 
-    // Raw Aluminum Billet Workpiece being machined
+    // Clamped Metal Billet Workpiece
     const workpiece = new THREE.Mesh(
-      new THREE.BoxGeometry(0.24, 0.16, 0.24),
-      new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.25, metalness: 0.9 })
+      new THREE.BoxGeometry(0.24, 0.18, 0.24),
+      new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.2, metalness: 0.92 })
     );
-    workpiece.position.set(0, 1.05, 0.1);
+    workpiece.position.set(0, 1.07, 0);
     workpiece.castShadow = true;
     cncGroup.add(workpiece);
+    simRef.current.workpiece = workpiece;
 
-    // Vertical Spindle Ram / Z-Axis Carriage
-    const spindleRam = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.8, 0.42), matLightEnclosure);
-    spindleRam.position.set(0, 2.05, 0.1);
-    cncGroup.add(spindleRam);
+    // Z-Axis Vertical Spindle Carriage & Guideways
+    const spindleCarriage = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.9, 0.48), matLightCabin);
+    spindleCarriage.position.set(0, 2.05, -0.15);
+    cncGroup.add(spindleCarriage);
 
-    // Spindle Cartridge Body
-    const spindleBody = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.4, 20), matDarkBase);
-    spindleBody.position.set(0, 1.55, 0.1);
-    cncGroup.add(spindleBody);
+    // Spindle Group (Feeds down into cut when RUNNING)
+    const spindleGroup = new THREE.Group();
+    spindleGroup.position.set(0, 1.6, 0);
+    cncGroup.add(spindleGroup);
+    simRef.current.spindleGroup = spindleGroup;
 
-    // Rotating Spindle Tool Holder (BT40 Chuck) & Carbide Endmill
+    // Heavy Cast Iron Spindle Nose Body
+    const spindleNose = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.14, 0.38, 20), matDarkBase);
+    spindleGroup.add(spindleNose);
+
+    // High-Speed Rotating Spindle Chuck (BT40 Toolholder)
     const spindleHead = new THREE.Group();
-    spindleHead.position.set(0, 1.35, 0.1);
-    cncGroup.add(spindleHead);
+    spindleHead.position.set(0, -0.18, 0);
+    spindleGroup.add(spindleHead);
     simRef.current.spindleHead = spindleHead;
 
-    const toolHolder = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.045, 0.12, 16), matChrome);
-    spindleHead.add(toolHolder);
+    const bt40Chuck = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.048, 0.14, 16), matChrome);
+    spindleHead.add(bt40Chuck);
 
-    const endmillCutter = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.018, 0.018, 0.14, 12),
-      new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.15, metalness: 0.95 })
+    // Carbide End Mill Cutter
+    const cutterMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.016, 0.016, 0.16, 12),
+      new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.12, metalness: 0.98 })
     );
-    endmillCutter.position.y = -0.11;
-    spindleHead.add(endmillCutter);
-    simRef.current.cutterMesh = endmillCutter;
+    cutterMesh.position.y = -0.12;
+    spindleHead.add(cutterMesh);
+    simRef.current.cutterMesh = cutterMesh;
 
-    // Dual Flexible Coolant Nozzles (Blue/Orange Loc-Line)
-    const hoseMatBlue = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
-    const hoseMatOrange = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.5 });
-
-    const coolantL = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.28, 8), hoseMatBlue);
+    // Dual Flexible Coolant Nozzles (Blue/Orange Loc-Line pointing at cutter)
+    const coolantL = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.32, 8), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
     coolantL.rotation.z = Math.PI / 4;
-    coolantL.position.set(-0.16, 1.35, 0.15);
-    cncGroup.add(coolantL);
+    coolantL.position.set(-0.16, -0.05, 0.08);
+    spindleGroup.add(coolantL);
 
-    const coolantR = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.28, 8), hoseMatOrange);
+    const coolantR = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.32, 8), new THREE.MeshStandardMaterial({ color: 0xf97316 }));
     coolantR.rotation.z = -Math.PI / 4;
-    coolantR.position.set(0.16, 1.35, 0.15);
-    cncGroup.add(coolantR);
+    coolantR.position.set(0.16, -0.05, 0.08);
+    spindleGroup.add(coolantR);
 
-    // Animated Chip/Sparks Particle System
-    const chipCount = 35;
+    // Machining Sparks & Coolant Spray Particle System
+    const chipCount = 45;
     const chipGeo = new THREE.BufferGeometry();
     const chipPositions = new Float32Array(chipCount * 3);
     for (let c = 0; c < chipCount; c++) {
-      chipPositions[c * 3] = (Math.random() - 0.5) * 0.18;
-      chipPositions[c * 3 + 1] = 1.1 + Math.random() * 0.15;
-      chipPositions[c * 3 + 2] = 0.1 + (Math.random() - 0.5) * 0.18;
+      chipPositions[c * 3] = (Math.random() - 0.5) * 0.16;
+      chipPositions[c * 3 + 1] = 1.1 + Math.random() * 0.12;
+      chipPositions[c * 3 + 2] = (Math.random() - 0.5) * 0.16;
     }
     chipGeo.setAttribute('position', new THREE.BufferAttribute(chipPositions, 3));
-    const chipMat = new THREE.PointsMaterial({ color: 0xfacc15, size: 0.024, transparent: true, opacity: 0.85 });
+    const chipMat = new THREE.PointsMaterial({ color: 0xfacc15, size: 0.026, transparent: true, opacity: 0.9 });
     const chipParticles = new THREE.Points(chipGeo, chipMat);
     cncGroup.add(chipParticles);
     simRef.current.chipsParticles = chipParticles;
 
     // ----------------------------------------------------
-    // CNC OPERATOR CONSOLE ON SWIVEL ARM (Matching Photo 2)
-    // ----------------------------------------------------
-    const consoleArm = new THREE.Group();
-    consoleArm.position.set(1.45, 1.6, 0.85);
-    cncGroup.add(consoleArm);
-
-    // Articulated Steel Arm Tube
-    const armTube = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.65, 12), matDarkBase);
-    armTube.rotation.z = Math.PI / 3;
-    consoleArm.add(armTube);
-
-    // Console Enclosure Housing
-    const consoleBox = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.68, 0.16), matAccentDark);
-    consoleBox.position.set(0.55, 0.15, 0.18);
-    consoleBox.rotation.y = -0.38;
-    consoleArm.add(consoleBox);
-
-    // Dynamic 2D Canvas Screen for CNC Controller (Fanuc/Siemens 840D style)
-    const cncCanvas = document.createElement('canvas');
-    cncCanvas.width = 512;
-    cncCanvas.height = 360;
-    const cncCtx = cncCanvas.getContext('2d');
-    const cncTexture = new THREE.CanvasTexture(cncCanvas);
-    cncTexture.minFilter = THREE.LinearFilter;
-    simRef.current.cncScreenTexture = cncTexture;
-    simRef.current.cncScreenCtx = cncCtx;
-    simRef.current.cncScreenCanvas = cncCanvas;
-
-    const cncScreen = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.36, 0.01), new THREE.MeshBasicMaterial({ map: cncTexture }));
-    cncScreen.position.set(0.55, 0.24, 0.265);
-    cncScreen.rotation.y = -0.38;
-    consoleArm.add(cncScreen);
-
-    // Physical CNC Control Keypad & Buttons below screen
-    const keypad = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.18, 0.02), matDarkBase);
-    keypad.position.set(0.55, -0.07, 0.265);
-    keypad.rotation.y = -0.38;
-    consoleArm.add(keypad);
-
-    // Red Emergency Stop Mushroom button on CNC Console
-    const estopBtn = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.026, 0.026, 0.03, 14),
-      new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3 })
-    );
-    estopBtn.rotation.x = Math.PI / 2;
-    estopBtn.position.set(0.72, -0.07, 0.285);
-    consoleArm.add(estopBtn);
-
-    // ----------------------------------------------------
-    // TRICOLOR SIGNAL TOWER LIGHT (High atop CNC machine)
+    // 4E. TRICOLOR SIGNAL TOWER LIGHT (High atop CNC machine)
     // ----------------------------------------------------
     const towerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.45, 12), matChrome);
-    towerPole.position.set(-0.85, 2.85, 0);
+    towerPole.position.set(-0.85, 2.7, 0);
     cncGroup.add(towerPole);
 
     const tLensGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.08, 16);
@@ -452,15 +480,15 @@ export default function MdmsFactory3D({ onBookDemo }) {
     const towerGreenMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x22c55e, emissiveIntensity: 0.95 });
 
     const tRed = new THREE.Mesh(tLensGeo, towerRedMat);
-    tRed.position.set(-0.85, 3.25, 0);
+    tRed.position.set(-0.85, 3.12, 0);
     cncGroup.add(tRed);
 
     const tYellow = new THREE.Mesh(tLensGeo, towerYellowMat);
-    tYellow.position.set(-0.85, 3.16, 0);
+    tYellow.position.set(-0.85, 3.03, 0);
     cncGroup.add(tYellow);
 
     const tGreen = new THREE.Mesh(tLensGeo, towerGreenMat);
-    tGreen.position.set(-0.85, 3.07, 0);
+    tGreen.position.set(-0.85, 2.94, 0);
     cncGroup.add(tGreen);
 
     simRef.current.towerRedMat = towerRedMat;
@@ -468,15 +496,68 @@ export default function MdmsFactory3D({ onBookDemo }) {
     simRef.current.towerGreenMat = towerGreenMat;
 
     // ----------------------------------------------------
-    // 5. THE REAL RVMAITECH MDMS DATA LOGGER HARDWARE
-    // Waveshare ESP32-S3-ETH-8DI-8RO-C (Directly matching Photo 1!)
-    // Mounted on an industrial stand on the right side of the machine
+    // 4F. CNC OPERATOR CONSOLE & HMI MONITOR SCREEN (MATCHING IMAGE 4!)
+    // Renders the exact MDMS Dashboard: CBR-01, Mercerizer, Group 1 58% Availability
+    // ----------------------------------------------------
+    const consoleArm = new THREE.Group();
+    consoleArm.position.set(1.4, 1.5, 0.7);
+    cncGroup.add(consoleArm);
+
+    // Swivel Arm
+    const armSupport = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.65, 12), matDarkBase);
+    armSupport.rotation.z = Math.PI / 3;
+    consoleArm.add(armSupport);
+
+    // 24" Large Console Enclosure Box
+    const consoleHousing = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.62, 0.12), matAccentDark);
+    consoleHousing.position.set(0.65, 0.22, 0.22);
+    consoleHousing.rotation.y = -0.38;
+    consoleArm.add(consoleHousing);
+
+    // CanvasTexture for High-Res Client MDMS Dashboard (Image 4)
+    const dashCanvas = document.createElement('canvas');
+    dashCanvas.width = 1024;
+    dashCanvas.height = 720;
+    const dashCtx = dashCanvas.getContext('2d');
+    const dashTexture = new THREE.CanvasTexture(dashCanvas);
+    dashTexture.minFilter = THREE.LinearFilter;
+    simRef.current.dashTexture = dashTexture;
+    simRef.current.dashCtx = dashCtx;
+    simRef.current.dashCanvas = dashCanvas;
+
+    const dashScreenMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(0.72, 0.54, 0.01),
+      new THREE.MeshBasicMaterial({ map: dashTexture })
+    );
+    dashScreenMesh.position.set(0.65, 0.24, 0.285);
+    dashScreenMesh.rotation.y = -0.38;
+    consoleArm.add(dashScreenMesh);
+
+    // Physical CNC Buttons below the screen
+    const keypadStrip = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.08, 0.02), matDarkBase);
+    keypadStrip.position.set(0.65, -0.06, 0.285);
+    keypadStrip.rotation.y = -0.38;
+    consoleArm.add(keypadStrip);
+
+    // Red Emergency Stop Button on Console
+    const estopConsoleBtn = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.024, 0.024, 0.03, 14),
+      new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.3 })
+    );
+    estopConsoleBtn.rotation.x = Math.PI / 2;
+    estopConsoleBtn.position.set(0.88, -0.06, 0.31);
+    consoleArm.add(estopConsoleBtn);
+
+    // ----------------------------------------------------
+    // 5. RVMAITECH BRANDED MDMS DATA LOGGER HARDWARE
+    // Model: RvmAiTech MDMS-8DI-8RO-PRO
+    // Features: 8CH Digital Inputs + 8CH Relays + Ethernet + CAN + Wi-Fi
     // ----------------------------------------------------
     const loggerStation = new THREE.Group();
     loggerStation.position.set(1.85, 0, 0.4);
     scene.add(loggerStation);
 
-    // Industrial Pedestal & DIN Rail Mounting Backplate
+    // Pedestal Stand
     const standPost = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.05, 1.4, 16), matDarkBase);
     standPost.position.y = 0.7;
     standPost.castShadow = true;
@@ -486,103 +567,104 @@ export default function MdmsFactory3D({ onBookDemo }) {
     standBase.position.y = 0.02;
     loggerStation.add(standBase);
 
-    // DIN Rail Backplate (Galvanized Steel)
+    // Galvanized Steel DIN Rail Backplate
     const dinBackplate = new THREE.Mesh(
-      new THREE.BoxGeometry(0.72, 0.85, 0.02),
+      new THREE.BoxGeometry(0.74, 0.86, 0.02),
       new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.25 })
     );
     dinBackplate.position.set(0, 1.5, 0);
     loggerStation.add(dinBackplate);
 
-    // Steel DIN Rail (Top-Hat 35mm DIN Rail)
+    // Steel DIN Rail (Top-Hat 35mm)
     const dinRail = new THREE.Mesh(
-      new THREE.BoxGeometry(0.64, 0.035, 0.015),
+      new THREE.BoxGeometry(0.66, 0.035, 0.015),
       new THREE.MeshStandardMaterial({ color: 0xcfd8dc, metalness: 0.95, roughness: 0.15 })
     );
     dinRail.position.set(0, 1.5, 0.018);
     loggerStation.add(dinRail);
 
-    // ==========================================
-    // EXACT ESP32-S3-ETH-8DI-8RO-C CONTROLLER ENCLOSURE
-    // Dimensions: ~145mm high x ~90mm wide x ~40mm deep (scaled 3D: 0.38 x 0.54 x 0.08)
-    // ==========================================
+    // The Logger Enclosure
     const loggerGroup = new THREE.Group();
     loggerGroup.position.set(0, 1.5, 0.058);
     loggerStation.add(loggerGroup);
 
-    // Black Industrial Plastic Enclosure (Matching Photo 1)
-    const loggerBodyMat = new THREE.MeshStandardMaterial({
-      color: 0x181e28, // Jet black textured industrial housing
-      roughness: 0.45,
-      metalness: 0.2,
-    });
-    const loggerBody = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.52, 0.065), loggerBodyMat);
+    // Jet Black Industrial Plastic Enclosure
+    const loggerBody = new THREE.Mesh(
+      new THREE.BoxGeometry(0.34, 0.52, 0.065),
+      new THREE.MeshStandardMaterial({ color: 0x181e28, roughness: 0.45, metalness: 0.2 })
+    );
     loggerGroup.add(loggerBody);
 
-    // Side DIN Rail Mounting Ears & Tabs (Top & Bottom)
+    // DIN Rail Mounting Tabs (Top & Bottom)
     [-0.27, 0.27].forEach((ey) => {
-      const ear = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.03, 0.04), loggerBodyMat);
+      const ear = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.03, 0.04), matDarkBase);
       ear.position.set(0, ey, -0.01);
       loggerGroup.add(ear);
     });
 
     // ------------------------------------------
-    // SILKSCREEN LABEL TEXTURE (MATCHING PHOTO 1)
+    // RVMAITECH BRANDED SILKSCREEN LABEL
     // ------------------------------------------
     const labelCanvas = document.createElement('canvas');
     labelCanvas.width = 512;
     labelCanvas.height = 768;
     const lCtx = labelCanvas.getContext('2d');
 
-    // Black background
-    lCtx.fillStyle = '#0f172a';
+    // Dark sleek background
+    lCtx.fillStyle = '#0a1526';
     lCtx.fillRect(0, 0, 512, 768);
 
-    // Blue header accent badge on top right
+    // Power block header badge on top right
     lCtx.fillStyle = '#0284c7';
     lCtx.fillRect(340, 20, 150, 70);
     lCtx.fillStyle = '#ffffff';
     lCtx.font = 'bold 22px sans-serif';
-    lCtx.fillText('7~36V', 355, 52);
+    lCtx.fillText('7~36V DC', 350, 52);
     lCtx.font = 'bold 18px monospace';
-    lCtx.fillText('+   -', 365, 78);
+    lCtx.fillText('+   -', 368, 78);
 
-    // Waveshare Logo & Model Name (Exactly as in Photo 1!)
+    // RvmAiTech Logo & Branding (Replaced Waveshare!)
     lCtx.fillStyle = '#ffffff';
-    lCtx.font = 'bold 36px sans-serif';
-    lCtx.fillText('WAVESHARE', 40, 68);
+    lCtx.font = 'bold 40px sans-serif';
+    lCtx.fillText('RvmAiTech', 40, 70);
+
+    // Red/Orange dot on Ai
+    lCtx.fillStyle = '#f47b20';
+    lCtx.beginPath();
+    lCtx.arc(178, 48, 6, 0, Math.PI * 2);
+    lCtx.fill();
+
     lCtx.fillStyle = '#38bdf8';
-    lCtx.font = 'bold 18px sans-serif';
-    lCtx.fillText('share awesome hardware', 40, 95);
+    lCtx.font = 'bold 17px sans-serif';
+    lCtx.fillText('SMART INDUSTRIAL TELEMETRY GATEWAY', 40, 98);
 
     // Model Number Silkscreen
     lCtx.fillStyle = '#ffffff';
-    lCtx.font = 'bold 26px monospace';
-    lCtx.fillText('ESP32-S3-ETH-8DI-8RO-C', 40, 145);
+    lCtx.font = 'bold 25px monospace';
+    lCtx.fillText('MDMS-8DI-8RO-PRO', 40, 145);
     lCtx.fillStyle = '#94a3b8';
-    lCtx.font = '19px sans-serif';
+    lCtx.font = '18px sans-serif';
     lCtx.fillText('8CH Relay Outputs and 8CH Digital Inputs', 40, 178);
 
-    // White Divider Line
+    // Divider Line
     lCtx.strokeStyle = '#334155';
     lCtx.lineWidth = 3;
     lCtx.beginPath();
     lCtx.moveTo(30, 200); lCtx.lineTo(482, 200);
     lCtx.stroke();
 
-    // Left Side: 8CH Relay Outputs labels (CH1 - CH8)
+    // Left Side: 8CH Relay Outputs (CH1 - CH8)
     lCtx.fillStyle = '#38bdf8';
     lCtx.font = 'bold 20px monospace';
     for (let c = 1; c <= 8; c++) {
       const cy = 240 + (c - 1) * 60;
       lCtx.fillText(`CH${c}`, 40, cy);
-      // Circuit switch diagram icon
       lCtx.strokeStyle = '#64748b';
       lCtx.lineWidth = 2;
       lCtx.strokeRect(95, cy - 18, 30, 22);
     }
 
-    // Right Side: DI1 - DI8 Digital Inputs & Ports (Matching Photo 1)
+    // Right Side: DI1 - DI8 Digital Inputs & Ports
     lCtx.fillStyle = '#facc15';
     lCtx.font = 'bold 20px monospace';
     lCtx.fillText('CAN: H L G', 340, 145);
@@ -595,7 +677,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
     lCtx.fillStyle = '#cbd5e1';
     lCtx.fillText('COM  DGND', 340, 565);
 
-    // Port Badges: USB, ETH, ANT
+    // Port Badges: ETH & Wi-Fi ANT
     lCtx.fillStyle = '#0284c7';
     lCtx.fillRect(330, 610, 155, 45);
     lCtx.fillStyle = '#ffffff';
@@ -610,7 +692,6 @@ export default function MdmsFactory3D({ onBookDemo }) {
 
     const labelTex = new THREE.CanvasTexture(labelCanvas);
     labelTex.minFilter = THREE.LinearFilter;
-    simRef.current.loggerLabelTex = labelTex;
 
     const labelFace = new THREE.Mesh(
       new THREE.PlaneGeometry(0.31, 0.48),
@@ -619,41 +700,35 @@ export default function MdmsFactory3D({ onBookDemo }) {
     labelFace.position.set(0, 0, 0.033);
     loggerGroup.add(labelFace);
 
-    // ------------------------------------------
-    // GREEN SCREW TERMINAL BLOCKS (Pluggable Phoenix Contact style)
-    // ------------------------------------------
-    const greenTerminalMat = new THREE.MeshStandardMaterial({
-      color: 0x15803d, // High-visibility industrial terminal green
-      roughness: 0.35,
-      metalness: 0.2,
-    });
-    const terminalScrewMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.1 });
+    // Green Screw Terminal Blocks (Phoenix Contact style)
+    const greenTermMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.35, metalness: 0.2 });
+    const screwMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.1 });
 
-    // Left Side Terminal Blocks (Relays CH1-CH8)
+    // Left Side Relays CH1-CH8
     for (let r = 0; r < 8; r++) {
       const ry = 0.18 - r * 0.052;
-      const tBlock = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.038, 0.04), greenTerminalMat);
+      const tBlock = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.038, 0.04), greenTermMat);
       tBlock.position.set(-0.18, ry, 0.01);
       loggerGroup.add(tBlock);
 
-      const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.01, 8), terminalScrewMat);
-      screw.position.set(-0.18, ry, 0.032);
-      loggerGroup.add(screw);
+      const sc = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.01, 8), screwMat);
+      sc.position.set(-0.18, ry, 0.032);
+      loggerGroup.add(sc);
     }
 
-    // Right Side Terminal Blocks (Power, CAN, Digital Inputs DI1-DI8)
+    // Right Side Digital Inputs DI1-DI8 & Power
     for (let d = 0; d < 10; d++) {
       const dy = 0.21 - d * 0.044;
-      const tBlock = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.032, 0.04), greenTerminalMat);
+      const tBlock = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.032, 0.04), greenTermMat);
       tBlock.position.set(0.18, dy, 0.01);
       loggerGroup.add(tBlock);
 
-      const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.01, 8), terminalScrewMat);
-      screw.position.set(0.18, dy, 0.032);
-      loggerGroup.add(screw);
+      const sc = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.01, 8), screwMat);
+      sc.position.set(0.18, dy, 0.032);
+      loggerGroup.add(sc);
     }
 
-    // Ethernet RJ45 Jack (Bottom Right)
+    // Ethernet RJ45 Jack with plugged Blue LAN cable
     const ethJack = new THREE.Mesh(
       new THREE.BoxGeometry(0.065, 0.055, 0.045),
       new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.95, roughness: 0.15 })
@@ -661,7 +736,6 @@ export default function MdmsFactory3D({ onBookDemo }) {
     ethJack.position.set(0.14, -0.22, 0.03);
     loggerGroup.add(ethJack);
 
-    // Blue Ethernet Cable plugged into RJ45 Jack running down
     const ethCable = new THREE.Mesh(
       new THREE.CylinderGeometry(0.008, 0.008, 1.2, 10),
       new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 })
@@ -669,7 +743,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
     ethCable.position.set(0.14, -0.75, 0.03);
     loggerGroup.add(ethCable);
 
-    // Gold SMA Wi-Fi Antenna Connector & Black Antenna Stub (Matching Photo 1!)
+    // Gold SMA Wi-Fi Antenna Connector & Black Antenna Stub
     const smaConnector = new THREE.Mesh(
       new THREE.CylinderGeometry(0.012, 0.012, 0.035, 12),
       new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.95, roughness: 0.1 })
@@ -685,9 +759,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
     wifiAntenna.position.set(0.14, -0.05, 0.075);
     loggerGroup.add(wifiAntenna);
 
-    // ------------------------------------------
-    // STATUS LEDS ON ESP32-S3 (PWR, RX, TX, DI)
-    // ------------------------------------------
+    // Status LEDs on RvmAiTech Logger (PWR, RX, TX)
     const ledPwr = new THREE.Mesh(new THREE.SphereGeometry(0.006, 8, 8), new THREE.MeshBasicMaterial({ color: 0x22c55e }));
     ledPwr.position.set(0.06, 0.22, 0.035);
     loggerGroup.add(ledPwr);
@@ -704,13 +776,12 @@ export default function MdmsFactory3D({ onBookDemo }) {
     simRef.current.ledTx = ledTx;
 
     // ----------------------------------------------------
-    // 6. PHYSICAL INTERCONNECTION WIRING & DATA FLOW
-    // Physical signal wires running from CNC Machine -> MDMS Logger DI Pins!
+    // 6. PHYSICAL INTERCONNECTION WIRING & DATA PARTICLES
+    // Flexible signal wires running from CNC Machine -> RvmAiTech Logger DI Pins!
     // ----------------------------------------------------
     const wireHarnessGroup = new THREE.Group();
     scene.add(wireHarnessGroup);
 
-    // Color-coded industrial signal wires connecting CNC to Logger
     const makeWire = (start, mid, end, colorHex) => {
       const curve = new THREE.CatmullRomCurve3([start, mid, end]);
       const geo = new THREE.TubeGeometry(curve, 32, 0.006, 8, false);
@@ -720,118 +791,260 @@ export default function MdmsFactory3D({ onBookDemo }) {
       return curve;
     };
 
-    // Wire 1: Yellow Wire -> DI1 (Spindle Run Sensor)
+    // Wire 1: Yellow Wire -> DI1 (Spindle Run)
     const curve1 = makeWire(
-      new THREE.Vector3(-0.4, 1.55, 0.1),
-      new THREE.Vector3(0.6, 1.2, 0.3),
+      new THREE.Vector3(-0.35, 1.55, 0.1),
+      new THREE.Vector3(0.65, 1.25, 0.3),
       new THREE.Vector3(1.85 + 0.18, 1.5 + 0.166, 0.4 + 0.068),
       0xfacc15
     );
 
     // Wire 2: Green Wire -> DI2 (In-Cycle M-Code)
     const curve2 = makeWire(
-      new THREE.Vector3(-0.4, 1.1, 0.1),
-      new THREE.Vector3(0.6, 1.1, 0.3),
+      new THREE.Vector3(-0.35, 1.1, 0.1),
+      new THREE.Vector3(0.65, 1.1, 0.3),
       new THREE.Vector3(1.85 + 0.18, 1.5 + 0.122, 0.4 + 0.068),
       0x22c55e
     );
 
     // Wire 3: Orange Wire -> DI3 (Part Counter Switch)
     const curve3 = makeWire(
-      new THREE.Vector3(-0.4, 0.8, 0.1),
-      new THREE.Vector3(0.6, 1.0, 0.3),
+      new THREE.Vector3(-0.35, 0.8, 0.1),
+      new THREE.Vector3(0.65, 1.0, 0.3),
       new THREE.Vector3(1.85 + 0.18, 1.5 + 0.078, 0.4 + 0.068),
       0xf97316
     );
 
-    // Wire 4: Red Wire -> DI4 (Machine Alarm Interlock)
+    // Wire 4: Red Wire -> DI4 (Alarm Interlock)
     const curve4 = makeWire(
-      new THREE.Vector3(-0.4, 2.8, 0),
-      new THREE.Vector3(0.6, 1.8, 0.3),
+      new THREE.Vector3(-0.35, 2.7, 0),
+      new THREE.Vector3(0.65, 1.8, 0.3),
       new THREE.Vector3(1.85 + 0.18, 1.5 + 0.034, 0.4 + 0.068),
       0xef4444
     );
 
-    // Animated Glowing Signal Pulses (Electrons) travelling through the wires
-    const pulseMatCyan = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-    const pulseMatGreen = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
-    const pulseMatOrange = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
-    const pulseMatRed = new THREE.MeshBasicMaterial({ color: 0xf87171 });
+    // Glowing Electron Pulses
+    const pMatCyan = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const pMatGreen = new THREE.MeshBasicMaterial({ color: 0x4ade80 });
+    const pMatOrange = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+    const pMatRed = new THREE.MeshBasicMaterial({ color: 0xf87171 });
 
-    const createPulseMesh = (mat) => {
+    const createPulse = (mat) => {
       const p = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 8), mat);
       scene.add(p);
       return p;
     };
 
-    const pulse1 = createPulseMesh(pulseMatCyan);
-    const pulse2 = createPulseMesh(pulseMatGreen);
-    const pulse3 = createPulseMesh(pulseMatOrange);
-    const pulse4 = createPulseMesh(pulseMatRed);
-
     simRef.current.dataPulses = [
-      { mesh: pulse1, curve: curve1, speed: 0.7, offset: 0 },
-      { mesh: pulse2, curve: curve2, speed: 0.6, offset: 0.35 },
-      { mesh: pulse3, curve: curve3, speed: 0.8, offset: 0.7 },
-      { mesh: pulse4, curve: curve4, speed: 0.9, offset: 0.2 },
+      { mesh: createPulse(pMatCyan), curve: curve1, speed: 0.75, offset: 0 },
+      { mesh: createPulse(pMatGreen), curve: curve2, speed: 0.65, offset: 0.35 },
+      { mesh: createPulse(pMatOrange), curve: curve3, speed: 0.85, offset: 0.7 },
+      { mesh: createPulse(pMatRed), curve: curve4, speed: 0.95, offset: 0.2 },
     ];
 
-    // Helper: Draw Fanuc/Siemens CNC Screen
-    const drawCncScreen = (ctx, st, rpm, feed, pwr) => {
-      ctx.fillStyle = '#061325';
-      ctx.fillRect(0, 0, 512, 360);
+    // ----------------------------------------------------
+    // HELPER: RENDER EXACT CLIENT MDMS DASHBOARD (IMAGE 4)
+    // ----------------------------------------------------
+    const drawMdmsDashboardCanvas = (ctx, data, st) => {
+      // Dark navy slate background matching Image 4
+      ctx.fillStyle = '#0a192f';
+      ctx.fillRect(0, 0, 1024, 720);
 
-      // Top Header
-      ctx.fillStyle = '#0284c7';
-      ctx.fillRect(0, 0, 512, 40);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 18px monospace';
-      ctx.fillText('RVMAITECH CNC CONTROLLER — 5-AXIS VMC', 16, 26);
-
-      // Status pill
-      ctx.fillStyle = st === 'running' ? '#22c55e' : st === 'idle' ? '#facc15' : '#ef4444';
+      // Top Title Bar
+      ctx.fillStyle = '#94a3b8';
       ctx.font = 'bold 16px sans-serif';
-      ctx.fillText(`[${st.toUpperCase()}]`, 410, 26);
+      ctx.fillText('GROUP SUMMARY · PRE-TREATMENT', 30, 42);
 
-      // Axis Coordinates Display
-      ctx.fillStyle = '#0f294d';
-      ctx.fillRect(20, 55, 472, 120);
-      ctx.strokeStyle = '#0284c7';
+      // Left Column Card: Group 1 Summary
+      ctx.fillStyle = '#0f243e';
+      ctx.fillRect(25, 60, 360, 630);
+      ctx.strokeStyle = '#1e3a5f';
       ctx.lineWidth = 1.5;
-      ctx.strokeRect(20, 55, 472, 120);
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 22px monospace';
-      ctx.fillText('ACTUAL POSITION (MACHINE WORK)', 35, 85);
+      ctx.strokeRect(25, 60, 360, 630);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 24px monospace';
-      ctx.fillText(`X: -120.450 mm    Y: +45.820 mm`, 35, 125);
-      ctx.fillText(`Z:   -8.500 mm    B:  +0.000 °`, 35, 158);
+      ctx.font = 'bold 28px sans-serif';
+      ctx.fillText('Group 1', 45, 105);
 
-      // Spindle & Feed Telemetry
-      ctx.fillStyle = '#0b1d38';
-      ctx.fillRect(20, 190, 472, 150);
-      ctx.strokeRect(20, 190, 472, 150);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '16px sans-serif';
+      ctx.fillText('3 machines · Shift B · Night', 45, 135);
 
+      // Donut Availability Meter
+      ctx.fillStyle = '#f97316';
+      ctx.font = 'bold 54px sans-serif';
+      ctx.fillText(`${data.groupAvailability}%`, 45, 215);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('AVAILABILITY', 45, 245);
+
+      // Produced Meters
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 32px sans-serif';
+      ctx.fillText(`${data.groupProducedMtr.toLocaleString()} mtr`, 45, 305);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('PRODUCED', 45, 330);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText(data.groupRunTime, 240, 305);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('RUN TIME', 240, 330);
+
+      // Orange Progress Bar
+      ctx.fillStyle = '#1e3a5f';
+      ctx.fillRect(45, 345, 310, 8);
+      ctx.fillStyle = '#f97316';
+      ctx.fillRect(45, 345, 190, 8);
+
+      // Run Time / Idle / Stopped stats boxes
+      const drawMiniStat = (x, y, w, title, val, color) => {
+        ctx.fillStyle = '#0a192f';
+        ctx.fillRect(x, y, w, 55);
+        ctx.strokeStyle = '#1e3a5f';
+        ctx.strokeRect(x, y, w, 55);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(title, x + 10, y + 20);
+
+        ctx.fillStyle = color;
+        ctx.font = 'bold 16px sans-serif';
+        ctx.fillText(val, x + 10, y + 44);
+      };
+
+      drawMiniStat(45, 370, 95, 'RUN TIME', data.groupRunTime, '#22c55e');
+      drawMiniStat(150, 370, 95, 'IDLE', data.groupIdleTime, '#facc15');
+      drawMiniStat(255, 370, 95, 'STOPPED', data.groupStoppedTime, '#94a3b8');
+
+      // Status pill: 1 machine idle
       ctx.fillStyle = '#facc15';
-      ctx.font = 'bold 20px monospace';
-      ctx.fillText(`SPINDLE: ${rpm} RPM   LOAD: ${pwr} kW`, 35, 225);
-      ctx.fillText(`FEED:    ${feed} mm/min  TOOL: T04 (Endmill)`, 35, 260);
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('⏸ 1 machine idle', 45, 460);
 
-      ctx.fillStyle = st === 'running' ? '#4ade80' : '#f87171';
-      ctx.font = 'bold 16px monospace';
-      ctx.fillText(st === 'running' ? '>> MDMS EDGE SAMPLING ACTIVE (1000Hz)' : '>> FEED HOLD / SETUP IN PROGRESS', 35, 305);
+      // Last 7 Days Production Bar Chart (Matching Image 4!)
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('LAST 7 DAYS · PRODUCTION (mtr)', 45, 510);
+      ctx.fillText('800,017', 280, 510);
+
+      const days = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+      const heights = [70, 25, 45, 65, 75, 95, 65];
+      days.forEach((day, i) => {
+        const bx = 45 + i * 44;
+        const by = 640;
+        const bh = heights[i];
+        ctx.fillStyle = '#0d9488';
+        ctx.fillRect(bx, by - bh, 30, bh);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(day, bx, by + 16);
+      });
+
+      // Right Column: MACHINES (Image 4)
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('MACHINES · 3 CONNECTED', 410, 42);
+
+      // Card 1: CBR-01 / CNC-01
+      const drawMachineCard = (y, name, sub, avail, mtr, speed, isRun, runT, idleT, stopT, downT) => {
+        ctx.fillStyle = '#0f243e';
+        ctx.fillRect(410, y, 585, 290);
+        ctx.strokeStyle = '#1e3a5f';
+        ctx.strokeRect(410, y, 585, 290);
+
+        // Donut Ring (Avail %)
+        ctx.fillStyle = '#0d9488';
+        ctx.font = 'bold 36px sans-serif';
+        ctx.fillText(`${avail}%`, 435, y + 65);
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillText('AVAIL', 438, y + 88);
+
+        // Machine Title & Status
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.fillText(name, 540, y + 45);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '15px sans-serif';
+        ctx.fillText(sub, 540, y + 72);
+
+        // Live Status Badge
+        ctx.fillStyle = isRun ? '#22c55e' : '#facc15';
+        ctx.font = 'bold 17px sans-serif';
+        ctx.fillText(isRun ? '● Running' : '● Idle', 880, y + 45);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '15px sans-serif';
+        ctx.fillText(`speed ${speed} m/min`, 830, y + 80);
+
+        // Meter counter
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px sans-serif';
+        ctx.fillText(`${mtr.toLocaleString()} mtr`, 540, y + 120);
+
+        // Progress bar
+        ctx.fillStyle = '#1e3a5f';
+        ctx.fillRect(435, y + 145, 535, 8);
+        ctx.fillStyle = isRun ? '#f97316' : '#f87171';
+        ctx.fillRect(435, y + 145, isRun ? 360 : 180, 8);
+
+        // 4 sub boxes: RUN TIME, IDLE, STOPPED, DOWNTIME
+        drawMiniStat(435, y + 175, 120, 'RUN TIME', runT, '#22c55e');
+        drawMiniStat(570, y + 175, 120, 'IDLE', idleT, '#facc15');
+        drawMiniStat(705, y + 175, 120, 'STOPPED', stopT, '#94a3b8');
+        drawMiniStat(840, y + 175, 120, 'DOWNTIME', downT, '#f87171');
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '13px sans-serif';
+        ctx.fillText('Last data 1s ago (RvmAiTech MDMS Live IoT)', 435, y + 265);
+        ctx.fillText('time from PLC counters', 810, y + 265);
+      };
+
+      // Card 1: CBR-01 (Active machine)
+      drawMachineCard(
+        60,
+        'CNC-01 (CBR-01)',
+        '5-Axis CNC Milling Center',
+        data.cbrAvail,
+        data.cbrProducedMtr,
+        data.cbrSpeed,
+        st === 'running',
+        data.cbrRunTime,
+        data.cbrIdleTime,
+        '0m',
+        data.cbrDowntime
+      );
+
+      // Card 2: Mercerizer-01 (Idle machine)
+      drawMachineCard(
+        380,
+        'MERCERIZER',
+        'MERCERIZER-01 · forming line',
+        data.mercAvail,
+        data.mercProducedMtr,
+        0,
+        false,
+        data.mercRunTime,
+        data.mercIdleTime,
+        '0m',
+        data.mercDowntime
+      );
     };
 
-    drawCncScreen(cncCtx, machineState, 6250, 1450, 12.8);
-    cncTexture.needsUpdate = true;
+    drawMdmsDashboardCanvas(dashCtx, dashboardData, machineState);
+    dashTexture.needsUpdate = true;
 
     // Animation Loop
     let animId;
     let lastClock = performance.now();
-    let chipTime = 0;
-    let lastCncDraw = 0;
+    let cutterAngle = 0;
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -842,35 +1055,54 @@ export default function MdmsFactory3D({ onBookDemo }) {
       const sim = simRef.current;
       const state = sim.machineState;
 
-      // Smooth camera transition toward presets
+      // Smooth camera interpolation toward presets
       if (sim.camera && sim.controls) {
         camera.position.lerp(sim.targetCamPos, 0.06);
         sim.controls.target.lerp(sim.targetLookAt, 0.06);
         sim.controls.update();
       }
 
-      // Periodically update CNC screen canvas texture
-      if (now - lastCncDraw > 200) {
-        lastCncDraw = now;
-        drawCncScreen(sim.cncScreenCtx, state, state === 'running' ? 6250 : 0, state === 'running' ? 1450 : 0, state === 'running' ? 12.8 : 1.2);
-        sim.cncScreenTexture.needsUpdate = true;
+      // Periodically refresh the MDMS dashboard canvas texture
+      if (now - sim.lastDashDraw > 250) {
+        sim.lastDashDraw = now;
+        drawMdmsDashboardCanvas(sim.dashCtx, dashboardData, state);
+        sim.dashTexture.needsUpdate = true;
       }
 
-      // 1. Spindle Rotation & Machining Chips
+      // ------------------------------------------
+      // DYNAMIC MACHINE MOTION: RUN vs STOP / IDLE
+      // ------------------------------------------
+      // Target door position: Open (+0.75m to the right) when IDLE/STOPPED; Closed (0m) when RUNNING
+      const targetDoorX = state === 'running' ? 0 : 0.72;
+      sim.doorOffset += (targetDoorX - sim.doorOffset) * 0.08;
+      if (sim.slidingDoor) {
+        sim.slidingDoor.position.x = sim.doorOffset;
+      }
+
+      // Target Spindle Z-Feed: Lowers into cutting position when RUNNING; Retracts upward when STOPPED
+      const targetSpindleY = state === 'running' ? 1.48 : 1.72;
+      if (sim.spindleGroup) {
+        sim.spindleGroup.position.y += (targetSpindleY - sim.spindleGroup.position.y) * 0.06;
+      }
+
+      // Machine Running Behavior
       if (state === 'running') {
+        // High-speed spindle spin (6,500 RPM)
+        cutterAngle += 35.0 * dt;
         if (sim.spindleHead) {
-          sim.spindleHead.rotation.y += 28.0 * dt; // Rapid spindle spin
+          sim.spindleHead.rotation.y = cutterAngle;
         }
+
+        // Active Sparks & Chip Particles
         if (sim.chipsParticles) {
           sim.chipsParticles.visible = true;
-          chipTime += dt * 8;
           const pos = sim.chipsParticles.geometry.attributes.position.array;
           for (let i = 0; i < chipCount; i++) {
-            pos[i * 3 + 1] -= dt * 0.4;
-            if (pos[i * 3 + 1] < 1.05) {
-              pos[i * 3 + 1] = 1.22 + Math.random() * 0.05;
-              pos[i * 3] = (Math.random() - 0.5) * 0.18;
-              pos[i * 3 + 2] = 0.1 + (Math.random() - 0.5) * 0.18;
+            pos[i * 3 + 1] -= dt * 0.5;
+            if (pos[i * 3 + 1] < 1.06) {
+              pos[i * 3 + 1] = 1.25 + Math.random() * 0.04;
+              pos[i * 3] = (Math.random() - 0.5) * 0.16;
+              pos[i * 3 + 2] = (Math.random() - 0.5) * 0.16;
             }
           }
           sim.chipsParticles.geometry.attributes.position.needsUpdate = true;
@@ -882,24 +1114,24 @@ export default function MdmsFactory3D({ onBookDemo }) {
         sim.towerYellowMat.emissive.setHex(0x000000);
         sim.towerRedMat.emissive.setHex(0x000000);
 
-        // Blinking Communication LEDs on Waveshare Logger
+        // Blinking LEDs on RvmAiTech Logger (High-speed telemetry transmission)
         if (sim.ledRx) {
-          const rxBlink = Math.sin(now * 0.02) > 0.2;
+          const rxBlink = Math.sin(now * 0.02) > 0.1;
           sim.ledRx.material.color.setHex(rxBlink ? 0x38bdf8 : 0x0284c7);
         }
         if (sim.ledTx) {
-          const txBlink = Math.sin(now * 0.025) > 0.3;
+          const txBlink = Math.sin(now * 0.024) > 0.2;
           sim.ledTx.material.color.setHex(txBlink ? 0xf97316 : 0x7c2d12);
         }
 
-        // Animate glowing signal pulses flowing through wires into logger
+        // Animated Electrical Pulses flowing into Logger DI pins
         sim.dataPulses.forEach((p) => {
           p.mesh.visible = true;
           const prog = ((now * 0.001 * p.speed) + p.offset) % 1;
-          const pt = p.curve.getPointAt(prog);
-          p.mesh.position.copy(pt);
+          p.mesh.position.copy(p.curve.getPointAt(prog));
         });
       } else if (state === 'idle') {
+        // Machine Stopped / Feed Hold: Spindle stops, chips stop, door glides open!
         if (sim.chipsParticles) sim.chipsParticles.visible = false;
 
         // Tricolor Tower Light: Yellow ON
@@ -922,7 +1154,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
         if (sim.ledRx) sim.ledRx.material.color.setHex(0x0369a1);
         if (sim.ledTx) sim.ledTx.material.color.setHex(0x7c2d12);
       } else {
-        // FAULT / ALARM
+        // Machine Fault / Alarm / E-Stop
         if (sim.chipsParticles) sim.chipsParticles.visible = false;
 
         // Tricolor Tower Light: Flashing Red
@@ -935,7 +1167,6 @@ export default function MdmsFactory3D({ onBookDemo }) {
         // Alarm wire pulse active
         sim.dataPulses.forEach((p, idx) => {
           if (idx === 3) {
-            // Alarm wire
             p.mesh.visible = true;
             const prog = ((now * 0.0015) + p.offset) % 1;
             p.mesh.position.copy(p.curve.getPointAt(prog));
@@ -978,7 +1209,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
         ref={mountRef}
         style={{
           width: '100%',
-          height: '580px',
+          height: '600px',
           cursor: 'grab',
           position: 'relative',
         }}
@@ -994,7 +1225,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
         flexWrap: 'wrap',
         gap: '10px',
         alignItems: 'center',
-        background: 'rgba(11, 22, 38, 0.9)',
+        background: 'rgba(11, 22, 38, 0.92)',
         backdropFilter: 'blur(10px)',
         border: '1px solid rgba(56, 189, 248, 0.35)',
         padding: '10px 14px',
@@ -1019,21 +1250,21 @@ export default function MdmsFactory3D({ onBookDemo }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: '#94a3b8' }}>
           <Cpu size={14} color="#38bdf8" />
-          <span>Logger: <strong style={{ color: '#38bdf8' }}>ESP32-S3-ETH (Active)</strong></span>
+          <span>Logger: <strong style={{ color: '#38bdf8' }}>RvmAiTech MDMS Edge</strong></span>
         </div>
 
         <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.2)' }} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: '#94a3b8' }}>
           <Activity size={14} color="#4ade80" />
-          <span>OEE: <strong style={{ color: '#4ade80' }}>{telemetry.oee}%</strong></span>
+          <span>Availability: <strong style={{ color: '#4ade80' }}>{dashboardData.groupAvailability}%</strong></span>
         </div>
 
         <div style={{ width: '1px', height: '18px', background: 'rgba(255,255,255,0.2)' }} />
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: '#94a3b8' }}>
           <Gauge size={14} color="#facc15" />
-          <span>Spindle: <strong style={{ color: '#fff' }}>{telemetry.rpm} RPM</strong></span>
+          <span>Speed: <strong style={{ color: '#fff' }}>{dashboardData.cbrSpeed} m/min ({dashboardData.rpm} RPM)</strong></span>
         </div>
       </div>
 
@@ -1045,7 +1276,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
         zIndex: 10,
         display: 'flex',
         gap: '6px',
-        background: 'rgba(11, 22, 38, 0.9)',
+        background: 'rgba(11, 22, 38, 0.92)',
         backdropFilter: 'blur(10px)',
         border: '1px solid rgba(56, 189, 248, 0.3)',
         padding: '6px',
@@ -1085,9 +1316,9 @@ export default function MdmsFactory3D({ onBookDemo }) {
             alignItems: 'center',
             gap: '5px',
           }}
-          title="Inspect Waveshare ESP32-S3 Data Logger"
+          title="Inspect RvmAiTech MDMS Data Logger"
         >
-          <Cpu size={13} /> MDMS Logger
+          <Cpu size={13} /> RvmAiTech Logger
         </button>
         <button
           onClick={() => setCamView('spindle')}
@@ -1123,336 +1354,270 @@ export default function MdmsFactory3D({ onBookDemo }) {
             alignItems: 'center',
             gap: '5px',
           }}
-          title="View CNC Control Screen"
+          title="View HMI Dashboard on Monitor"
         >
-          <Gauge size={13} /> CNC Console
+          <Monitor size={13} /> HMI Dashboard
         </button>
       </div>
 
-      {/* Operator Control Deck & Telemetry Cards */}
+      {/* Operator Machine Controls & Real MDMS Dashboard Cards */}
       <div style={{
         padding: '24px',
         background: '#07101d',
         borderTop: '1px solid rgba(56, 189, 248, 0.2)',
         color: '#e2e8f0',
       }}>
-        {/* 3 Main Informational Grid Cards */}
+        {/* Machine Hardware Action Buttons */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          marginBottom: '20px',
+          padding: '14px 18px',
+          borderRadius: '12px',
+          background: 'rgba(15, 23, 42, 0.85)',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+        }}>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#fff' }}>
+              Machine Operational State Control:
+            </div>
+            <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              Cycle Start closes sliding door &amp; ramps spindle to 6,250 RPM. Feed Hold retracts cutter &amp; slides door open!
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={() => setMachineState('running')}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '8px',
+                border: 'none',
+                background: machineState === 'running' ? '#15803d' : '#1e293b',
+                color: '#fff',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: machineState === 'running' ? '0 0 16px rgba(34, 197, 94, 0.6)' : 'none',
+              }}
+            >
+              <Play size={16} color="#4ade80" />
+              CYCLE START (RUN)
+            </button>
+
+            <button
+              onClick={() => setMachineState('idle')}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '8px',
+                border: 'none',
+                background: machineState === 'idle' ? '#a16207' : '#1e293b',
+                color: '#fff',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: machineState === 'idle' ? '0 0 16px rgba(250, 204, 21, 0.6)' : 'none',
+              }}
+            >
+              <Pause size={16} color="#fde047" />
+              FEED HOLD (STOP / OPEN DOOR)
+            </button>
+
+            <button
+              onClick={() => setMachineState('fault')}
+              style={{
+                padding: '10px 18px',
+                borderRadius: '8px',
+                border: 'none',
+                background: machineState === 'fault' ? '#b91c1c' : '#1e293b',
+                color: '#fff',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: machineState === 'fault' ? '0 0 16px rgba(239, 68, 68, 0.8)' : 'none',
+              }}
+            >
+              <AlertTriangle size={16} color="#f87171" />
+              ALARM / E-STOP
+            </button>
+          </div>
+        </div>
+
+        {/* 2-Column Grid: Exact Client MDMS Dashboard (from Image 4) */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
           gap: '20px',
         }}>
-          {/* Card 1: Machine Controls & Simulation */}
+          {/* Column 1: Group 1 Overview & Pre-Treatment */}
           <div style={{
-            background: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(56, 189, 248, 0.25)',
+            background: 'rgba(15, 36, 62, 0.85)',
+            border: '1.5px solid rgba(56, 189, 248, 0.35)',
             borderRadius: '12px',
-            padding: '18px',
+            padding: '20px',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Sliders size={18} color="#38bdf8" />
-                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
-                  CNC Machine State Controls
-                </h4>
+            <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
+              GROUP SUMMARY · PRE-TREATMENT
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '6px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#fff' }}>Group 1</h3>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>3 machines · Shift B · Night</span>
+            </div>
+
+            {/* Circular Availability & Produced Meters */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              margin: '20px 0',
+              padding: '16px',
+              background: '#0a192f',
+              borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <div>
+                <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#f97316', lineHeight: 1 }}>
+                  {dashboardData.groupAvailability}%
+                </div>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginTop: '4px' }}>
+                  AVAILABILITY
+                </div>
               </div>
-              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Real-time Signal Generator</span>
+
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                  {dashboardData.groupProducedMtr.toLocaleString()} <span style={{ fontSize: '1rem', color: '#38bdf8' }}>mtr</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
+                  PRODUCED · {dashboardData.groupRunTime} RUN
+                </div>
+              </div>
             </div>
 
-            {/* 3 State Toggle Buttons */}
+            {/* 3 Metric Pills: RUN TIME | IDLE | STOPPED */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '16px' }}>
-              <button
-                onClick={() => setMachineState('running')}
-                style={{
-                  padding: '10px 8px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: machineState === 'running' ? '#15803d' : '#1e293b',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  boxShadow: machineState === 'running' ? '0 0 14px rgba(34, 197, 94, 0.6)' : 'none',
-                }}
-              >
-                <Play size={16} color="#4ade80" />
-                CYCLE START
-              </button>
-
-              <button
-                onClick={() => setMachineState('idle')}
-                style={{
-                  padding: '10px 8px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: machineState === 'idle' ? '#a16207' : '#1e293b',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  boxShadow: machineState === 'idle' ? '0 0 14px rgba(250, 204, 21, 0.6)' : 'none',
-                }}
-              >
-                <Pause size={16} color="#fde047" />
-                FEED HOLD
-              </button>
-
-              <button
-                onClick={() => setMachineState('fault')}
-                style={{
-                  padding: '10px 8px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: machineState === 'fault' ? '#b91c1c' : '#1e293b',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  boxShadow: machineState === 'fault' ? '0 0 16px rgba(239, 68, 68, 0.8)' : 'none',
-                }}
-              >
-                <AlertTriangle size={16} color="#f87171" />
-                ALARM / E-STOP
-              </button>
+              <div style={{ padding: '8px', borderRadius: '8px', background: '#0a192f', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700 }}>RUN TIME</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#4ade80' }}>{dashboardData.groupRunTime}</div>
+              </div>
+              <div style={{ padding: '8px', borderRadius: '8px', background: '#0a192f', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700 }}>IDLE</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#facc15' }}>{dashboardData.groupIdleTime}</div>
+              </div>
+              <div style={{ padding: '8px', borderRadius: '8px', background: '#0a192f', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: 700 }}>STOPPED</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#94a3b8' }}>{dashboardData.groupStoppedTime}</div>
+              </div>
             </div>
 
-            {/* CNC G-Code / Active Block Readout */}
+            <div style={{ fontSize: '0.8rem', color: '#facc15', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Pause size={14} /> 1 machine idle (Mercerizer-01)
+            </div>
+          </div>
+
+          {/* Column 2: CBR-01 (CNC Milling Center) Live Telemetry Card */}
+          <div style={{
+            background: 'rgba(15, 36, 62, 0.85)',
+            border: '1.5px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: '12px',
+            padding: '20px',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>
+                  CNC-01 (CBR-01)
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>5-Axis CNC Milling Center · Spindle Telemetry</span>
+              </div>
+              <span style={{
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                padding: '4px 10px',
+                borderRadius: '8px',
+                background: machineState === 'running' ? 'rgba(34, 197, 94, 0.2)' : machineState === 'idle' ? 'rgba(250, 204, 21, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                color: machineState === 'running' ? '#4ade80' : machineState === 'idle' ? '#fde047' : '#f87171',
+                border: `1px solid ${machineState === 'running' ? '#22c55e' : machineState === 'idle' ? '#facc15' : '#ef4444'}`,
+              }}>
+                ● {dashboardData.cbrStatus}
+              </span>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              margin: '16px 0',
+              padding: '12px 16px',
+              background: '#0a192f',
+              borderRadius: '8px',
+            }}>
+              <div>
+                <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff' }}>
+                  {dashboardData.cbrProducedMtr.toLocaleString()}
+                </span>
+                <span style={{ color: '#38bdf8', fontSize: '1rem', marginLeft: '6px' }}>mtr</span>
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
+                Speed: <strong style={{ color: '#facc15' }}>{dashboardData.cbrSpeed} m/min</strong> ({dashboardData.rpm} RPM)
+              </div>
+            </div>
+
+            {/* 4 Stats: Run Time, Idle, Stopped, Downtime */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '14px' }}>
+              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>RUN TIME</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#4ade80' }}>{dashboardData.cbrRunTime}</div>
+              </div>
+              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>IDLE</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#facc15' }}>{dashboardData.cbrIdleTime}</div>
+              </div>
+              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>STOPPED</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#94a3b8' }}>0m</div>
+              </div>
+              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>DOWNTIME</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f87171' }}>{dashboardData.cbrDowntime}</div>
+              </div>
+            </div>
+
             <div style={{
               background: '#050c18',
               borderRadius: '8px',
               padding: '10px 12px',
-              fontFamily: 'monospace',
               fontSize: '0.78rem',
+              fontFamily: 'monospace',
+              color: '#38bdf8',
               border: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <div style={{ color: '#94a3b8', fontSize: '0.7rem', marginBottom: '2px' }}>ACTIVE CNC G-CODE BLOCK:</div>
-              <div style={{ color: machineState === 'running' ? '#4ade80' : machineState === 'idle' ? '#facc15' : '#f87171', fontWeight: 700 }}>
-                {telemetry.gCode}
-              </div>
-              <div style={{ color: '#cbd5e1', marginTop: '4px', fontSize: '0.72rem' }}>
-                Tool: {telemetry.activeTool}
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2: Waveshare ESP32-S3 Edge Logger Status */}
-          <div style={{
-            background: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(56, 189, 248, 0.25)',
-            borderRadius: '12px',
-            padding: '18px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Cpu size={18} color="#38bdf8" />
-                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
-                  Waveshare ESP32-S3 Edge Gateway
-                </h4>
-              </div>
-              <span style={{
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                padding: '2px 8px',
-                borderRadius: '6px',
-                background: 'rgba(56, 189, 248, 0.15)',
-                color: '#38bdf8',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-              }}>
-                MQTT 1000Hz
-              </span>
-            </div>
-
-            {/* 8 Digital Input Pin Indicators */}
-            <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 600, marginBottom: '6px' }}>
-              PHYSICAL HARDWARE DIGITAL INPUTS (DI1 - DI8):
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '12px' }}>
-              <div style={{
-                padding: '6px',
-                borderRadius: '6px',
-                background: telemetry.loggerStatus.di1_spindle ? 'rgba(34, 197, 94, 0.2)' : '#1e293b',
-                border: `1px solid ${telemetry.loggerStatus.di1_spindle ? '#22c55e' : 'rgba(255,255,255,0.1)'}`,
-                textAlign: 'center',
-                fontSize: '0.72rem',
-              }}>
-                <div style={{ fontWeight: 700, color: telemetry.loggerStatus.di1_spindle ? '#4ade80' : '#94a3b8' }}>DI 1</div>
-                <div style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>Spindle</div>
-              </div>
-
-              <div style={{
-                padding: '6px',
-                borderRadius: '6px',
-                background: telemetry.loggerStatus.di2_inCycle ? 'rgba(34, 197, 94, 0.2)' : '#1e293b',
-                border: `1px solid ${telemetry.loggerStatus.di2_inCycle ? '#22c55e' : 'rgba(255,255,255,0.1)'}`,
-                textAlign: 'center',
-                fontSize: '0.72rem',
-              }}>
-                <div style={{ fontWeight: 700, color: telemetry.loggerStatus.di2_inCycle ? '#4ade80' : '#94a3b8' }}>DI 2</div>
-                <div style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>In-Cycle</div>
-              </div>
-
-              <div style={{
-                padding: '6px',
-                borderRadius: '6px',
-                background: telemetry.loggerStatus.di3_partCounter ? 'rgba(249, 115, 22, 0.2)' : '#1e293b',
-                border: `1px solid ${telemetry.loggerStatus.di3_partCounter ? '#f97316' : 'rgba(255,255,255,0.1)'}`,
-                textAlign: 'center',
-                fontSize: '0.72rem',
-              }}>
-                <div style={{ fontWeight: 700, color: telemetry.loggerStatus.di3_partCounter ? '#fb923c' : '#94a3b8' }}>DI 3</div>
-                <div style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>Part Pulse</div>
-              </div>
-
-              <div style={{
-                padding: '6px',
-                borderRadius: '6px',
-                background: telemetry.loggerStatus.di4_alarm ? 'rgba(239, 68, 68, 0.25)' : '#1e293b',
-                border: `1px solid ${telemetry.loggerStatus.di4_alarm ? '#ef4444' : 'rgba(255,255,255,0.1)'}`,
-                textAlign: 'center',
-                fontSize: '0.72rem',
-              }}>
-                <div style={{ fontWeight: 700, color: telemetry.loggerStatus.di4_alarm ? '#f87171' : '#94a3b8' }}>DI 4</div>
-                <div style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>Alarm</div>
-              </div>
-            </div>
-
-            {/* Network & Protocol Status */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#cbd5e1', padding: '6px 8px', background: '#050c18', borderRadius: '6px' }}>
-              <span>Ethernet: <strong style={{ color: '#4ade80' }}>100Mbps Link OK</strong></span>
-              <span>Wi-Fi/BT: <strong style={{ color: '#38bdf8' }}>-54 dBm</strong></span>
-              <span>CAN Bus: <strong style={{ color: '#facc15' }}>Active</strong></span>
-            </div>
-          </div>
-
-          {/* Card 3: Cloud MDMS Real-Time Analytics */}
-          <div style={{
-            background: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(56, 189, 248, 0.25)',
-            borderRadius: '12px',
-            padding: '18px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Activity size={18} color="#38bdf8" />
-                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc' }}>
-                  Live MDMS Cloud Analytics
-                </h4>
-              </div>
-              <span style={{ fontSize: '0.75rem', color: '#4ade80', fontWeight: 700 }}>
-                Shift OEE: {telemetry.oee}%
-              </span>
-            </div>
-
-            {/* 4 Stat Boxes */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div className="mdms3d-stat" style={{ padding: '8px 10px' }}>
-                <Gauge size={16} color="#38bdf8" />
-                <div>
-                  <small style={{ fontSize: '0.68rem' }}>Spindle Speed</small>
-                  <b style={{ fontSize: '0.95rem' }}>{telemetry.rpm} RPM</b>
-                </div>
-              </div>
-
-              <div className="mdms3d-stat" style={{ padding: '8px 10px' }}>
-                <Zap size={16} color="#facc15" />
-                <div>
-                  <small style={{ fontSize: '0.68rem' }}>Power Load</small>
-                  <b style={{ fontSize: '0.95rem' }}>{telemetry.power} kW</b>
-                </div>
-              </div>
-
-              <div className="mdms3d-stat" style={{ padding: '8px 10px' }}>
-                <Thermometer size={16} color="#f47b20" />
-                <div>
-                  <small style={{ fontSize: '0.68rem' }}>Bearing Temp</small>
-                  <b style={{ fontSize: '0.95rem' }}>{telemetry.temp} °C</b>
-                </div>
-              </div>
-
-              <div className="mdms3d-stat" style={{ padding: '8px 10px' }}>
-                <Box size={16} color="#4ade80" />
-                <div>
-                  <small style={{ fontSize: '0.68rem' }}>Finished Parts</small>
-                  <b style={{ fontSize: '0.95rem' }}>{telemetry.parts} pcs</b>
-                </div>
-              </div>
-            </div>
-
-            {/* Availability / Performance / Quality Bar */}
-            <div style={{ marginTop: '10px', fontSize: '0.72rem', color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
-              <span>Avail: <strong style={{ color: '#4ade80' }}>{telemetry.availability}%</strong></span>
-              <span>Perf: <strong style={{ color: '#38bdf8' }}>{telemetry.performance}%</strong></span>
-              <span>Quality: <strong style={{ color: '#facc15' }}>{telemetry.quality}%</strong></span>
-            </div>
-          </div>
-        </div>
-
-        {/* HOW RVMAITECH MDMS WORKS - ARCHITECTURE EXPLAINER BANNER */}
-        <div style={{
-          marginTop: '20px',
-          padding: '16px 20px',
-          borderRadius: '12px',
-          background: 'linear-gradient(90deg, rgba(2, 132, 199, 0.22), rgba(15, 23, 42, 0.8))',
-          border: '1px solid rgba(56, 189, 248, 0.35)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <Info size={18} color="#38bdf8" />
-            <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc' }}>
-              How Rvmaitech MDMS Hardware Connects to Any Industrial Machine:
-            </h4>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '12px',
-            fontSize: '0.78rem',
-            color: '#cbd5e1',
-            lineHeight: 1.5,
-          }}>
-            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '10px', borderRadius: '8px' }}>
-              <strong style={{ color: '#38bdf8', display: 'block', marginBottom: '2px' }}>1. Non-Invasive Sensor Tap</strong>
-              We connect optocoupler signal taps or current sensors to the machine's spindle, cycle relays, and limits without altering OEM PLC programs.
-            </div>
-
-            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '10px', borderRadius: '8px' }}>
-              <strong style={{ color: '#4ade80', display: 'block', marginBottom: '2px' }}>2. Waveshare ESP32-S3 Edge</strong>
-              The 8-Channel Digital Input &amp; Relay module samples signals at 1000Hz, computing exact machining cycle times and micro-stoppages.
-            </div>
-
-            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '10px', borderRadius: '8px' }}>
-              <strong style={{ color: '#facc15', display: 'block', marginBottom: '2px' }}>3. Secure MQTT / Ethernet</strong>
-              Telemetry is encrypted and transmitted over factory LAN or Wi-Fi to the on-premise gateway or cloud database in milliseconds.
-            </div>
-
-            <div style={{ background: 'rgba(0,0,0,0.25)', padding: '10px', borderRadius: '8px' }}>
-              <strong style={{ color: '#f87171', display: 'block', marginBottom: '2px' }}>4. Instant OEE &amp; Alerting</strong>
-              Plant managers see live OEE, tool degradation, predictive maintenance alarms, and shift reports across mobile &amp; plant screens.
+              <div>DI 1 (Spindle): <strong style={{ color: machineState === 'running' ? '#4ade80' : '#f87171' }}>{machineState === 'running' ? 'HIGH (Active)' : 'LOW'}</strong> | DI 2 (In-Cycle): <strong style={{ color: machineState === 'running' ? '#4ade80' : '#f87171' }}>{machineState === 'running' ? 'HIGH' : 'LOW'}</strong></div>
+              <div style={{ marginTop: '2px', color: '#cbd5e1' }}>RvmAiTech MDMS Data Logger: Transmitting via MQTT @ 1000Hz</div>
             </div>
           </div>
         </div>
 
         {/* CTA Button */}
         {onBookDemo && (
-          <div style={{ marginTop: '16px', textAlign: 'center' }}>
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <button
               onClick={onBookDemo}
               className="btn btn-primary btn-3d-orange"
               style={{ padding: '12px 28px', fontSize: '0.9rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '8px' }}
             >
-              <span>Schedule On-Site MDMS Hardware Survey &amp; Demo</span>
+              <span>Schedule Live RvmAiTech MDMS Factory Demo</span>
               <ArrowRight size={16} />
             </button>
           </div>
