@@ -946,11 +946,12 @@ export default function SmartConveyor3D({ onBookDemo }) {
     termBox.position.set(-0.28, 0.18, 0);
     motorGroup.add(termBox);
 
-    // Flexible Black Conduit connecting Motor into Cable Tray
-    const conduitGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.55, 10);
-    conduitGeo.rotateX(Math.PI / 3);
-    const conduit = new THREE.Mesh(conduitGeo, darkSlotMat);
-    conduit.position.set(-0.28, -0.12, -0.2);
+    // Flexible Black Conduit connecting Motor into Cable Tray (Neat vertical drop into tray)
+    const conduit = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.016, 0.016, 0.35, 12),
+      darkSlotMat
+    );
+    conduit.position.set(-0.28, -0.08, 0);
     motorGroup.add(conduit);
 
     // ----------------------------------------------------
@@ -1755,12 +1756,12 @@ export default function SmartConveyor3D({ onBookDemo }) {
           sim.beltTexture.offset.x -= moveDist * 0.12;
         }
 
-        // Rotate Return Rollers & End Pulley Drums
+        // Rotate Return Rollers & End Pulley Drums around their cylindrical Z-axis (Forward Rolling)
         sim.rollers.forEach((r) => {
-          r.rotation.y -= moveDist * 16;
+          r.rotation.z -= moveDist * 22;
         });
         sim.endDrums.forEach((d) => {
-          d.rotation.x += moveDist * 8;
+          d.rotation.z -= moveDist * 10;
         });
 
         // Spawn new box

@@ -392,21 +392,107 @@ export default function MdmsFactory3D({ onBookDemo }) {
     tableBed.receiveShadow = true;
     cncGroup.add(tableBed);
 
-    // Machine Vise (Heavy Hydraulic Milling Vise)
-    const vise = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.14, 0.42), matAccentDark);
-    vise.position.set(0, 0.91, 0);
-    vise.castShadow = true;
-    cncGroup.add(vise);
+    // ----------------------------------------------------
+    // CNC 4TH-AXIS ROTARY CHUCK & CYLINDER MANUFACTURING SETUP
+    // Real industrial pneumatic / hydraulic cylinder manufacturing line
+    // ----------------------------------------------------
+    const fixtureGroup = new THREE.Group();
+    fixtureGroup.position.set(0, 0.84, 0);
+    cncGroup.add(fixtureGroup);
 
-    // Clamped Metal Billet Workpiece
-    const workpiece = new THREE.Mesh(
-      new THREE.BoxGeometry(0.24, 0.18, 0.24),
-      new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.2, metalness: 0.92 })
+    // Left Side: 4th-Axis Rotary Headstock (3-Jaw Indexing Chuck)
+    const headstockBase = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.32), matDarkBase);
+    headstockBase.position.set(-0.46, 0.11, 0);
+    fixtureGroup.add(headstockBase);
+
+    const rotaryChuck = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.12, 0.12, 24),
+      new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 })
     );
-    workpiece.position.set(0, 1.07, 0);
-    workpiece.castShadow = true;
-    cncGroup.add(workpiece);
-    simRef.current.workpiece = workpiece;
+    rotaryChuck.rotation.z = Math.PI / 2;
+    rotaryChuck.position.set(-0.32, 0.14, 0);
+    fixtureGroup.add(rotaryChuck);
+
+    // 3 Hardened Chuck Jaws
+    for (let j = 0; j < 3; j++) {
+      const angle = (j * Math.PI * 2) / 3;
+      const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.05, 0.04), matChrome);
+      jaw.position.set(-0.25, 0.14 + Math.sin(angle) * 0.08, Math.cos(angle) * 0.08);
+      fixtureGroup.add(jaw);
+    }
+
+    // Right Side: CNC Tailstock with Revolving Live Center
+    const tailstockBase = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.3), matDarkBase);
+    tailstockBase.position.set(0.48, 0.11, 0);
+    fixtureGroup.add(tailstockBase);
+
+    const tailstockQuill = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.14, 16), matChrome);
+    tailstockQuill.rotation.z = Math.PI / 2;
+    tailstockQuill.position.set(0.36, 0.14, 0);
+    fixtureGroup.add(tailstockQuill);
+
+    const liveCenterCone = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.08, 16), matChrome);
+    liveCenterCone.rotation.z = -Math.PI / 2;
+    liveCenterCone.position.set(0.27, 0.14, 0);
+    fixtureGroup.add(liveCenterCone);
+
+    // ----------------------------------------------------
+    // PRECISION CYLINDER WORKPIECE BEING MACHINED
+    // (Hydraulic / Pneumatic Cylinder Barrel with Machined O-Ring Ports & Turned Shaft)
+    // ----------------------------------------------------
+    const cylinderGroup = new THREE.Group();
+    cylinderGroup.position.set(0, 0.98, 0);
+    cncGroup.add(cylinderGroup);
+    simRef.current.workpiece = cylinderGroup;
+
+    // Polished Chrome-Plated Steel Materials
+    const cylMatPolished = new THREE.MeshStandardMaterial({
+      color: 0xf1f5f9,
+      metalness: 0.98,
+      roughness: 0.12,
+    });
+    const cylMatMachined = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8,
+      metalness: 0.92,
+      roughness: 0.28,
+    });
+    const cylMatBronze = new THREE.MeshStandardMaterial({
+      color: 0xf59e0b,
+      metalness: 0.85,
+      roughness: 0.25,
+    });
+
+    // Main Cylinder Barrel
+    const cylinderBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 0.48, 32), cylMatPolished);
+    cylinderBarrel.rotation.z = Math.PI / 2;
+    cylinderBarrel.castShadow = true;
+    cylinderGroup.add(cylinderBarrel);
+
+    // Turned Piston Rod Neck on Left End
+    const pistonNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 0.14, 24), cylMatMachined);
+    pistonNeck.rotation.z = Math.PI / 2;
+    pistonNeck.position.set(-0.28, 0, 0);
+    cylinderGroup.add(pistonNeck);
+
+    // Mounting Flange Collar with Chamfer
+    const flangeCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.078, 0.078, 0.04, 32), cylMatMachined);
+    flangeCollar.rotation.z = Math.PI / 2;
+    flangeCollar.position.set(-0.18, 0, 0);
+    cylinderGroup.add(flangeCollar);
+
+    // Machined O-Ring Seal Channels on Cylinder Body
+    [-0.08, 0.08].forEach((px) => {
+      const oRingGroove = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.068, 0.022, 32), cylMatBronze);
+      oRingGroove.rotation.z = Math.PI / 2;
+      oRingGroove.position.set(px, 0, 0);
+      cylinderGroup.add(oRingGroove);
+    });
+
+    // Cylinder End Cap on Right Side
+    const cylinderCap = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.08, 24), cylMatMachined);
+    cylinderCap.rotation.z = Math.PI / 2;
+    cylinderCap.position.set(0.26, 0, 0);
+    cylinderGroup.add(cylinderCap);
 
     // Z-Axis Vertical Spindle Carriage & Guideways
     const spindleCarriage = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.9, 0.48), matLightCabin);
@@ -1093,16 +1179,21 @@ export default function MdmsFactory3D({ onBookDemo }) {
           sim.spindleHead.rotation.y = cutterAngle;
         }
 
-        // Active Sparks & Chip Particles
+        // Rotate Precision Cylinder Workpiece smoothly on 4th-Axis Chuck
+        if (sim.workpiece) {
+          sim.workpiece.rotation.x += dt * 1.6;
+        }
+
+        // Active Sparks & Chip Particles erupting from Cylinder
         if (sim.chipsParticles) {
           sim.chipsParticles.visible = true;
           const pos = sim.chipsParticles.geometry.attributes.position.array;
           for (let i = 0; i < chipCount; i++) {
-            pos[i * 3 + 1] -= dt * 0.5;
-            if (pos[i * 3 + 1] < 1.06) {
-              pos[i * 3 + 1] = 1.25 + Math.random() * 0.04;
-              pos[i * 3] = (Math.random() - 0.5) * 0.16;
-              pos[i * 3 + 2] = (Math.random() - 0.5) * 0.16;
+            pos[i * 3 + 1] -= dt * 0.45;
+            if (pos[i * 3 + 1] < 1.04) {
+              pos[i * 3 + 1] = 1.18 + Math.random() * 0.04;
+              pos[i * 3] = (Math.random() - 0.5) * 0.22;
+              pos[i * 3 + 2] = (Math.random() - 0.5) * 0.12;
             }
           }
           sim.chipsParticles.geometry.attributes.position.needsUpdate = true;
