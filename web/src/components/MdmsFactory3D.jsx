@@ -28,36 +28,77 @@ export default function MdmsFactory3D({ onBookDemo }) {
   const [machineState, setMachineState] = useState('running');
   const [activeCamPreset, setActiveCamPreset] = useState('cell'); // 'cell' | 'logger' | 'spindle' | 'console'
 
-  // Live Client MDMS Dashboard Metrics (Matching Image 4)
+  // Live Client MDMS Dashboard Metrics for 3 Connected CNC Lathe Machines
   const [dashboardData, setDashboardData] = useState({
-    group: 'Group 1 · Shift B (Night)',
-    groupAvailability: 58,
-    groupProducedMtr: 20809,
+    group: 'Group 1 · CNC Lathe Shop',
+    groupAvailability: 88,
+    groupProducedCount: 1847, // Total Count in Pcs / Cylinders (Replaced mtr!)
+    groupTargetCount: 2200,
     groupRunTime: '6h 15m',
-    groupIdleTime: '4h 37m',
+    groupIdleTime: '45m',
     groupStoppedTime: '0m',
-    // Machine 1: CNC / CBR-01
-    cbrStatus: 'Running',
-    cbrAvail: 59,
-    cbrProducedMtr: 7368,
-    cbrSpeed: 60, // m/min
-    cbrRunTime: '2h 07m',
-    cbrIdleTime: '1h 29m',
-    cbrDowntime: '1h 29m',
-    // Machine 2: Mercerizer-01
-    mercStatus: 'Idle',
-    mercAvail: 37,
-    mercProducedMtr: 3692,
-    mercSpeed: 0,
-    mercRunTime: '1h 20m',
-    mercIdleTime: '2h 17m',
-    mercDowntime: '2h 17m',
-    // Live Engineering Telemetry
-    rpm: 6250,
-    powerKw: 12.8,
-    tempC: 48,
-    partsCompleted: 342,
-    gCode: 'N140 G01 X-120.4 Y45.8 Z-8.5 F1450 S6250',
+
+    // Machine 1: CNC Lathe Machine - 01 (Cylinder Turning Center)
+    m1Name: 'CNC Lathe Machine - 01',
+    m1Sub: 'Hydraulic Cylinder Turning Center',
+    m1Status: 'Running',
+    m1Avail: 92,
+    m1ProducedCount: 845, // Count (Pcs)
+    m1Target: 1000,
+    m1OkCount: 840,
+    m1NgCount: 5,
+    m1Rpm: 2850,
+    m1Feed: 0.28, // mm/rev
+    m1CycleTime: '1m 35s',
+    m1Diameter: 'Ø 65.0 mm',
+    m1PowerKw: 12.5,
+    m1RunTime: '6h 05m',
+    m1IdleTime: '25m',
+    m1Downtime: '0m',
+
+    // Machine 2: CNC Lathe Machine - 02 (Piston Rod CNC)
+    m2Name: 'CNC Lathe Machine - 02',
+    m2Sub: 'Piston Rod Precision Turning',
+    m2Status: 'Running',
+    m2Avail: 86,
+    m2ProducedCount: 612, // Count (Pcs)
+    m2Target: 750,
+    m2OkCount: 609,
+    m2NgCount: 3,
+    m2Rpm: 3200,
+    m2Feed: 0.22, // mm/rev
+    m2CycleTime: '1m 15s',
+    m2Diameter: 'Ø 42.0 mm',
+    m2PowerKw: 10.8,
+    m2RunTime: '5h 45m',
+    m2IdleTime: '45m',
+    m2Downtime: '0m',
+
+    // Machine 3: CNC Lathe Machine - 03 (Thread & Flange CNC)
+    m3Name: 'CNC Lathe Machine - 03',
+    m3Sub: 'Flange & Port Threading Center',
+    m3Status: 'Idle',
+    m3Avail: 74,
+    m3ProducedCount: 390, // Count (Pcs)
+    m3Target: 500,
+    m3OkCount: 388,
+    m3NgCount: 2,
+    m3Rpm: 0,
+    m3Feed: 0.00,
+    m3CycleTime: '2m 10s',
+    m3Diameter: 'Ø 78.0 mm',
+    m3PowerKw: 1.2,
+    m3RunTime: '4h 10m',
+    m3IdleTime: '2h 20m',
+    m3Downtime: '0m',
+
+    // Live Engineering Telemetry for active 3D CNC Lathe Machine
+    rpm: 2850,
+    feedRate: 0.28,
+    powerKw: 12.5,
+    tempC: 49,
+    partsCompleted: 845,
+    gCode: 'N140 G01 X-28.5 Z-145.0 F0.28 S2850 (Cylinder Cut)',
   });
 
   // Shared simulation refs for Three.js animation
@@ -88,6 +129,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
     dashCtx: null,
     dashCanvas: null,
     lastDashDraw: 0,
+    dashboardData: null,
   });
 
   // Sync state to simRef
@@ -95,51 +137,66 @@ export default function MdmsFactory3D({ onBookDemo }) {
     simRef.current.machineState = machineState;
   }, [machineState]);
 
+  useEffect(() => {
+    simRef.current.dashboardData = dashboardData;
+  }, [dashboardData]);
+
   // Live telemetry ticker that updates metrics based on machineState
   useEffect(() => {
     const timer = setInterval(() => {
       setDashboardData((prev) => {
         if (machineState === 'running') {
-          const incMtr = Math.floor(1 + Math.random() * 3);
-          const rpmJitter = Math.floor(6200 + Math.random() * 140);
-          const pwrJitter = parseFloat((12.4 + Math.random() * 0.8).toFixed(1));
+          const incCount = Math.random() > 0.6 ? 1 : 0;
+          const rpmJitter = Math.floor(2820 + Math.random() * 60);
+          const pwrJitter = parseFloat((12.3 + Math.random() * 0.5).toFixed(1));
           const tempJitter = Math.floor(48 + Math.random() * 2);
 
-          return {
+          const next = {
             ...prev,
-            cbrStatus: 'Running',
-            cbrSpeed: 60,
-            cbrProducedMtr: prev.cbrProducedMtr + incMtr,
-            groupProducedMtr: prev.groupProducedMtr + incMtr,
-            groupAvailability: 59,
+            m1Status: 'Running',
+            m1Rpm: rpmJitter,
+            m1PowerKw: pwrJitter,
+            m1ProducedCount: prev.m1ProducedCount + incCount,
+            m1OkCount: prev.m1OkCount + incCount,
+            groupProducedCount: prev.groupProducedCount + incCount,
+            groupAvailability: 89,
             rpm: rpmJitter,
+            feedRate: 0.28,
             powerKw: pwrJitter,
             tempC: tempJitter,
-            partsCompleted: prev.partsCompleted + (Math.random() > 0.7 ? 1 : 0),
-            gCode: `N${Math.floor(140 + Math.random() * 20)} G01 X${(Math.random() * -140).toFixed(1)} Y${(Math.random() * 70).toFixed(1)} Z-8.5 F1450 S${rpmJitter}`,
+            partsCompleted: prev.m1ProducedCount + incCount,
+            gCode: `N${Math.floor(140 + Math.random() * 20)} G01 X-${(25 + Math.random() * 8).toFixed(1)} Z-${(120 + Math.random() * 50).toFixed(1)} F0.28 S${rpmJitter}`,
           };
+          simRef.current.dashboardData = next;
+          return next;
         } else if (machineState === 'idle') {
-          return {
+          const next = {
             ...prev,
-            cbrStatus: 'Idle',
-            cbrSpeed: 0,
-            groupAvailability: 46,
+            m1Status: 'Idle (Hold)',
+            m1Rpm: 0,
+            m1PowerKw: 1.6,
+            groupAvailability: 78,
             rpm: 0,
-            powerKw: 1.8,
+            powerKw: 1.6,
             tempC: Math.max(36, prev.tempC - 0.4),
-            gCode: 'M00 FEED HOLD / OPERATOR INSPECTION',
+            gCode: 'M00 FEED HOLD / OPERATOR INSPECT',
           };
+          simRef.current.dashboardData = next;
+          return next;
         } else {
           // fault
-          return {
+          const next = {
             ...prev,
-            cbrStatus: 'Downtime Alert',
-            cbrSpeed: 0,
-            groupAvailability: 38,
+            m1Status: 'Alarm / E-Stop',
+            m1Rpm: 0,
+            m1PowerKw: 0.4,
+            groupAvailability: 62,
             rpm: 0,
-            powerKw: 0.5,
-            gCode: 'ALARM 1024: TOOL BREAKAGE / EMERGENCY STOP',
+            powerKw: 0.4,
+            gCode: 'ALARM 1024: E-STOP ENGAGED / DOOR INTERLOCK',
           };
+          simRef.current.dashboardData = next;
+          return next;
         }
       });
     }, 1200);
@@ -929,17 +986,18 @@ export default function MdmsFactory3D({ onBookDemo }) {
     ];
 
     // ----------------------------------------------------
-    // HELPER: RENDER EXACT CLIENT MDMS DASHBOARD (IMAGE 4)
+    // HELPER: RENDER CLIENT MDMS DASHBOARD (3 CNC LATHE MACHINES)
+    // Displays Count (Pcs) & Parameters (RPM, Feed, Cycle Time, Spec, Load)
     // ----------------------------------------------------
     const drawMdmsDashboardCanvas = (ctx, data, st) => {
-      // Dark navy slate background matching Image 4
+      // Dark navy slate background
       ctx.fillStyle = '#0a192f';
       ctx.fillRect(0, 0, 1024, 720);
 
       // Top Title Bar
       ctx.fillStyle = '#94a3b8';
       ctx.font = 'bold 16px sans-serif';
-      ctx.fillText('GROUP SUMMARY · PRE-TREATMENT', 30, 42);
+      ctx.fillText('GROUP SUMMARY · CNC LATHE SHOP (3 MACHINES CONNECTED)', 30, 42);
 
       // Left Column Card: Group 1 Summary
       ctx.fillStyle = '#0f243e';
@@ -954,39 +1012,35 @@ export default function MdmsFactory3D({ onBookDemo }) {
 
       ctx.fillStyle = '#94a3b8';
       ctx.font = '16px sans-serif';
-      ctx.fillText('3 machines · Shift B · Night', 45, 135);
+      ctx.fillText('3 CNC Lathe Machines · Shift A', 45, 135);
 
-      // Donut Availability Meter
-      ctx.fillStyle = '#f97316';
+      // Availability Meter
+      ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 54px sans-serif';
       ctx.fillText(`${data.groupAvailability}%`, 45, 215);
 
       ctx.fillStyle = '#94a3b8';
       ctx.font = 'bold 15px sans-serif';
-      ctx.fillText('AVAILABILITY', 45, 245);
+      ctx.fillText('AVAILABILITY · OEE: 87.2%', 45, 245);
 
-      // Produced Meters
+      // Produced Count (CONT) - Replaced meters (mtr) with Count (Pcs)!
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 32px sans-serif';
-      ctx.fillText(`${data.groupProducedMtr.toLocaleString()} mtr`, 45, 305);
+      ctx.font = 'bold 34px sans-serif';
+      ctx.fillText(`${data.groupProducedCount.toLocaleString()} Pcs`, 45, 305);
 
       ctx.fillStyle = '#94a3b8';
       ctx.font = '14px sans-serif';
-      ctx.fillText('PRODUCED', 45, 330);
+      ctx.fillText('TOTAL PRODUCED COUNT', 45, 330);
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 22px sans-serif';
-      ctx.fillText(data.groupRunTime, 240, 305);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText(`Target: ${data.groupTargetCount} Pcs`, 220, 305);
 
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '14px sans-serif';
-      ctx.fillText('RUN TIME', 240, 330);
-
-      // Orange Progress Bar
+      // Cyan / Orange Progress Bar
       ctx.fillStyle = '#1e3a5f';
       ctx.fillRect(45, 345, 310, 8);
       ctx.fillStyle = '#f97316';
-      ctx.fillRect(45, 345, 190, 8);
+      ctx.fillRect(45, 345, 260, 8);
 
       // Run Time / Idle / Stopped stats boxes
       const drawMiniStat = (x, y, w, title, val, color) => {
@@ -1008,19 +1062,19 @@ export default function MdmsFactory3D({ onBookDemo }) {
       drawMiniStat(150, 370, 95, 'IDLE', data.groupIdleTime, '#facc15');
       drawMiniStat(255, 370, 95, 'STOPPED', data.groupStoppedTime, '#94a3b8');
 
-      // Status pill: 1 machine idle
-      ctx.fillStyle = '#facc15';
+      // Status pill: 2 machines running, 1 idle
+      ctx.fillStyle = '#4ade80';
       ctx.font = 'bold 15px sans-serif';
-      ctx.fillText('⏸ 1 machine idle', 45, 460);
+      ctx.fillText('● 2 Machines Running  |  ⏸ 1 Idle (Setup)', 45, 460);
 
-      // Last 7 Days Production Bar Chart (Matching Image 4!)
+      // Last 7 Days Production (Pcs) Bar Chart
       ctx.fillStyle = '#cbd5e1';
       ctx.font = 'bold 14px sans-serif';
-      ctx.fillText('LAST 7 DAYS · PRODUCTION (mtr)', 45, 510);
-      ctx.fillText('800,017', 280, 510);
+      ctx.fillText('LAST 7 DAYS · PRODUCTION (Pcs)', 45, 510);
+      ctx.fillText('14,250 Pcs', 280, 510);
 
       const days = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-      const heights = [70, 25, 45, 65, 75, 95, 65];
+      const heights = [70, 25, 78, 85, 92, 98, 90];
       days.forEach((day, i) => {
         const bx = 45 + i * 44;
         const by = 640;
@@ -1032,95 +1086,169 @@ export default function MdmsFactory3D({ onBookDemo }) {
         ctx.fillText(day, bx, by + 16);
       });
 
-      // Right Column: MACHINES (Image 4)
+      // Right Column: MACHINES (3 CNC Lathe Machines with Count & Parameters)
       ctx.fillStyle = '#94a3b8';
       ctx.font = 'bold 16px sans-serif';
-      ctx.fillText('MACHINES · 3 CONNECTED', 410, 42);
+      ctx.fillText('MACHINES · 3 CNC LATHE CONNECTED', 410, 42);
 
-      // Card 1: CBR-01 / CNC-01
-      const drawMachineCard = (y, name, sub, avail, mtr, speed, isRun, runT, idleT, stopT, downT) => {
+      const drawMachineCard = (y, name, sub, avail, count, ok, ng, isRun, statusText, rpm, feed, cycle, kw, runT, idleT, downT, spec) => {
+        // Card Box
         ctx.fillStyle = '#0f243e';
-        ctx.fillRect(410, y, 585, 290);
-        ctx.strokeStyle = '#1e3a5f';
-        ctx.strokeRect(410, y, 585, 290);
+        ctx.fillRect(410, y, 585, 195);
+        ctx.strokeStyle = isRun ? '#0284c7' : '#1e3a5f';
+        ctx.lineWidth = isRun ? 1.5 : 1;
+        ctx.strokeRect(410, y, 585, 195);
 
-        // Donut Ring (Avail %)
+        // Donut / Avail % Badge
         ctx.fillStyle = '#0d9488';
-        ctx.font = 'bold 36px sans-serif';
-        ctx.fillText(`${avail}%`, 435, y + 65);
+        ctx.font = 'bold 26px sans-serif';
+        ctx.fillText(`${avail}%`, 428, y + 40);
         ctx.fillStyle = '#94a3b8';
-        ctx.font = 'bold 13px sans-serif';
-        ctx.fillText('AVAIL', 438, y + 88);
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('AVAIL', 430, y + 56);
 
-        // Machine Title & Status
+        // Machine Name & Subtitle
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 24px sans-serif';
-        ctx.fillText(name, 540, y + 45);
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText(name, 505, y + 34);
 
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '15px sans-serif';
-        ctx.fillText(sub, 540, y + 72);
-
-        // Live Status Badge
-        ctx.fillStyle = isRun ? '#22c55e' : '#facc15';
-        ctx.font = 'bold 17px sans-serif';
-        ctx.fillText(isRun ? '● Running' : '● Idle', 880, y + 45);
-
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '15px sans-serif';
-        ctx.fillText(`speed ${speed} m/min`, 830, y + 80);
-
-        // Meter counter
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 36px sans-serif';
-        ctx.fillText(`${mtr.toLocaleString()} mtr`, 540, y + 120);
-
-        // Progress bar
-        ctx.fillStyle = '#1e3a5f';
-        ctx.fillRect(435, y + 145, 535, 8);
-        ctx.fillStyle = isRun ? '#f97316' : '#f87171';
-        ctx.fillRect(435, y + 145, isRun ? 360 : 180, 8);
-
-        // 4 sub boxes: RUN TIME, IDLE, STOPPED, DOWNTIME
-        drawMiniStat(435, y + 175, 120, 'RUN TIME', runT, '#22c55e');
-        drawMiniStat(570, y + 175, 120, 'IDLE', idleT, '#facc15');
-        drawMiniStat(705, y + 175, 120, 'STOPPED', stopT, '#94a3b8');
-        drawMiniStat(840, y + 175, 120, 'DOWNTIME', downT, '#f87171');
-
-        ctx.fillStyle = '#64748b';
         ctx.font = '13px sans-serif';
-        ctx.fillText('Last data 1s ago (RvmAiTech MDMS Live IoT)', 435, y + 265);
-        ctx.fillText('time from PLC counters', 810, y + 265);
+        ctx.fillText(sub, 505, y + 54);
+
+        // Status Badge (Top Right)
+        ctx.fillStyle = isRun ? '#22c55e' : statusText.includes('Alarm') ? '#ef4444' : '#facc15';
+        ctx.font = 'bold 15px sans-serif';
+        ctx.fillText(statusText, 860, y + 34);
+
+        // Count (CONT) - Big Bold Text (Replaced mtr!)
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.fillText(`${count.toLocaleString()} Pcs`, 505, y + 84);
+
+        // Quality Yield & OK/NG
+        const yieldVal = ((ok / Math.max(1, ok + ng)) * 100).toFixed(1);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillText(`Yield: ${yieldVal}% (${ok} OK / ${ng} NG)`, 675, y + 82);
+
+        // Progress Bar
+        ctx.fillStyle = '#1e3a5f';
+        ctx.fillRect(425, y + 96, 555, 6);
+        ctx.fillStyle = isRun ? '#f97316' : '#64748b';
+        ctx.fillRect(425, y + 96, isRun ? 420 : 260, 6);
+
+        // Machine Parameters Row (PERA MITTER)
+        ctx.fillStyle = '#071527';
+        ctx.fillRect(425, y + 110, 555, 42);
+        ctx.strokeStyle = '#1e293b';
+        ctx.strokeRect(425, y + 110, 555, 42);
+
+        // Parameter 1: Spindle RPM
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px sans-serif';
+        ctx.fillText('SPINDLE', 438, y + 124);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText(`${rpm} RPM`, 438, y + 142);
+
+        // Parameter 2: Feed Rate
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px sans-serif';
+        ctx.fillText('FEED', 550, y + 124);
+        ctx.fillStyle = '#4ade80';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText(`${feed} mm/r`, 550, y + 142);
+
+        // Parameter 3: Cycle Time
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px sans-serif';
+        ctx.fillText('CYCLE TIME', 660, y + 124);
+        ctx.fillStyle = '#facc15';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText(cycle, 660, y + 142);
+
+        // Parameter 4: Power Load / Spec
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px sans-serif';
+        ctx.fillText('LOAD / SPEC', 785, y + 124);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 13px monospace';
+        ctx.fillText(`${kw} kW · ${spec}`, 785, y + 142);
+
+        // Bottom Times & MDMS Data Link
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px sans-serif';
+        ctx.fillText(`Run: ${runT} | Idle: ${idleT} | Down: ${downT}`, 425, y + 176);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('RvmAiTech MDMS Live IoT (ESP32-S3 @ 1000Hz)', 710, y + 176);
       };
 
-      // Card 1: CBR-01 (Active machine)
+      // Card 1: CNC Lathe Machine - 01 (Active machine in 3D scene)
+      const m1IsRun = st === 'running';
+      const m1StatusLabel = m1IsRun ? '● Running' : st === 'idle' ? '⏸ Idle (Hold)' : '⚠️ Alarm';
       drawMachineCard(
-        60,
-        'CNC-01 (CBR-01)',
-        '5-Axis CNC Milling Center',
-        data.cbrAvail,
-        data.cbrProducedMtr,
-        data.cbrSpeed,
-        st === 'running',
-        data.cbrRunTime,
-        data.cbrIdleTime,
-        '0m',
-        data.cbrDowntime
+        56,
+        data.m1Name,
+        data.m1Sub,
+        data.m1Avail,
+        data.m1ProducedCount,
+        data.m1OkCount,
+        data.m1NgCount,
+        m1IsRun,
+        m1StatusLabel,
+        data.m1Rpm,
+        data.m1Feed,
+        data.m1CycleTime,
+        data.m1PowerKw,
+        data.m1RunTime,
+        data.m1IdleTime,
+        data.m1Downtime,
+        data.m1Diameter
       );
 
-      // Card 2: Mercerizer-01 (Idle machine)
+      // Card 2: CNC Lathe Machine - 02 (Piston Rod Turning)
       drawMachineCard(
-        380,
-        'MERCERIZER',
-        'MERCERIZER-01 · forming line',
-        data.mercAvail,
-        data.mercProducedMtr,
-        0,
+        265,
+        data.m2Name,
+        data.m2Sub,
+        data.m2Avail,
+        data.m2ProducedCount,
+        data.m2OkCount,
+        data.m2NgCount,
+        true,
+        '● Running',
+        data.m2Rpm,
+        data.m2Feed,
+        data.m2CycleTime,
+        data.m2PowerKw,
+        data.m2RunTime,
+        data.m2IdleTime,
+        data.m2Downtime,
+        data.m2Diameter
+      );
+
+      // Card 3: CNC Lathe Machine - 03 (Flange Collar Threading)
+      drawMachineCard(
+        475,
+        data.m3Name,
+        data.m3Sub,
+        data.m3Avail,
+        data.m3ProducedCount,
+        data.m3OkCount,
+        data.m3NgCount,
         false,
-        data.mercRunTime,
-        data.mercIdleTime,
-        '0m',
-        data.mercDowntime
+        '⏸ Idle (Setup)',
+        data.m3Rpm,
+        data.m3Feed,
+        data.m3CycleTime,
+        data.m3PowerKw,
+        data.m3RunTime,
+        data.m3IdleTime,
+        data.m3Downtime,
+        data.m3Diameter
       );
     };
 
@@ -1151,7 +1279,8 @@ export default function MdmsFactory3D({ onBookDemo }) {
       // Periodically refresh the MDMS dashboard canvas texture
       if (now - sim.lastDashDraw > 250) {
         sim.lastDashDraw = now;
-        drawMdmsDashboardCanvas(sim.dashCtx, dashboardData, state);
+        const curData = sim.dashboardData || dashboardData;
+        drawMdmsDashboardCanvas(sim.dashCtx, curData, state);
         sim.dashTexture.needsUpdate = true;
       }
 
@@ -1333,7 +1462,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
             boxShadow: `0 0 10px ${machineState === 'running' ? '#22c55e' : machineState === 'idle' ? '#facc15' : '#ef4444'}`,
           }} />
           <span style={{ fontWeight: 800, fontSize: '0.88rem', letterSpacing: '0.5px' }}>
-            5-AXIS CNC: {machineState.toUpperCase()}
+            CNC LATHE MACHINE: {machineState.toUpperCase()}
           </span>
         </div>
 
@@ -1355,7 +1484,7 @@ export default function MdmsFactory3D({ onBookDemo }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: '#94a3b8' }}>
           <Gauge size={14} color="#facc15" />
-          <span>Speed: <strong style={{ color: '#fff' }}>{dashboardData.cbrSpeed} m/min ({dashboardData.rpm} RPM)</strong></span>
+          <span>Count: <strong style={{ color: '#fff' }}>{dashboardData.m1ProducedCount} Pcs ({dashboardData.rpm} RPM)</strong></span>
         </div>
       </div>
 
@@ -1546,13 +1675,13 @@ export default function MdmsFactory3D({ onBookDemo }) {
           </div>
         </div>
 
-        {/* 2-Column Grid: Exact Client MDMS Dashboard (from Image 4) */}
+        {/* 2-Column Grid: Real CNC Lathe MDMS Shop-Floor Telemetry */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
           gap: '20px',
         }}>
-          {/* Column 1: Group 1 Overview & Pre-Treatment */}
+          {/* Column 1: Group 1 Overview & Shop-Floor Summary */}
           <div style={{
             background: 'rgba(15, 36, 62, 0.85)',
             border: '1.5px solid rgba(56, 189, 248, 0.35)',
@@ -1560,14 +1689,14 @@ export default function MdmsFactory3D({ onBookDemo }) {
             padding: '20px',
           }}>
             <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
-              GROUP SUMMARY · PRE-TREATMENT
+              GROUP SUMMARY · CNC LATHE SHOP
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '6px' }}>
-              <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#fff' }}>Group 1</h3>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>3 machines · Shift B · Night</span>
+              <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#fff' }}>Group 1 · Cylinder Turning Cell</h3>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>3 CNC Lathe Machines · Shift A</span>
             </div>
 
-            {/* Circular Availability & Produced Meters */}
+            {/* Circular Availability & Produced Count */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -1579,20 +1708,20 @@ export default function MdmsFactory3D({ onBookDemo }) {
               border: '1px solid rgba(255,255,255,0.06)',
             }}>
               <div>
-                <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#f97316', lineHeight: 1 }}>
+                <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#38bdf8', lineHeight: 1 }}>
                   {dashboardData.groupAvailability}%
                 </div>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', marginTop: '4px' }}>
-                  AVAILABILITY
+                  AVAILABILITY (OEE: 87.2%)
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
-                  {dashboardData.groupProducedMtr.toLocaleString()} <span style={{ fontSize: '1rem', color: '#38bdf8' }}>mtr</span>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                  {dashboardData.groupProducedCount.toLocaleString()} <span style={{ fontSize: '1rem', color: '#38bdf8' }}>Pcs</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
-                  PRODUCED · {dashboardData.groupRunTime} RUN
+                  TOTAL COUNT · Target: {dashboardData.groupTargetCount} Pcs
                 </div>
               </div>
             </div>
@@ -1613,89 +1742,166 @@ export default function MdmsFactory3D({ onBookDemo }) {
               </div>
             </div>
 
-            <div style={{ fontSize: '0.8rem', color: '#facc15', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Pause size={14} /> 1 machine idle (Mercerizer-01)
+            <div style={{ fontSize: '0.8rem', color: '#4ade80', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
+              <CheckCircle2 size={14} color="#4ade80" /> 2 Machines Running | ⏸ 1 Machine Idle (CNC Lathe - 03 Tool Setup)
+            </div>
+
+            {/* 7 Days Production Bar Chart */}
+            <div style={{ background: '#0a192f', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '8px' }}>
+                <span>LAST 7 DAYS · PRODUCTION (Pcs)</span>
+                <span style={{ color: '#38bdf8' }}>14,250 Pcs</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', alignItems: 'flex-end', height: '60px' }}>
+                {[
+                  { d: 'Sat', c: 1850, h: '70%' },
+                  { d: 'Sun', c: 420, h: '25%' },
+                  { d: 'Mon', c: 2100, h: '78%' },
+                  { d: 'Tue', c: 2300, h: '85%' },
+                  { d: 'Wed', c: 2450, h: '92%' },
+                  { d: 'Thu', c: 2600, h: '98%' },
+                  { d: 'Fri', c: 2530, h: '90%' },
+                ].map((item, idx) => (
+                  <div key={idx} style={{ textAlign: 'center' }}>
+                    <div style={{ height: item.h, background: '#0d9488', borderRadius: '3px 3px 0 0', width: '100%' }} />
+                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '4px' }}>{item.d}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Column 2: CBR-01 (CNC Milling Center) Live Telemetry Card */}
+          {/* Column 2: 3 Connected CNC Lathe Machines with Count & Live Parameters */}
           <div style={{
-            background: 'rgba(15, 36, 62, 0.85)',
-            border: '1.5px solid rgba(56, 189, 248, 0.35)',
-            borderRadius: '12px',
-            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>
-                  CNC-01 (CBR-01)
-                </h3>
-                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>5-Axis CNC Milling Center · Spindle Telemetry</span>
-              </div>
-              <span style={{
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                padding: '4px 10px',
-                borderRadius: '8px',
-                background: machineState === 'running' ? 'rgba(34, 197, 94, 0.2)' : machineState === 'idle' ? 'rgba(250, 204, 21, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                color: machineState === 'running' ? '#4ade80' : machineState === 'idle' ? '#fde047' : '#f87171',
-                border: `1px solid ${machineState === 'running' ? '#22c55e' : machineState === 'idle' ? '#facc15' : '#ef4444'}`,
-              }}>
-                ● {dashboardData.cbrStatus}
-              </span>
+            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              CONNECTED MACHINES · 3 CNC LATHE TURNING CENTERS
             </div>
 
+            {/* Machine 1: CNC Lathe Machine - 01 (Active in 3D) */}
             <div style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              justifyContent: 'space-between',
-              margin: '16px 0',
-              padding: '12px 16px',
-              background: '#0a192f',
-              borderRadius: '8px',
+              background: 'rgba(15, 36, 62, 0.9)',
+              border: '1.5px solid #0284c7',
+              borderRadius: '10px',
+              padding: '14px',
+              boxShadow: '0 4px 16px rgba(2, 132, 199, 0.25)',
             }}>
-              <div>
-                <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff' }}>
-                  {dashboardData.cbrProducedMtr.toLocaleString()}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>
+                    {dashboardData.m1Name} <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 600 }}>(Active 3D Machining Scene)</span>
+                  </h4>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{dashboardData.m1Sub} · Spec: {dashboardData.m1Diameter}</div>
+                </div>
+                <span style={{
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  background: machineState === 'running' ? 'rgba(34, 197, 94, 0.2)' : machineState === 'idle' ? 'rgba(250, 204, 21, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                  color: machineState === 'running' ? '#4ade80' : machineState === 'idle' ? '#fde047' : '#f87171',
+                  border: `1px solid ${machineState === 'running' ? '#22c55e' : machineState === 'idle' ? '#facc15' : '#ef4444'}`,
+                }}>
+                  ● {dashboardData.m1Status}
                 </span>
-                <span style={{ color: '#38bdf8', fontSize: '1rem', marginLeft: '6px' }}>mtr</span>
               </div>
-              <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
-                Speed: <strong style={{ color: '#facc15' }}>{dashboardData.cbrSpeed} m/min</strong> ({dashboardData.rpm} RPM)
+
+              {/* Count & Yield */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', margin: '8px 0' }}>
+                <div>
+                  <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#38bdf8' }}>{dashboardData.m1ProducedCount}</span>
+                  <span style={{ fontSize: '0.85rem', color: '#94a3b8', marginLeft: '4px' }}>Pcs (Count)</span>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                  Quality Yield: <strong style={{ color: '#4ade80' }}>99.4%</strong> ({dashboardData.m1OkCount} OK / {dashboardData.m1NgCount} NG)
+                </div>
+              </div>
+
+              {/* Parameters Box (PERA MITTER) */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '6px',
+                background: '#071527',
+                padding: '8px',
+                borderRadius: '6px',
+                border: '1px solid rgba(255,255,255,0.06)',
+                textAlign: 'center',
+              }}>
+                <div>
+                  <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>SPINDLE</div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>{dashboardData.m1Rpm} RPM</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>FEED RATE</div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#4ade80', fontFamily: 'monospace' }}>{dashboardData.m1Feed} mm/r</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>CYCLE TIME</div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#facc15', fontFamily: 'monospace' }}>{dashboardData.m1CycleTime}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>LOAD / TEMP</div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#e2e8f0', fontFamily: 'monospace' }}>{dashboardData.m1PowerKw} kW ({dashboardData.tempC}°C)</div>
+                </div>
               </div>
             </div>
 
-            {/* 4 Stats: Run Time, Idle, Stopped, Downtime */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '14px' }}>
-              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>RUN TIME</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#4ade80' }}>{dashboardData.cbrRunTime}</div>
-              </div>
-              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>IDLE</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#facc15' }}>{dashboardData.cbrIdleTime}</div>
-              </div>
-              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>STOPPED</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#94a3b8' }}>0m</div>
-              </div>
-              <div style={{ padding: '6px', borderRadius: '6px', background: '#0a192f', textAlign: 'center' }}>
-                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>DOWNTIME</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f87171' }}>{dashboardData.cbrDowntime}</div>
-              </div>
-            </div>
-
+            {/* Machine 2: CNC Lathe Machine - 02 */}
             <div style={{
-              background: '#050c18',
-              borderRadius: '8px',
-              padding: '10px 12px',
-              fontSize: '0.78rem',
-              fontFamily: 'monospace',
-              color: '#38bdf8',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(15, 36, 62, 0.75)',
+              border: '1px solid rgba(56, 189, 248, 0.25)',
+              borderRadius: '10px',
+              padding: '12px',
             }}>
-              <div>DI 1 (Spindle): <strong style={{ color: machineState === 'running' ? '#4ade80' : '#f87171' }}>{machineState === 'running' ? 'HIGH (Active)' : 'LOW'}</strong> | DI 2 (In-Cycle): <strong style={{ color: machineState === 'running' ? '#4ade80' : '#f87171' }}>{machineState === 'running' ? 'HIGH' : 'LOW'}</strong></div>
-              <div style={{ marginTop: '2px', color: '#cbd5e1' }}>RvmAiTech MDMS Data Logger: Transmitting via MQTT @ 1000Hz</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#fff' }}>{dashboardData.m2Name}</h4>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{dashboardData.m2Sub} · Spec: {dashboardData.m2Diameter}</div>
+                </div>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', border: '1px solid #22c55e' }}>
+                  ● {dashboardData.m2Status}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', margin: '6px 0' }}>
+                <div>
+                  <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8' }}>{dashboardData.m2ProducedCount}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8', marginLeft: '4px' }}>Pcs (Count)</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
+                  Spindle: <strong style={{ color: '#38bdf8' }}>{dashboardData.m2Rpm} RPM</strong> | Feed: <strong style={{ color: '#4ade80' }}>{dashboardData.m2Feed} mm/r</strong> | Cycle: <strong style={{ color: '#facc15' }}>{dashboardData.m2CycleTime}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Machine 3: CNC Lathe Machine - 03 */}
+            <div style={{
+              background: 'rgba(15, 36, 62, 0.75)',
+              border: '1px solid rgba(56, 189, 248, 0.25)',
+              borderRadius: '10px',
+              padding: '12px',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#fff' }}>{dashboardData.m3Name}</h4>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{dashboardData.m3Sub} · Spec: {dashboardData.m3Diameter}</div>
+                </div>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', background: 'rgba(250, 204, 21, 0.2)', color: '#fde047', border: '1px solid #facc15' }}>
+                  ⏸ {dashboardData.m3Status}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', margin: '6px 0' }}>
+                <div>
+                  <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#94a3b8' }}>{dashboardData.m3ProducedCount}</span>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8', marginLeft: '4px' }}>Pcs (Count)</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                  Spindle: <strong style={{ color: '#94a3b8' }}>0 RPM (Standby)</strong> | Cycle: <strong style={{ color: '#facc15' }}>{dashboardData.m3CycleTime}</strong> | Tool Setup
+                </div>
+              </div>
             </div>
           </div>
         </div>
