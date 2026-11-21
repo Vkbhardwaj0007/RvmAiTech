@@ -27,9 +27,6 @@ import { canRun3D } from '../components/heroScene3DSupport';
  *      or a slow connection downloads nothing at all.
  */
 const HeroScene3D = lazy(() => import('../components/HeroScene3D'));
-const SmartParking3DSimulator = lazy(() => import('../components/SmartParking3DSimulator'));
-const MdmsFactory3D = lazy(() => import('../components/MdmsFactory3D'));
-const SmartConveyor3D = lazy(() => import('../components/SmartConveyor3D'));
 
 const FB_STATS = [
   { value: '50+', label: 'Automation projects' },
@@ -227,60 +224,6 @@ export default function Home() {
 
       {/* PRODUCT SOLUTIONS SHOWCASE (MDMS, Datalogger, Home Automation separated) */}
       <ProductSolutionsSection />
-
-      {/* 3D INTERACTIVE MDMS FACTORY FLOOR */}
-      <section id="mdms-3d-floor" style={{ padding: '86px 0', background: 'linear-gradient(180deg, #ffffff 0%, #f1f6fd 100%)' }}>
-        <div className="wrap">
-          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 38px', maxWidth: 820 }}>
-            <div className="sec-kicker">Interactive 3D Factory Digital Twin</div>
-            <h2>
-              3D Live MDMS Shop-Floor &amp; Machine Telemetry
-            </h2>
-            <p style={{ maxWidth: 720, margin: '12px auto 0' }}>
-              Click any 3D machine on the shop floor (CNC, Hydraulic Press, Injection Molding, or Assembly Line) to inspect live OEE %, RPM, power draw, and simulate Run/Idle/Fault states in real time.
-            </p>
-          </div>
-          <Suspense fallback={null}>
-            <MdmsFactory3D onBookDemo={() => { setDemoProduct('MDMS (Machine Data Monitoring)'); setDemoOpen(true); }} />
-          </Suspense>
-        </div>
-      </section>
-
-      {/* 3D SMART CONVEYOR & AI MACHINE VISION INSPECTION DEMO */}
-      <section id="smart-conveyor-3d" style={{ padding: '86px 0', background: 'linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%)' }}>
-        <div className="wrap">
-          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 38px', maxWidth: 840 }}>
-            <div className="sec-kicker">Interactive 3D Industrial Machine Demo</div>
-            <h2>
-              Smart Conveyor Belt · AI Vision QC &amp; Automated OK / NG Sorting
-            </h2>
-            <p style={{ maxWidth: 740, margin: '12px auto 0' }}>
-              Real-world industrial automation in action: Aluminum extrusion roller conveyor with AC drive motor, Siemens PLC cabinet, overhead CMOS vision camera scanning packages, high-speed pneumatic reject pusher for NG defects, and live factory SCADA HMI telemetry.
-            </p>
-          </div>
-          <Suspense fallback={null}>
-            <SmartConveyor3D onBookDemo={() => { setDemoProduct('Smart Conveyor & AI Vision Inspection System'); setDemoOpen(true); }} />
-          </Suspense>
-        </div>
-      </section>
-
-      {/* 3D SMART PARKING SYSTEM — LIVE ANPR CAMERA, QR REGISTRATION & EXIT BILLING SIMULATOR */}
-      <section className="dark" id="smart-parking-3d" style={{ padding: '86px 0' }}>
-        <div className="wrap">
-          <div className="sec-head" style={{ textAlign: 'center', margin: '0 auto 38px', maxWidth: 820 }}>
-            <div className="sec-kicker">Interactive 3D Smart Parking System</div>
-            <h2 style={{ color: '#ffffff' }}>
-              ANPR Camera Scan · QR Customer Registration · Automated Exit Billing
-            </h2>
-            <p style={{ color: '#c4d4ea', maxWidth: 720, margin: '12px auto 0' }}>
-              Experience our complete 3D Smart Parking workflow: Entry ANPR number plate scan, Customer Kiosk QR registration (Name &amp; Phone), live slot timer, and automated Exit QR payment gate control.
-            </p>
-          </div>
-          <Suspense fallback={null}>
-            <SmartParking3DSimulator />
-          </Suspense>
-        </div>
-      </section>
 
       {/* WHY CHOOSE RVMAITECH */}
       <WhyChooseSection />
