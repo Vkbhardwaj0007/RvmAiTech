@@ -355,28 +355,28 @@ export default function SmartParking3DSimulator() {
 
     if (preset === 'cctv-top') {
       // Top-Down Bird's Eye View (Matching Images 1 & 4)
-      ref.targetCamPos.set(0, 28.0, 2.0);
-      ref.targetLookAt.set(0, 0, -5.0);
+      ref.targetCamPos.set(0, 36.0, 0.1);
+      ref.targetLookAt.set(0, 0, -2.0);
     } else if (preset === 'entry-anpr') {
       // Entry ANPR Camera View
-      ref.targetCamPos.set(-14.5, 4.2, 8.5);
+      ref.targetCamPos.set(-16.0, 4.5, 8.0);
       ref.targetLookAt.set(-11.5, 1.2, 3.2);
     } else if (preset === 'guard-room') {
       // Security Guard Cabin View
-      ref.targetCamPos.set(-17.5, 3.5, 5.0);
-      ref.targetLookAt.set(-16.0, 1.4, 1.2);
+      ref.targetCamPos.set(-19.0, 4.0, 5.0);
+      ref.targetLookAt.set(-15.5, 1.6, 0.5);
     } else if (preset === 'bays') {
       // Parking Bays Row View
-      ref.targetCamPos.set(0.5, 8.5, 8.0);
-      ref.targetLookAt.set(0.5, 0.5, -4.5);
+      ref.targetCamPos.set(0, 11.0, 9.0);
+      ref.targetLookAt.set(0, 0.5, -4.5);
     } else if (preset === 'exit-gate') {
       // Exit Gate Camera View
-      ref.targetCamPos.set(11.5, 4.2, 8.5);
-      ref.targetLookAt.set(11.5, 1.2, 3.2);
+      ref.targetCamPos.set(13.5, 4.5, 8.0);
+      ref.targetLookAt.set(11.2, 1.2, 3.2);
     } else {
-      // Perspective View
-      ref.targetCamPos.set(0, 14.0, 22.0);
-      ref.targetLookAt.set(0, 0.4, 0);
+      // Perspective View: Perfect Wide Angle framing
+      ref.targetCamPos.set(-1.5, 23.0, 27.0);
+      ref.targetLookAt.set(0, 0.4, -0.5);
     }
   };
 
@@ -407,27 +407,34 @@ export default function SmartParking3DSimulator() {
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x060f1b);
-    scene.fog = new THREE.FogExp2(0x060f1b, 0.014);
+    scene.fog = new THREE.FogExp2(0x060f1b, 0.008);
 
-    const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 180);
-    camera.position.set(0, 14.0, 22.0);
-    camera.lookAt(0, 0.4, 0);
+    const camera = new THREE.PerspectiveCamera(44, w / h, 0.1, 200);
+    camera.position.set(-1.5, 23.0, 27.0);
+    camera.lookAt(0, 0.4, -0.5);
     simRef.current.camera = camera;
 
-    // Environmental Lighting
-    scene.add(new THREE.AmbientLight(0xdbeafe, 1.3));
-    const sunLight = new THREE.DirectionalLight(0xffffff, 2.4);
-    sunLight.position.set(18, 26, 18);
+    // Multi-Point Balanced Lighting (Vibrant & Realistic Showroom Quality)
+    scene.add(new THREE.AmbientLight(0xffffff, 1.25));
+    const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x1e293b, 1.3);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xffffff, 2.3);
+    sunLight.position.set(16, 28, 22);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
     sunLight.shadow.camera.near = 0.5;
-    sunLight.shadow.camera.far = 70;
-    sunLight.shadow.camera.left = -25;
-    sunLight.shadow.camera.right = 25;
-    sunLight.shadow.camera.top = 25;
-    sunLight.shadow.camera.bottom = -25;
+    sunLight.shadow.camera.far = 80;
+    sunLight.shadow.camera.left = -30;
+    sunLight.shadow.camera.right = 30;
+    sunLight.shadow.camera.top = 30;
+    sunLight.shadow.camera.bottom = -30;
     scene.add(sunLight);
+
+    const fillLight = new THREE.DirectionalLight(0x93c5fd, 1.1);
+    fillLight.position.set(-22, 20, -18);
+    scene.add(fillLight);
 
     const entryScanLight = new THREE.PointLight(0x38bdf8, 0, 10);
     entryScanLight.position.set(-11.5, 2.2, 3.5);
@@ -458,6 +465,14 @@ export default function SmartParking3DSimulator() {
     // ----------------------------------------------------
     // 1. GROUND PLATFORM & MULTI-LANE ROADWAY (48m x 36m)
     // ----------------------------------------------------
+    const terrain = new THREE.Mesh(
+      new THREE.BoxGeometry(140.0, 0.2, 90.0),
+      new THREE.MeshStandardMaterial({ color: 0x091424, roughness: 0.95, metalness: 0.05 })
+    );
+    terrain.position.y = -0.32;
+    terrain.receiveShadow = true;
+    world.add(terrain);
+
     const ground = new THREE.Mesh(new THREE.BoxGeometry(48.0, 0.4, 34.0), matConcrete);
     ground.position.y = -0.22;
     ground.receiveShadow = true;
@@ -727,8 +742,8 @@ export default function SmartParking3DSimulator() {
     // ----------------------------------------------------
     const buildSedanCar = (colorHex) => {
       const g = new THREE.Group();
-      const pMat = new THREE.MeshStandardMaterial({ color: colorHex, metalness: 0.92, roughness: 0.16 });
-      const gMat = new THREE.MeshStandardMaterial({ color: 0x091424, metalness: 0.95, roughness: 0.08 });
+      const pMat = new THREE.MeshStandardMaterial({ color: colorHex, metalness: 0.35, roughness: 0.22 });
+      const gMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.85, roughness: 0.12, transparent: true, opacity: 0.75 });
 
       // Lower unibody
       const lower = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.44, 1.62), pMat);
@@ -771,6 +786,13 @@ export default function SmartParking3DSimulator() {
       rearWindow.rotation.z = 0.55;
       g.add(rearWindow);
 
+      // Side view mirrors
+      [-0.86, 0.86].forEach((mz) => {
+        const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.14), pMat);
+        mirror.position.set(0.65, 0.78, mz);
+        g.add(mirror);
+      });
+
       // Headlights & Taillights
       [-0.58, 0.58].forEach((hz) => {
         const hl = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.32), new THREE.MeshBasicMaterial({ color: 0xf8fafc }));
@@ -782,14 +804,22 @@ export default function SmartParking3DSimulator() {
       tailLight.position.set(-2.16, 0.48, 0);
       g.add(tailLight);
 
-      // HSRP License Plates
-      const fPlate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.48), matMarkingWhite);
+      // Realistic Indian HSRP License Plates (White with Blue IND strip)
+      const fPlate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.52), matMarkingWhite);
       fPlate.position.set(2.2, 0.22, 0);
       g.add(fPlate);
 
-      const rPlate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.48), matMarkingWhite);
+      const fInd = new THREE.Mesh(new THREE.BoxGeometry(0.042, 0.14, 0.08), new THREE.MeshBasicMaterial({ color: 0x1d4ed8 }));
+      fInd.position.set(2.2, 0.22, -0.22);
+      g.add(fInd);
+
+      const rPlate = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.14, 0.52), matMarkingWhite);
       rPlate.position.set(-2.2, 0.28, 0);
       g.add(rPlate);
+
+      const rInd = new THREE.Mesh(new THREE.BoxGeometry(0.042, 0.14, 0.08), new THREE.MeshBasicMaterial({ color: 0x1d4ed8 }));
+      rInd.position.set(-2.2, 0.28, 0.22);
+      g.add(rInd);
 
       // 4 Alloy Wheels with Brembo Calipers
       const matRubberTire = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.85 });
@@ -954,7 +984,9 @@ export default function SmartParking3DSimulator() {
           pb.rotation.y = Math.PI / 2;
           box.add(pb);
         } else {
-          const pc = buildSedanCar(slot.id.charCodeAt(1) % 2 === 0 ? 0x94a3b8 : 0x0f172a);
+          const CAR_COLORS = [0xf8fafc, 0xdc2626, 0x2563eb, 0x94a3b8, 0xd97706, 0x475569];
+          const colorPick = CAR_COLORS[Math.abs(slot.id.charCodeAt(0) * 11 + slot.id.charCodeAt(slot.id.length - 1)) % CAR_COLORS.length];
+          const pc = buildSedanCar(colorPick);
           pc.position.set(0, 0, 0);
           pc.rotation.y = Math.PI / 2;
           box.add(pc);
@@ -1421,11 +1453,70 @@ export default function SmartParking3DSimulator() {
             ))}
           </div>
 
-          {/* 3D Viewport with Live Zoomed ANPR Camera PIP HUD */}
-          <div style={{ position: 'relative', width: '100%', height: '520px', background: '#050c18' }}>
+          {/* Clean Active Stage Info Bar (Placed Outside 3D Canvas so vehicles are NEVER blocked!) */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            padding: '10px 18px',
+            background: 'rgba(15, 23, 42, 0.85)',
+            borderRadius: '10px',
+            border: '1px solid rgba(56, 189, 248, 0.25)',
+            margin: '6px 0 12px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <span style={{
+                background: '#0284c7',
+                color: '#fff',
+                fontSize: '0.72rem',
+                fontWeight: 900,
+                padding: '3px 8px',
+                borderRadius: '4px',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}>
+                STAGE {simStage + 1} OF 6
+              </span>
+              <span style={{ fontSize: '0.9rem', fontWeight: 900, color: '#f8fafc' }}>
+                {STAGES[simStage].title}
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                — {STAGES[simStage].desc}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setAutoPlay(!autoPlay)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '5px 14px',
+                  borderRadius: '6px',
+                  background: autoPlay ? '#ef4444' : '#16a34a',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  boxShadow: autoPlay ? '0 0 12px rgba(239, 68, 68, 0.4)' : '0 0 12px rgba(22, 163, 74, 0.4)',
+                }}
+              >
+                {autoPlay ? <Pause size={13} /> : <Play size={13} />}
+                {autoPlay ? 'PAUSE WORKFLOW' : 'AUTO PLAY WORKFLOW'}
+              </button>
+            </div>
+          </div>
+
+          {/* 3D Viewport with Live Zoomed ANPR Camera PIP HUD (Full Unblocked Visibility) */}
+          <div style={{ position: 'relative', width: '100%', height: '620px', background: '#050c18', borderRadius: '12px', overflow: 'hidden' }}>
             <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
 
-            {/* LIVE ZOOMED ANPR CAMERA PICTURE-IN-PICTURE (PIP) HUD */}
+            {/* LIVE ZOOMED ANPR CAMERA PICTURE-IN-PICTURE (PIP) HUD (100% Vector, Zero Broken Images) */}
             <div style={{
               position: 'absolute',
               top: '16px',
@@ -1434,7 +1525,7 @@ export default function SmartParking3DSimulator() {
               background: 'rgba(7, 16, 29, 0.94)',
               backdropFilter: 'blur(10px)',
               borderRadius: '12px',
-              border: '1.5px solid rgba(56, 189, 248, 0.4)',
+              border: '1.5px solid rgba(56, 189, 248, 0.45)',
               padding: '12px',
               boxShadow: '0 10px 30px rgba(0,0,0,0.7)',
               zIndex: 10,
@@ -1451,56 +1542,111 @@ export default function SmartParking3DSimulator() {
                 </span>
               </div>
 
-              {/* Simulated Camera Video Stream & Detection Bounding Box */}
+              {/* Vector Simulated Night-Vision Camera Feed & HSRP Detection */}
               <div style={{
                 position: 'relative',
-                height: '110px',
+                height: '115px',
                 borderRadius: '8px',
-                background: '#030812',
+                background: 'radial-gradient(ellipse at center, #0f2438 0%, #030812 100%)',
                 overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.1)',
-                display: 'grid',
-                placeItems: 'center',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}>
-                <img
-                  src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=400&q=80"
-                  alt="ANPR Stream"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }}
-                />
+                {/* Viewfinder Grid & Corner Reticles */}
+                <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+                  <line x1="10" y1="10" x2="25" y2="10" stroke="#38bdf8" strokeWidth="2" />
+                  <line x1="10" y1="10" x2="10" y2="25" stroke="#38bdf8" strokeWidth="2" />
+                  <line x1="290" y1="10" x2="305" y2="10" stroke="#38bdf8" strokeWidth="2" />
+                  <line x1="305" y1="10" x2="305" y2="25" stroke="#38bdf8" strokeWidth="2" />
+                  <line x1="10" y1="90" x2="25" y2="90" stroke="#38bdf8" strokeWidth="2" />
+                  <line x1="10" y1="75" x2="10" y2="90" stroke="#38bdf8" strokeWidth="2" />
+                  <line x1="290" y1="90" x2="305" y2="90" stroke="#38bdf8" strokeWidth="2" />
+                  <line x1="305" y1="75" x2="305" y2="90" stroke="#38bdf8" strokeWidth="2" />
+                  {/* Subtle target crosshairs */}
+                  <line x1="160" y1="20" x2="160" y2="35" stroke="rgba(56,189,248,0.3)" strokeWidth="1" strokeDasharray="3 3" />
+                  <line x1="160" y1="80" x2="160" y2="95" stroke="rgba(56,189,248,0.3)" strokeWidth="1" strokeDasharray="3 3" />
+                </svg>
 
-                {/* Animated Green OCR Detection Reticle */}
+                {/* Animated Green Laser Scan Line */}
                 <div style={{
                   position: 'absolute',
-                  width: '180px',
-                  height: '60px',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '2px',
+                  background: '#22c55e',
+                  boxShadow: '0 0 10px #22c55e, 0 0 20px #22c55e',
+                  animation: 'scanLine 2s infinite ease-in-out',
+                }} />
+
+                {/* Simulated Vehicle Silhouette & Optical Headlamp Glow */}
+                <div style={{ position: 'absolute', width: '220px', height: '45px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none', opacity: 0.7 }}>
+                  <div style={{ width: '28px', height: '14px', borderRadius: '50%', background: '#ffffff', filter: 'blur(6px)', opacity: 0.8 }} />
+                  <div style={{ width: '28px', height: '14px', borderRadius: '50%', background: '#ffffff', filter: 'blur(6px)', opacity: 0.8 }} />
+                </div>
+
+                {/* Animated Green OCR Detection Bounding Box */}
+                <div style={{
+                  position: 'relative',
+                  width: '210px',
+                  padding: '4px 6px',
                   border: '2px solid #22c55e',
-                  borderRadius: '4px',
-                  boxShadow: '0 0 12px rgba(34, 197, 94, 0.6)',
+                  borderRadius: '6px',
+                  background: 'rgba(5, 12, 22, 0.85)',
+                  boxShadow: '0 0 14px rgba(34, 197, 94, 0.65)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  gap: '8px',
                 }}>
+                  {/* Indian HSRP Blue IND Strip with Hologram */}
                   <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '2px',
-                    background: '#38bdf8',
-                    boxShadow: '0 0 8px #38bdf8',
-                    animation: 'scanLine 1.5s infinite linear',
-                  }} />
-                  <span style={{
-                    background: '#ffffff',
-                    color: '#0f172a',
+                    width: '18px',
+                    height: '28px',
+                    background: '#1d4ed8',
+                    borderRadius: '2px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontSize: '0.45rem',
                     fontWeight: 900,
-                    fontSize: '0.85rem',
-                    padding: '2px 8px',
-                    borderRadius: '3px',
-                    letterSpacing: '1px',
+                  }}>
+                    <span>🇮🇳</span>
+                    <span>IND</span>
+                  </div>
+
+                  {/* Embossed Registration Plate Text */}
+                  <span style={{
+                    fontFamily: 'monospace',
+                    fontWeight: 900,
+                    fontSize: '1.05rem',
+                    color: '#f8fafc',
+                    letterSpacing: '2px',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.8)',
                   }}>
                     {activeVehicleData.plate}
                   </span>
+                </div>
+
+                {/* Watermark Overlay */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '4px',
+                  left: '8px',
+                  right: '8px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.58rem',
+                  color: '#64748b',
+                  fontFamily: 'monospace',
+                }}>
+                  <span>RvmAiTech-ANPR-v4.2</span>
+                  <span>1080P @ 60FPS</span>
                 </div>
               </div>
 
@@ -1510,30 +1656,6 @@ export default function SmartParking3DSimulator() {
                 <div>Slot: <strong style={{ color: '#22c55e' }}>{activeVehicleData.assignedSlot}</strong></div>
                 <div>Gate: <strong style={{ color: '#38bdf8' }}>Entrance Barrier A</strong></div>
                 <div>Auth: <strong style={{ color: '#4ade80' }}>AUTHORIZED</strong></div>
-              </div>
-            </div>
-
-            {/* Bottom Left Quick Stage Overview Banner */}
-            <div style={{
-              position: 'absolute',
-              bottom: '16px',
-              left: '16px',
-              maxWidth: '520px',
-              background: 'rgba(7, 16, 29, 0.94)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '10px',
-              border: '1px solid rgba(56, 189, 248, 0.3)',
-              padding: '12px 16px',
-              zIndex: 10,
-            }}>
-              <div style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                LIVE WORKFLOW SEQUENCE: STAGE {simStage + 1} OF 6
-              </div>
-              <div style={{ fontSize: '0.95rem', fontWeight: 900, color: '#fff', marginTop: '3px' }}>
-                {STAGES[simStage].title}
-              </div>
-              <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: '3px' }}>
-                {STAGES[simStage].desc}
               </div>
             </div>
           </div>
@@ -1762,20 +1884,58 @@ export default function SmartParking3DSimulator() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '16px' }}>
             {[
-              { id: 'CAM-01', title: 'ENTRY GATE ANPR OCR CAMERA', feedUrl: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80', status: 'ACTIVE SCANNING' },
-              { id: 'CAM-02', title: 'EXIT GATE AUTOMATED BILLING CAM', feedUrl: 'https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=600&q=80', status: 'STANDBY' },
-              { id: 'CAM-03', title: 'ZONE A & B CAR BAY SURVEILLANCE', feedUrl: 'https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=600&q=80', status: 'AI OCCUPANCY TRACKING' },
-              { id: 'CAM-04', title: 'SECURITY GUARD CABIN PERIMETER', feedUrl: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=600&q=80', status: 'GUARD ON DUTY' },
+              { id: 'CAM-01', title: 'ENTRY GATE ANPR OCR CAMERA', status: 'ACTIVE SCANNING', plate: 'HR-38-AB-7052', color: '#22c55e' },
+              { id: 'CAM-02', title: 'EXIT GATE AUTOMATED BILLING CAM', status: 'STANDBY READY', plate: 'DL-01-CZ-3341', color: '#f47b20' },
+              { id: 'CAM-03', title: 'ZONE A & B CAR BAY SURVEILLANCE', status: 'AI OCCUPANCY TRACKING', plate: 'UP-16-EK-4011', color: '#38bdf8' },
+              { id: 'CAM-04', title: 'SECURITY GUARD CABIN PERIMETER', status: 'GUARD ON DUTY', plate: 'HR-26-DK-9080', color: '#a855f7' },
             ].map((cam) => (
               <div key={cam.id} style={{ background: '#050c18', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
                 <div style={{ padding: '8px 12px', background: '#0a1626', display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 800 }}>
                   <span style={{ color: '#fff' }}>{cam.id}: {cam.title}</span>
                   <span style={{ color: '#38bdf8' }}>{cam.status}</span>
                 </div>
-                <div style={{ position: 'relative', height: '180px' }}>
-                  <img src={cam.feedUrl} alt={cam.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <div style={{ position: 'absolute', top: '8px', left: '8px', background: 'rgba(0,0,0,0.7)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', color: '#4ade80' }}>
-                    ● LIVE
+                <div style={{
+                  position: 'relative',
+                  height: '180px',
+                  background: 'radial-gradient(ellipse at center, #0c2035 0%, #030812 100%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}>
+                  {/* Viewfinder crosshairs & reticles */}
+                  <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+                    <line x1="16" y1="16" x2="36" y2="16" stroke={cam.color} strokeWidth="2" />
+                    <line x1="16" y1="16" x2="16" y2="36" stroke={cam.color} strokeWidth="2" />
+                    <line x1="95%" y1="16" x2="98%" y2="16" stroke={cam.color} strokeWidth="2" />
+                    <line x1="98%" y1="16" x2="98%" y2="36" stroke={cam.color} strokeWidth="2" />
+                    <line x1="16" y1="90%" x2="36" y2="90%" stroke={cam.color} strokeWidth="2" />
+                    <line x1="16" y1="80%" x2="16" y2="90%" stroke={cam.color} strokeWidth="2" />
+                  </svg>
+
+                  {/* AI Detection Bounding Box */}
+                  <div style={{
+                    padding: '8px 14px',
+                    border: `2px solid ${cam.color}`,
+                    borderRadius: '6px',
+                    background: 'rgba(5, 12, 22, 0.85)',
+                    boxShadow: `0 0 16px ${cam.color}44`,
+                    textAlign: 'center',
+                  }}>
+                    <div style={{ fontSize: '0.65rem', color: cam.color, fontWeight: 900, letterSpacing: '0.08em' }}>
+                      AI VEHICLE TARGET ACQUIRED
+                    </div>
+                    <div style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '2px', marginTop: '3px' }}>
+                      {cam.plate}
+                    </div>
+                  </div>
+
+                  <div style={{ position: 'absolute', top: '8px', left: '8px', background: 'rgba(0,0,0,0.7)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.68rem', color: '#4ade80', fontWeight: 800 }}>
+                    ● LIVE 1080p
+                  </div>
+                  <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(0,0,0,0.7)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.65rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+                    RvmAiTech CCTV Hub
                   </div>
                 </div>
               </div>
