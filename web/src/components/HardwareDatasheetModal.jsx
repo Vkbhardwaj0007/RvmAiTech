@@ -325,3 +325,4 @@ export default function HardwareDatasheetModal({ isOpen, onClose, variant = 'hom
     </div>
   );
 }
+

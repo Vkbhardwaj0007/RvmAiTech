@@ -6,6 +6,7 @@ import { PageHero } from './_hero.jsx';
 const RvmHardwareModule3D = lazy(() => import('../components/RvmHardwareModule3D'));
 const HardwareWiringGuide = lazy(() => import('../components/HardwareWiringGuide'));
 const RoiCalculator = lazy(() => import('../components/RoiCalculator'));
+const FactoryEfficiencyCalculator = lazy(() => import('../components/FactoryEfficiencyCalculator'));
 const CAT_INTRO = {
   Datalogger: {
     title: 'Datalogger — The Edge of MDMS',
@@ -179,8 +180,15 @@ export default function Products() {
           )}
         </div>
 
-        {/* Interactive ROI & Downtime Savings Calculator */}
+        {/* Factory OEE & Efficiency Diagnostic Calculator (Before vs After MDMS) */}
         <div style={{ marginTop: '48px' }}>
+          <Suspense fallback={null}>
+            <FactoryEfficiencyCalculator />
+          </Suspense>
+        </div>
+
+        {/* Interactive ROI & Downtime Savings Calculator */}
+        <div style={{ marginTop: '36px' }}>
           <Suspense fallback={null}>
             <RoiCalculator />
           </Suspense>
