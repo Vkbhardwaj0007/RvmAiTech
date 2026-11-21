@@ -169,7 +169,7 @@ export default function Home() {
                 <span className="card-link card-action-link">Learn more →</span>
               </Link>
             ))}
-            {services.length === 0 && <p className="muted">Services load nahi hue — backend chalu hai? (port 4000)</p>}
+            {services.length === 0 && <p className="muted">Loading enterprise services...</p>}
           </div>
         </div>
       </section>

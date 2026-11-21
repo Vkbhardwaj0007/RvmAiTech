@@ -3,12 +3,12 @@ import client from '../api/client';
 import { Sparkles, X, Send, Bot, MessageSquare, ArrowRight, RefreshCw, User } from 'lucide-react';
 
 const SUGGESTIONS = [
-  '🚗 Smart Parking kaise kaam karta hai?',
-  '⚡ Custom PCB Design ka kya process hai?',
+  '🚗 How does Smart Parking work?',
+  '⚡ What is your Custom PCB Design process?',
   '🏭 Industrial IoT & Modbus telemetry details',
-  '🎓 School ERP ke key features kya hain?',
-  '🏨 Hotel PMS software me kya milta hai?',
-  '💰 Project pricing & quotation kaise milega?',
+  '🎓 School ERP key features & modules',
+  '🏨 Hotel PMS software capabilities',
+  '💰 Project quotation & pricing estimate',
 ];
 
 export default function AiAssistant() {
@@ -45,14 +45,14 @@ export default function AiAssistant() {
       }));
 
       const res = await client.post('/ai/ask', { message: q, history });
-      const reply = res.data?.reply || 'Dhanyawad! Hamari team aapki requirement review karke WhatsApp par connect karegi (+91 70520 50656).';
+      const reply = res.data?.reply || 'Thank you! Our engineering team will review your requirement and connect with you on WhatsApp (+91 70520 50656).';
       setMessages((prev) => [...prev, { role: 'assistant', text: reply }]);
     } catch {
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          text: 'Maaf kijiye, server busy hai. Aap direct hamare Lead System Architect se WhatsApp par instantly baat kar sakte hain: **+91 70520 50656**',
+          text: 'The AI assistant service is temporarily busy. You can speak directly with our Lead System Architect on WhatsApp: **+91 70520 50656**',
         },
       ]);
     } finally {

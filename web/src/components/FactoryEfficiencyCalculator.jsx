@@ -150,7 +150,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
           Factory Efficiency Calculator: Before vs After MDMS
         </h3>
         <p style={{ color: '#94a3b8', fontSize: '0.92rem', margin: '10px auto 0', lineHeight: 1.6 }}>
-          Pata karein ki aapki factory ka current <b>OEE (Overall Equipment Effectiveness)</b> kitna hai, aur <b>RvmAiTech MDMS IoT Controller</b> lagane ke baad efficiency <b>kitne percent INCREASE hogi</b> aur extra production profit kitna milega.
+          Calculate your plant's current <b>OEE (Overall Equipment Effectiveness)</b> and discover how deploying the <b>RvmAiTech MDMS IoT Controller</b> significantly <b>boosts overall manufacturing efficiency</b> and monthly production output.
         </p>
       </div>
 
@@ -169,7 +169,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '12px' }}>
             <Factory size={18} color="#38bdf8" />
-            <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#f8fafc' }}>Aapke Factory Parameters Input Karein:</span>
+            <span style={{ fontWeight: 800, fontSize: '0.92rem', color: '#f8fafc' }}>Input Shop-Floor Parameters:</span>
           </div>
 
           {/* Slider 1: Machines */}
@@ -250,7 +250,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
               style={{ width: '100%', accentColor: '#ef4444', cursor: 'pointer' }}
             />
             <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-              (Tool change delay, tea lag, material waiting, undetected machine stoppage)
+              (Tool change delays, tea lags, material wait times, unlogged machine stoppages)
             </span>
           </div>
 
@@ -258,7 +258,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px' }}>
-                <span style={{ color: '#94a3b8', fontWeight: 600 }}>Cycle Time:</span>
+                <span style={{ color: '#94a3b8', fontWeight: 600 }}>Ideal Cycle Time:</span>
                 <span style={{ color: '#f59e0b', fontWeight: 800 }}>{idealCycleTimeSec}s</span>
               </div>
               <input
@@ -328,10 +328,10 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
                 </div>
                 <div>
                   <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 900, color: '#ffffff' }}>
-                    MDMS Lagane Se Efficiency <span style={{ color: '#4ade80', textDecoration: 'underline' }}>BAHUT JAYADA (INCREASE)</span> Hogi!
+                    Deploying MDMS Will <span style={{ color: '#4ade80', textDecoration: 'underline' }}>SIGNIFICANTLY INCREASE</span> Plant Efficiency!
                   </h4>
                   <p style={{ margin: '3px 0 0', fontSize: '0.78rem', color: '#cbd5e1' }}>
-                    Zero manual registers, instant breakdown alert, aur live machine speed tracking se overall plant OEE <b>+{metrics.oeeDelta}%</b> badh jati hai.
+                    Zero manual paperwork, instant automated breakdown dispatch, and real-time spindle cycle tracking increases overall plant OEE by <b>+{metrics.oeeDelta}%</b>.
                   </p>
                 </div>
               </div>
@@ -362,7 +362,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
               padding: '16px',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f87171', fontWeight: 800, fontSize: '0.8rem', marginBottom: '8px' }}>
-                <AlertTriangle size={15} /> BINA MDMS KE (Current)
+                <AlertTriangle size={15} /> WITHOUT MDMS (Current Baseline)
               </div>
 
               <div style={{ fontSize: '2rem', fontWeight: 900, color: '#fca5a5' }}>
@@ -374,7 +374,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
                 <div>• Availability: <b style={{ color: '#fff' }}>{metrics.current.availability}%</b></div>
                 <div>• Performance: <b style={{ color: '#fff' }}>{metrics.current.performance}%</b></div>
                 <div>• Quality Rate: <b style={{ color: '#fff' }}>{metrics.current.quality}%</b></div>
-                <div>• Breakdown Loss: <b style={{ color: '#f87171' }}>{metrics.current.downtimeMin} m/shift</b></div>
+                <div>• Breakdown Loss: <b style={{ color: '#f87171' }}>{metrics.current.downtimeMin} min/shift</b></div>
               </div>
 
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px', fontSize: '0.74rem', color: '#94a3b8' }}>
@@ -391,7 +391,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
               position: 'relative',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4ade80', fontWeight: 800, fontSize: '0.8rem', marginBottom: '8px' }}>
-                <Sparkles size={15} /> RVMAITECH MDMS KE SATH
+                <Sparkles size={15} /> WITH RVMAITECH MDMS (Optimized)
               </div>
 
               <div style={{ fontSize: '2rem', fontWeight: 900, color: '#4ade80' }}>
@@ -403,7 +403,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
                 <div>• Availability: <b style={{ color: '#4ade80' }}>{metrics.mdms.availability}%</b></div>
                 <div>• Performance: <b style={{ color: '#4ade80' }}>{metrics.mdms.performance}%</b></div>
                 <div>• Quality Rate: <b style={{ color: '#4ade80' }}>{metrics.mdms.quality}%</b></div>
-                <div>• Breakdown Loss: <b style={{ color: '#4ade80' }}>{metrics.mdms.downtimeMin} m/shift</b> (45% Cut)</div>
+                <div>• Breakdown Loss: <b style={{ color: '#4ade80' }}>{metrics.mdms.downtimeMin} min/shift</b> (45% Cut)</div>
               </div>
 
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px', fontSize: '0.74rem', color: '#94a3b8' }}>
@@ -425,14 +425,14 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
           }}>
             <div>
               <span style={{ fontSize: '0.72rem', color: '#bae6fd', fontWeight: 700, textTransform: 'uppercase' }}>
-                EXTRA PRODUCTION VALUE PER MONTH:
+                ADDITIONAL PRODUCTION VALUE PER MONTH:
               </span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#ffffff' }}>
                 +₹{metrics.extraRevenuePerMonth.toLocaleString('en-IN')}
                 <span style={{ fontSize: '0.8rem', color: '#e0f2fe', fontWeight: 600 }}> / month</span>
               </div>
               <span style={{ fontSize: '0.74rem', color: '#bae6fd' }}>
-                (+{metrics.extraPiecesPerMonth.toLocaleString('en-IN')} additional finished pieces without buying new machines)
+                (+{metrics.extraPiecesPerMonth.toLocaleString('en-IN')} extra finished pieces without purchasing new machines)
               </span>
             </div>
 
@@ -465,7 +465,7 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
             </button>
           </div>
 
-          {/* Explanation bullet points for User */}
+          {/* Explanation bullet points */}
           <div style={{
             background: 'rgba(15, 23, 42, 0.6)',
             borderRadius: '10px',
@@ -474,11 +474,11 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
             color: '#94a3b8',
             lineHeight: 1.5,
           }}>
-            <b style={{ color: '#38bdf8' }}>💡 MDMS Se Efficiency Kaise Badhti Hai?</b>
+            <b style={{ color: '#38bdf8' }}>💡 How Does MDMS Increase Factory Efficiency?</b>
             <div style={{ marginTop: '4px' }}>
-              1. <b>Zero Manipulation:</b> Operator register me jhoothi reading nahi bhar sakta; MDMS seedha machine ke spindle pulse se real count leta hai.<br />
-              2. <b>Fast Breakdown Response:</b> Machine rukte hi supervisor ke mobile par alert chala jata hai, jisse idle time 45% kam ho jata hai.<br />
-              3. <b>Preventive Maintenance:</b> Breakdown aane se pehle motor overload aur cycle speed drop alert mil jata hai.
+              1. <b>Zero Log Manipulation:</b> Eliminates falsified manual operator entries by tapping straight into the machine spindle pulse &amp; cycle sensors.<br />
+              2. <b>Immediate Breakdown Response:</b> Sends instant automated mobile siren alerts to maintenance leads within 1 second of stoppage, cutting idle response time by 45%.<br />
+              3. <b>Predictive Maintenance:</b> Monitors motor thermal draw and micro-pauses before full machine breakdowns occur, preventing costly production halts.
             </div>
           </div>
         </div>
@@ -487,3 +487,4 @@ export default function FactoryEfficiencyCalculator({ onOpenQuote }) {
     </div>
   );
 }
+

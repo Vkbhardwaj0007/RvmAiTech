@@ -33,13 +33,13 @@ export default function Contact() {
 
   async function submit(e) {
     e.preventDefault();
-    if (!form.name) { setErr('Naam zaroori hai'); return; }
+    if (!form.name) { setErr('Name is required'); return; }
     setBusy(true); setErr('');
     try {
       await client.post('/contact', { ...form, source: 'Website Contact Page' });
       setSent(true);
     } catch (ex) {
-      setErr(ex?.response?.data?.message || 'Bhej nahi paye — thodi der baad try karo.');
+      setErr(ex?.response?.data?.message || 'Could not send message — please try again later.');
     } finally { setBusy(false); }
   }
 
