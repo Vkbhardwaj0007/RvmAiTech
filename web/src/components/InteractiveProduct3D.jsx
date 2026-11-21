@@ -68,37 +68,61 @@ export default function InteractiveProduct3D({ mode = 'mdms', label = '360° Int
 
     const animatedParts = [];
 
-    if (mode === 'datalogger') {
-      // 3D Edge IoT Datalogger Enclosure & PCB
-      const board = new THREE.Mesh(track(new THREE.BoxGeometry(2.7, 0.22, 1.85)), matNavy);
-      root.add(board);
+    const matAbsBlack = track(new THREE.MeshStandardMaterial({ color: 0x181c24, metalness: 0.25, roughness: 0.65 }));
+    const matTerminalGreen = track(new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.45, metalness: 0.2 }));
+    const matScrewSilver = track(new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.95, roughness: 0.15 }));
+    const matBrassGold = track(new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.92, roughness: 0.25 }));
 
-      const chip = new THREE.Mesh(track(new THREE.BoxGeometry(0.85, 0.18, 0.85)), matDark);
-      chip.position.set(0, 0.18, 0);
+    if (mode === 'datalogger' || mode === 'mdms') {
+      // 3D RvmAiTech Industrial MDMS Datalogger Enclosure (Green Scheme)
+      const enc = new THREE.Mesh(track(new THREE.BoxGeometry(2.8, 0.58, 1.65)), matAbsBlack);
+      root.add(enc);
+
+      // Green Accent Top Face / Label
+      const topLabel = new THREE.Mesh(track(new THREE.BoxGeometry(2.5, 0.04, 1.35)), matGreen);
+      topLabel.position.y = 0.3;
+      root.add(topLabel);
+
+      // Core Microprocessor Badge
+      const chip = new THREE.Mesh(track(new THREE.BoxGeometry(0.8, 0.08, 0.55)), matDark);
+      chip.position.set(0, 0.33, 0);
       root.add(chip);
 
-      const chipCore = new THREE.Mesh(track(new THREE.BoxGeometry(0.5, 0.08, 0.5)), matCyan);
-      chipCore.position.set(0, 0.28, 0);
-      root.add(chipCore);
+      // Green Front Terminal Blocks (16-Pin for DI/DO)
+      const termF = new THREE.Mesh(track(new THREE.BoxGeometry(2.5, 0.32, 0.28)), matTerminalGreen);
+      termF.position.set(0, -0.05, 0.88);
+      root.add(termF);
 
-      // Pin headers / RS485 terminal blocks
-      for (let i = -3; i <= 3; i++) {
-        const pin = new THREE.Mesh(track(new THREE.BoxGeometry(0.18, 0.24, 0.26)), i % 2 === 0 ? matOrange : matCyan);
-        pin.position.set(i * 0.32, 0.18, 0.72);
-        root.add(pin);
+      // Terminal Screws
+      for (let i = -5; i <= 5; i++) {
+        const scr = new THREE.Mesh(track(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 10)), matScrewSilver);
+        scr.position.set(i * 0.22, 0.13, 0.9);
+        root.add(scr);
       }
 
-      // 4G Antenna
-      const antBase = new THREE.Mesh(track(new THREE.CylinderGeometry(0.12, 0.14, 0.3, 16)), matOrange);
-      antBase.position.set(1.05, 0.25, -0.62);
-      root.add(antBase);
+      // Top Terminal Block (Power & RS485)
+      const termT = new THREE.Mesh(track(new THREE.BoxGeometry(1.6, 0.3, 0.25)), matTerminalGreen);
+      termT.position.set(-0.35, 0.05, -0.88);
+      root.add(termT);
 
-      const antRod = new THREE.Mesh(track(new THREE.CylinderGeometry(0.05, 0.08, 1.35, 16)), matDark);
-      antRod.position.set(1.05, 0.95, -0.62);
-      root.add(antRod);
+      // SMA Brass Connector & Dipole Antenna
+      const sma = new THREE.Mesh(track(new THREE.CylinderGeometry(0.08, 0.1, 0.18, 12)), matBrassGold);
+      sma.rotation.x = Math.PI / 2;
+      sma.position.set(1.1, 0.12, -0.88);
+      root.add(sma);
+
+      const antMast = new THREE.Mesh(track(new THREE.CylinderGeometry(0.05, 0.07, 1.5, 14)), matDark);
+      antMast.position.set(1.1, 0.85, -0.92);
+      antMast.rotation.x = -0.15;
+      root.add(antMast);
+
+      // RJ45 Ethernet Port
+      const rj45 = new THREE.Mesh(track(new THREE.BoxGeometry(0.42, 0.34, 0.38)), matScrewSilver);
+      rj45.position.set(0.68, 0.12, -0.88);
+      root.add(rj45);
 
       const signalRing = new THREE.Mesh(track(new THREE.TorusGeometry(0.45, 0.025, 12, 36)), matWireCyan);
-      signalRing.position.set(1.05, 1.45, -0.62);
+      signalRing.position.set(1.1, 1.5, -0.95);
       signalRing.rotation.x = Math.PI / 2;
       root.add(signalRing);
       animatedParts.push((t) => {
@@ -107,38 +131,57 @@ export default function InteractiveProduct3D({ mode = 'mdms', label = '360° Int
         signalRing.rotation.z = t;
       });
 
-      const holoShell = new THREE.Mesh(track(new THREE.IcosahedronGeometry(1.75, 1)), matWireOrange);
+      const holoShell = new THREE.Mesh(track(new THREE.IcosahedronGeometry(1.85, 1)), matWireOrange);
       root.add(holoShell);
       animatedParts.push((t) => {
         holoShell.rotation.y = -t * 0.35;
       });
     } else if (mode === 'home') {
-      // 3D Smart Glass Switch Panel + Wireless IoT Rings
-      const panel = new THREE.Mesh(track(new THREE.BoxGeometry(2.3, 2.3, 0.24)), matDark);
-      root.add(panel);
+      // 3D RvmAiTech Smart Home Automation Controller (Blue Scheme)
+      const enc = new THREE.Mesh(track(new THREE.BoxGeometry(2.8, 0.58, 1.65)), matAbsBlack);
+      root.add(enc);
 
-      const frame = new THREE.Mesh(track(new THREE.BoxGeometry(2.42, 2.42, 0.16)), matNavy);
-      frame.position.z = -0.05;
-      root.add(frame);
+      // Blue Accent Top Label
+      const topLabel = new THREE.Mesh(track(new THREE.BoxGeometry(2.5, 0.04, 1.35)), matCyan);
+      topLabel.position.y = 0.3;
+      root.add(topLabel);
 
-      const positions = [
-        [-0.55, 0.55],
-        [0.55, 0.55],
-        [-0.55, -0.55],
-        [0.55, -0.55],
-      ];
-      positions.forEach(([x, y], idx) => {
-        const ring = new THREE.Mesh(
-          track(new THREE.TorusGeometry(0.3, 0.04, 14, 32)),
-          idx % 2 === 0 ? matCyan : matOrange
-        );
-        ring.position.set(x, y, 0.14);
-        root.add(ring);
+      // RvmAiTech Badge
+      const chip = new THREE.Mesh(track(new THREE.BoxGeometry(0.85, 0.08, 0.55)), matDark);
+      chip.position.set(0, 0.33, 0);
+      root.add(chip);
 
-        const dot = new THREE.Mesh(track(new THREE.SphereGeometry(0.09, 16, 16)), matGreen);
-        dot.position.set(x, y, 0.15);
-        root.add(dot);
-      });
+      // 8 Relay Terminal Outputs (Front Green Block)
+      const termF = new THREE.Mesh(track(new THREE.BoxGeometry(2.5, 0.32, 0.28)), matTerminalGreen);
+      termF.position.set(0, -0.05, 0.88);
+      root.add(termF);
+
+      for (let i = -5; i <= 5; i++) {
+        const scr = new THREE.Mesh(track(new THREE.CylinderGeometry(0.04, 0.04, 0.03, 10)), matScrewSilver);
+        scr.position.set(i * 0.22, 0.13, 0.9);
+        root.add(scr);
+      }
+
+      // Top Terminals (RS485 & 7~36V DC)
+      const termT = new THREE.Mesh(track(new THREE.BoxGeometry(1.6, 0.3, 0.25)), matTerminalGreen);
+      termT.position.set(-0.35, 0.05, -0.88);
+      root.add(termT);
+
+      // SMA Brass Connector & WiFi Dipole Antenna
+      const sma = new THREE.Mesh(track(new THREE.CylinderGeometry(0.08, 0.1, 0.18, 12)), matBrassGold);
+      sma.rotation.x = Math.PI / 2;
+      sma.position.set(1.1, 0.12, -0.88);
+      root.add(sma);
+
+      const antMast = new THREE.Mesh(track(new THREE.CylinderGeometry(0.05, 0.07, 1.5, 14)), matDark);
+      antMast.position.set(1.1, 0.85, -0.92);
+      antMast.rotation.x = -0.15;
+      root.add(antMast);
+
+      // RJ45 Ethernet Port
+      const rj45 = new THREE.Mesh(track(new THREE.BoxGeometry(0.42, 0.34, 0.38)), matScrewSilver);
+      rj45.position.set(0.68, 0.12, -0.88);
+      root.add(rj45);
 
       const wave = new THREE.Mesh(track(new THREE.TorusGeometry(1.65, 0.025, 12, 48)), matWireCyan);
       root.add(wave);

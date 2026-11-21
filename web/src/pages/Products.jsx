@@ -3,8 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import client from '../api/client';
 import { PageHero } from './_hero.jsx';
 
-const SmartParking3DSimulator = lazy(() => import('../components/SmartParking3DSimulator'));
-const MdmsFactory3D = lazy(() => import('../components/MdmsFactory3D'));
+const RvmHardwareModule3D = lazy(() => import('../components/RvmHardwareModule3D'));
 const CAT_INTRO = {
   Datalogger: {
     title: 'Datalogger — The Edge of MDMS',
@@ -107,21 +106,34 @@ export default function Products() {
           ))}
         </div>
 
-        {category === 'MDMS' && (
-          <div style={{ margin: '28px 0 36px' }}>
-            <Suspense fallback={null}>
-              <MdmsFactory3D />
-            </Suspense>
+        {/* Interactive 3D Hardware Module: RvmAiTech Home Automation & Industrial MDMS Datalogger */}
+        <div style={{ margin: '28px 0 36px' }}>
+          <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <span className="sec-kicker" style={{ fontSize: '0.75rem' }}>Interactive 3D Hardware Digital Twin</span>
+              <h3 style={{ margin: '2px 0 0', fontSize: '1.25rem', fontWeight: 800, color: '#0d2649' }}>
+                {category === 'MDMS' || category === 'Datalogger'
+                  ? 'RvmAiTech MDMS Industrial Edge Datalogger (3D Module)'
+                  : category === 'Smart Home Automation' || category === 'Home Automation'
+                  ? 'RvmAiTech Smart Home Automation IoT Hub (3D Module)'
+                  : 'RvmAiTech Universal IoT Hardware Controller (Home & Industrial MDMS)'}
+              </h3>
+            </div>
+            <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+              Drag to rotate 360° · Switch Home / MDMS Edition below
+            </span>
           </div>
-        )}
 
-        {(category === 'Smart Parking' || category === 'all') && (
-          <div style={{ margin: '28px 0 36px' }}>
-            <Suspense fallback={null}>
-              <SmartParking3DSimulator />
-            </Suspense>
-          </div>
-        )}
+          <Suspense fallback={
+            <div style={{ height: '480px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a1626', borderRadius: '16px', color: '#38bdf8' }}>
+              Loading 3D Hardware Digital Twin...
+            </div>
+          }>
+            <RvmHardwareModule3D
+              initialVariant={category === 'MDMS' || category === 'Datalogger' ? 'mdms' : 'home'}
+            />
+          </Suspense>
+        </div>
 
         <div className="grid-3" style={{ marginTop: 26 }}>
           {items.map((p) => (
