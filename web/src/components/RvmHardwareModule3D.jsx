@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import * as THREE from 'three';
 import {
   RotateCcw, Sparkles, Layers, CheckCircle2, Zap, Wifi, Cpu, ShieldCheck,
-  Maximize2, Eye, Info
+  Maximize2, Eye, Info, FileText
 } from 'lucide-react';
+
+const HardwareDatasheetModal = lazy(() => import('./HardwareDatasheetModal'));
 
 /**
  * Generates an ultra-crisp, realistic top-sticker texture matching the user's hardware photos.
@@ -252,6 +254,7 @@ export default function RvmHardwareModule3D({
   const [variant, setVariant] = useState(initialVariant); // 'home' | 'mdms'
   const [activePinout, setActivePinout] = useState('overview'); // 'overview' | 'relays' | 'inputs' | 'rs485' | 'antenna' | 'din'
   const [autoRotate, setAutoRotate] = useState(true);
+  const [showDatasheet, setShowDatasheet] = useState(false);
 
   // Interactive 3D scene refs
   const simRef = useRef({
@@ -642,8 +645,30 @@ export default function RvmHardwareModule3D({
           </button>
         </div>
 
-        {/* View / Auto-Rotate Action Buttons */}
+        {/* View / Auto-Rotate Action Buttons & Datasheet */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={() => setShowDatasheet(true)}
+            style={{
+              padding: '5px 12px',
+              borderRadius: '6px',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.35) 0%, rgba(14, 165, 233, 0.2) 100%)',
+              color: '#38bdf8',
+              fontSize: '0.74rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              boxShadow: '0 2px 8px rgba(2, 132, 199, 0.3)',
+            }}
+          >
+            <FileText size={13} color="#38bdf8" />
+            <span>Datasheet (PDF)</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setAutoRotate(!autoRotate)}
@@ -755,6 +780,18 @@ export default function RvmHardwareModule3D({
           <div style={{ fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>RvmAiTech Custom Firmware</div>
         </div>
       </div>
+
+      {/* Datasheet Modal */}
+      {showDatasheet && (
+        <Suspense fallback={null}>
+          <HardwareDatasheetModal
+            isOpen={showDatasheet}
+            onClose={() => setShowDatasheet(false)}
+            variant={variant}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
+

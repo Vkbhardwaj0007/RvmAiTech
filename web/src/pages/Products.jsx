@@ -4,6 +4,8 @@ import client from '../api/client';
 import { PageHero } from './_hero.jsx';
 
 const RvmHardwareModule3D = lazy(() => import('../components/RvmHardwareModule3D'));
+const HardwareWiringGuide = lazy(() => import('../components/HardwareWiringGuide'));
+const RoiCalculator = lazy(() => import('../components/RoiCalculator'));
 const CAT_INTRO = {
   Datalogger: {
     title: 'Datalogger — The Edge of MDMS',
@@ -135,6 +137,11 @@ export default function Products() {
           </Suspense>
         </div>
 
+        {/* Hardware Wiring & Field Connection Guide */}
+        <Suspense fallback={null}>
+          <HardwareWiringGuide />
+        </Suspense>
+
         <div className="grid-3" style={{ marginTop: 26 }}>
           {items.map((p) => (
             <article className="card" key={p._id} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -170,6 +177,13 @@ export default function Products() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Interactive ROI & Downtime Savings Calculator */}
+        <div style={{ marginTop: '48px' }}>
+          <Suspense fallback={null}>
+            <RoiCalculator />
+          </Suspense>
         </div>
       </div></section>
     </>
