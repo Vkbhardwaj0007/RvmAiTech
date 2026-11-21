@@ -100,6 +100,16 @@ const DEFAULT_ZONES = [
   },
 ];
 
+// 6-Stage Vehicle Lifecycle Simulation Sequence
+const STAGES = [
+  { id: 0, short: 'Approach', title: '1. Approaching Entry Gate', desc: 'Vehicle approaches Gate 1 lane at 15 km/h. Optical proximity sensor triggers high-resolution surveillance loop.' },
+  { id: 1, short: 'ANPR Scan', title: '2. AI ANPR OCR License Scan', desc: 'White bullet camera fires AI bounding box & laser OCR beam, recognizing registration number with 99.4% confidence.' },
+  { id: 2, short: 'Barrier Lift', title: '3. Gate Barrier Lift & Ingress', desc: 'Security authorization confirmed. Automatic boom barrier lifts to 90 degrees. Inbound vehicle enters facility.' },
+  { id: 3, short: 'Slot Parked', title: '4. Wayfinding & Slot Occupied', desc: 'Vehicle follows illuminated green ground arrows into designated bay. AI slot sensor switches from Green (Available) to Red (Occupied).' },
+  { id: 4, short: 'Exit Nav', title: '5. Reverse Out & Exit Wayfinding', desc: 'Vehicle unparks from slot (bay returns to Green Available) and navigates via the outbound road to Exit Gate 2.' },
+  { id: 5, short: 'UPI Billing', title: '6. Automated Exit Billing & Departure', desc: 'Exit ANPR verifies session duration (45 mins). Real-time UPI QR code generated. Upon instant settlement, exit barrier opens for departure.' },
+];
+
 // Helper to generate deterministic SVG QR code
 function KioskQrSvg({ seed = 'RVMAITECH', accent = '#0d2649' }) {
   const cells = [];
@@ -391,7 +401,7 @@ export default function SmartParking3DSimulator() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(w, h, false);
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     host.innerHTML = '';
     host.appendChild(renderer.domElement);
 
@@ -442,6 +452,8 @@ export default function SmartParking3DSimulator() {
     const matGlass = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.95, roughness: 0.1, transparent: true, opacity: 0.65 });
     const matOrangeBarrier = new THREE.MeshStandardMaterial({ color: 0xf47b20, emissive: 0xf47b20, emissiveIntensity: 0.25, metalness: 0.4, roughness: 0.25 });
     const matArrowGreen = new THREE.MeshBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.85 });
+    const matKioskScreen = new THREE.MeshBasicMaterial({ color: 0x0284c7 });
+    const matExitScreen = new THREE.MeshBasicMaterial({ color: 0xf47b20 });
 
     // ----------------------------------------------------
     // 1. GROUND PLATFORM & MULTI-LANE ROADWAY (48m x 36m)

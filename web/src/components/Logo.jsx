@@ -46,7 +46,7 @@ export default function Logo({ dark = false }) {
         height={MARK_H}
         // The mark is above the fold in the header, so it should not be
         // deferred behind anything else.
-        fetchPriority="high"
+        fetchpriority="high"
         decoding="async"
       />
     </a>
